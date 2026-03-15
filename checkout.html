@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — LUXE</title>
+  <title>Checkout — LUXE India</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     .checkout-grid {
       display: grid;
       grid-template-columns: 1fr 380px;
-      gap: 3rem;
+      gap: 2.5rem;
       align-items: start;
     }
 
@@ -18,12 +18,12 @@
       background: var(--black-2);
       border: 1px solid var(--black-4);
       border-radius: var(--radius-lg);
-      padding: 2rem;
-      margin-bottom: 1.5rem;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
     }
 
     .checkout-card h3 {
-      font-size: 1.1rem;
+      font-size: 1rem;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--black-4);
@@ -32,60 +32,87 @@
       gap: 0.75rem;
     }
 
-    .checkout-card h3 .step {
+    .step-num {
       width: 28px; height: 28px;
       background: var(--gold);
       color: var(--black);
       border-radius: 50%;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
 
+    /* Payment options */
     .payment-option {
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 1rem;
+      padding: 1rem 1.25rem;
       background: var(--black-3);
-      border: 1px solid var(--black-4);
+      border: 1.5px solid var(--black-4);
       border-radius: var(--radius);
       margin-bottom: 0.75rem;
-      cursor: none;
-      transition: var(--transition-fast);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
     }
-
     .payment-option:hover { border-color: var(--gold-dim); }
     .payment-option.selected {
       border-color: var(--gold);
-      background: rgba(201,169,110,0.05);
+      background: rgba(201,169,110,0.06);
     }
-
+    .payment-option.selected::before {
+      content: '✓';
+      position: absolute; top: 0.75rem; right: 1rem;
+      color: var(--gold); font-size: 0.85rem; font-weight: 700;
+    }
     .payment-option input[type=radio] { accent-color: var(--gold); }
-
-    .payment-option .method-name {
-      font-size: 0.85rem;
-      color: var(--cream);
-      font-weight: 500;
+    .pay-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .pay-name { font-size: 0.88rem; font-weight: 600; color: var(--cream); }
+    .pay-desc { font-size: 0.72rem; color: var(--gray-3); margin-top: 0.15rem; }
+    .pay-popular {
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; background: var(--gold); color: var(--black);
+      padding: 0.15rem 0.5rem; border-radius: 20px; margin-left: 0.5rem;
     }
 
-    .payment-option .method-desc {
-      font-size: 0.75rem;
-      color: var(--gray-3);
+    /* Trust badges */
+    .trust-row {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+      padding: 1rem 0;
+      border-top: 1px solid var(--black-4);
+      margin-top: 0.75rem;
+    }
+    .trust-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: var(--gray-3);
+    }
+    .trust-item i { color: var(--gold); }
+
+    /* Delivery estimate badge */
+    .delivery-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; color: var(--green);
+      background: rgba(39,174,96,0.1);
+      border: 1px solid rgba(39,174,96,0.2);
+      border-radius: 20px; padding: 0.3rem 0.75rem;
+      margin-top: 0.5rem;
     }
 
-    @media (max-width: 900px) {
+    /* Pincode verify */
+    .pincode-row { display: flex; gap: 0.5rem; }
+    .pincode-row input { flex: 1; }
+    .pincode-status { font-size: 0.75rem; margin-top: 0.3rem; }
+    .pincode-status.ok  { color: var(--green); }
+    .pincode-status.err { color: var(--red); }
+
+    @media(max-width:900px){
       .checkout-grid { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
+      .form-row,.form-row-3 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -94,167 +121,300 @@
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 
-<nav class="nav scrolled" id="main-nav">
+<!-- NAV -->
+<nav class="nav scrolled" style="position:fixed;background:rgba(8,8,8,0.95);backdrop-filter:blur(20px)">
   <div class="nav__inner">
     <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
-    <!-- Checkout progress -->
-    <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem">
-      <span style="color:var(--gold)">Cart</span>
+
+    <!-- Checkout steps -->
+    <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.72rem">
+      <a href="cart.html" style="color:var(--gold)">🛒 Cart</a>
       <span style="color:var(--black-4)">→</span>
-      <span style="color:var(--cream);font-weight:500">Checkout</span>
+      <span style="color:var(--cream);font-weight:600">Checkout</span>
       <span style="color:var(--black-4)">→</span>
       <span style="color:var(--gray-3)">Confirmation</span>
     </div>
+
     <a href="cart.html" class="btn btn-ghost btn-sm">
-      <i class="fa fa-arrow-left"></i> Back to Cart
+      <i class="fa fa-arrow-left"></i> Cart pe wapas
     </a>
   </div>
 </nav>
 
-<div class="container" style="padding-top:calc(var(--nav-h) + 3rem);padding-bottom:6rem">
-  <div style="margin-bottom:2.5rem">
-    <h4>Almost there</h4>
-    <h1 style="font-size:clamp(2rem,4vw,3rem)">Checkout</h1>
+<div class="container" style="padding-top:calc(var(--nav-h) + 2.5rem);padding-bottom:5rem">
+
+  <div style="margin-bottom:2rem">
+    <h4>Last Step</h4>
+    <h1 style="font-size:clamp(1.8rem,3.5vw,2.8rem)">Checkout</h1>
     <div class="divider"></div>
   </div>
 
-  <form id="checkout-form">
+  <form id="checkout-form" onsubmit="return false">
     <div class="checkout-grid">
+
+      <!-- ══ LEFT SIDE ══ -->
       <div>
-        <!-- Contact Info -->
+
+        <!-- 1. Contact Info -->
         <div class="checkout-card">
-          <h3><span class="step">1</span> Contact Information</h3>
+          <h3><span class="step-num">1</span> Contact Information</h3>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <input class="form-input" type="text" name="full-name" placeholder="John Doe" required style="width:100%">
+              <label class="form-label">Full Name *</label>
+              <input class="form-input" type="text" name="full-name"
+                placeholder="Aapka poora naam" required style="width:100%">
             </div>
             <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input class="form-input" type="email" name="email" placeholder="john@example.com" required style="width:100%">
+              <label class="form-label">Mobile Number *</label>
+              <div style="position:relative">
+                <span style="position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);color:var(--gray-2);font-size:0.85rem;pointer-events:none">+91</span>
+                <input class="form-input" type="tel" name="phone"
+                  placeholder="10-digit mobile number"
+                  maxlength="10" required
+                  style="width:100%;padding-left:3rem"
+                  oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+              </div>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Phone Number</label>
-            <input class="form-input" type="tel" name="phone" placeholder="+1 (555) 000-0000" style="width:100%">
+            <label class="form-label">Email Address *</label>
+            <input class="form-input" type="email" name="email"
+              placeholder="order@example.com" required style="width:100%">
           </div>
         </div>
 
-        <!-- Shipping Address -->
+        <!-- 2. Delivery Address -->
         <div class="checkout-card">
-          <h3><span class="step">2</span> Shipping Address</h3>
+          <h3><span class="step-num">2</span> Delivery Address</h3>
+
+          <!-- Pincode first — auto-fill city/state -->
           <div class="form-group">
-            <label class="form-label">Street Address</label>
-            <input class="form-input" type="text" name="address" placeholder="123 Main Street, Apt 4B" required style="width:100%">
+            <label class="form-label">PIN Code *</label>
+            <div class="pincode-row">
+              <input class="form-input" type="text" name="pincode" id="pincode-input"
+                placeholder="6-digit PIN code" maxlength="6" required
+                oninput="this.value=this.value.replace(/\D/g,'').slice(0,6);checkPincode(this.value)">
+              <button type="button" class="btn btn-outline btn-sm" onclick="verifyPincode()"
+                style="white-space:nowrap">Verify</button>
+            </div>
+            <div class="pincode-status" id="pincode-status"></div>
           </div>
+
+          <div class="form-group">
+            <label class="form-label">House / Flat / Building *</label>
+            <input class="form-input" type="text" name="address-line1"
+              placeholder="Flat no., Building name" required style="width:100%">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Street / Area / Locality *</label>
+            <input class="form-input" type="text" name="address"
+              placeholder="Street name, Colony, Sector" required style="width:100%">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Landmark (optional)</label>
+            <input class="form-input" type="text" name="landmark"
+              placeholder="Near school, temple, mall..." style="width:100%">
+          </div>
+
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">City</label>
-              <input class="form-input" type="text" name="city" placeholder="New York" required style="width:100%">
+              <label class="form-label">City / Town *</label>
+              <input class="form-input" type="text" name="city"
+                placeholder="e.g. Mumbai" required id="city-input" style="width:100%">
             </div>
             <div class="form-group">
-              <label class="form-label">State / Province</label>
-              <input class="form-input" type="text" name="state" placeholder="NY" required style="width:100%">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">ZIP / Postal Code</label>
-              <input class="form-input" type="text" name="zip" placeholder="10001" required style="width:100%">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Country</label>
-              <select class="form-input" name="country" style="width:100%">
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="GB">United Kingdom</option>
-                <option value="AU">Australia</option>
-                <option value="IN">India</option>
-                <option value="DE">Germany</option>
-                <option value="FR">France</option>
+              <label class="form-label">State *</label>
+              <select class="form-input" name="state" id="state-input" required style="width:100%">
+                <option value="">Select State</option>
+                <option>Andhra Pradesh</option>
+                <option>Arunachal Pradesh</option>
+                <option>Assam</option>
+                <option>Bihar</option>
+                <option>Chhattisgarh</option>
+                <option>Goa</option>
+                <option>Gujarat</option>
+                <option>Haryana</option>
+                <option>Himachal Pradesh</option>
+                <option>Jharkhand</option>
+                <option>Karnataka</option>
+                <option>Kerala</option>
+                <option>Madhya Pradesh</option>
+                <option>Maharashtra</option>
+                <option>Manipur</option>
+                <option>Meghalaya</option>
+                <option>Mizoram</option>
+                <option>Nagaland</option>
+                <option>Odisha</option>
+                <option>Punjab</option>
+                <option>Rajasthan</option>
+                <option>Sikkim</option>
+                <option>Tamil Nadu</option>
+                <option>Telangana</option>
+                <option>Tripura</option>
+                <option>Uttar Pradesh</option>
+                <option>Uttarakhand</option>
+                <option>West Bengal</option>
+                <!-- Union Territories -->
+                <option>Andaman and Nicobar Islands</option>
+                <option>Chandigarh</option>
+                <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                <option>Delhi</option>
+                <option>Jammu and Kashmir</option>
+                <option>Ladakh</option>
+                <option>Lakshadweep</option>
+                <option>Puducherry</option>
               </select>
             </div>
           </div>
-        </div>
 
-        <!-- Payment Method -->
-        <div class="checkout-card">
-          <h3><span class="step">3</span> Payment Method</h3>
-
-          <label class="payment-option selected" onclick="selectPayment(this)">
-            <input type="radio" name="payment" value="cod" checked>
-            <div>
-              <div class="method-name">💵 Cash on Delivery</div>
-              <div class="method-desc">Pay when your order arrives</div>
-            </div>
-          </label>
-
-          <label class="payment-option" onclick="selectPayment(this)">
-            <input type="radio" name="payment" value="stripe">
-            <div>
-              <div class="method-name">💳 Credit / Debit Card</div>
-              <div class="method-desc">Visa, Mastercard, Amex — powered by Stripe</div>
-            </div>
-          </label>
-
-          <label class="payment-option" onclick="selectPayment(this)">
-            <input type="radio" name="payment" value="paypal">
-            <div>
-              <div class="method-name">🅿️ PayPal</div>
-              <div class="method-desc">Fast and secure PayPal checkout</div>
-            </div>
-          </label>
-
-          <div id="card-fields" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--black-4)">
-            <div class="form-group">
-              <label class="form-label">Card Number</label>
-              <input class="form-input" type="text" placeholder="1234 5678 9012 3456" maxlength="19" style="width:100%"
-                oninput="this.value=this.value.replace(/\D/g,'').replace(/(\d{4})/g,'$1 ').trim()">
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Expiry Date</label>
-                <input class="form-input" type="text" placeholder="MM / YY" maxlength="7" style="width:100%">
-              </div>
-              <div class="form-group">
-                <label class="form-label">CVV</label>
-                <input class="form-input" type="text" placeholder="123" maxlength="4" style="width:100%">
-              </div>
-            </div>
+          <!-- Delivery estimate -->
+          <div class="delivery-badge" id="delivery-estimate" style="display:none">
+            <i class="fa fa-truck"></i>
+            <span id="delivery-text">Delivery estimate loading...</span>
           </div>
         </div>
+
+        <!-- 3. Payment Method -->
+        <div class="checkout-card">
+          <h3><span class="step-num">3</span> Payment Method</h3>
+
+          <!-- UPI — Popular -->
+          <label class="payment-option selected" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="upi" checked>
+            <div class="pay-icon">📱</div>
+            <div>
+              <div class="pay-name">
+                UPI <span class="pay-popular">Most Popular</span>
+              </div>
+              <div class="pay-desc">GPay, PhonePe, Paytm, BHIM — instant & secure</div>
+            </div>
+          </label>
+
+          <!-- UPI ID input (shown when UPI selected) -->
+          <div id="upi-field" style="margin-bottom:0.75rem;padding:0 0.25rem">
+            <input type="text" class="form-input" placeholder="Enter UPI ID (e.g. name@upi)"
+              style="width:100%;font-size:0.85rem">
+            <div style="font-size:0.7rem;color:var(--gray-3);margin-top:0.3rem">
+              GPay, PhonePe, Paytm, BHIM, Amazon Pay — sab accept hote hain
+            </div>
+          </div>
+
+          <!-- Cards -->
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="card">
+            <div class="pay-icon">💳</div>
+            <div>
+              <div class="pay-name">Credit / Debit Card</div>
+              <div class="pay-desc">Visa, Mastercard, RuPay — all cards accepted</div>
+            </div>
+          </label>
+
+          <!-- Card fields -->
+          <div id="card-fields" style="display:none;margin-bottom:0.75rem;padding:0 0.25rem">
+            <div class="form-group">
+              <input class="form-input" type="text" placeholder="Card Number"
+                maxlength="19" style="width:100%;letter-spacing:2px"
+                oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19)">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+              <input class="form-input" type="text" placeholder="MM / YY" maxlength="7">
+              <input class="form-input" type="text" placeholder="CVV" maxlength="4">
+            </div>
+          </div>
+
+          <!-- Net Banking -->
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="netbanking">
+            <div class="pay-icon">🏦</div>
+            <div>
+              <div class="pay-name">Net Banking</div>
+              <div class="pay-desc">SBI, HDFC, ICICI, Axis, Kotak — all banks supported</div>
+            </div>
+          </label>
+
+          <!-- Wallets -->
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="wallet">
+            <div class="pay-icon">👛</div>
+            <div>
+              <div class="pay-name">Wallets</div>
+              <div class="pay-desc">Paytm, MobiKwik, Freecharge, Amazon Pay</div>
+            </div>
+          </label>
+
+          <!-- EMI -->
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="emi">
+            <div class="pay-icon">📅</div>
+            <div>
+              <div class="pay-name">No-Cost EMI</div>
+              <div class="pay-desc">3, 6, 9 month EMI on select cards — zero extra charges</div>
+            </div>
+          </label>
+
+          <!-- COD -->
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="cod">
+            <div class="pay-icon">💵</div>
+            <div>
+              <div class="pay-name">Cash on Delivery</div>
+              <div class="pay-desc" id="cod-desc">Delivery pe cash ya card dena hoga (+₹49 handling fee)</div>
+            </div>
+          </label>
+
+          <!-- Trust badges -->
+          <div class="trust-row">
+            <div class="trust-item"><i class="fa fa-lock"></i> 100% Secure Payment</div>
+            <div class="trust-item"><i class="fa fa-shield-alt"></i> SSL Encrypted</div>
+            <div class="trust-item"><i class="fa fa-undo"></i> Easy Returns</div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Order Summary (sidebar) -->
-      <div>
+      <!-- ══ RIGHT SIDE — Summary ══ -->
+      <div style="position:sticky;top:calc(var(--nav-h) + 1.5rem)">
         <div class="cart-summary">
           <h3>Order Summary</h3>
-          <div id="checkout-summary">
-            <!-- Rendered by JS -->
-          </div>
+          <div id="checkout-summary"><!-- Rendered by JS --></div>
 
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--black-4)">
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="place-order-btn">
-              🔒 Place Order
+              🔒 Order Place Karo
             </button>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.5rem">
-            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
-              <i class="fa fa-shield-alt" style="color:var(--gold)"></i>
-              SSL Encrypted &amp; Secure
-            </div>
-            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
-              <i class="fa fa-undo" style="color:var(--gold)"></i>
-              30-day hassle-free returns
-            </div>
-            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
+          <div style="text-align:center;margin-top:1rem;font-size:0.7rem;color:var(--gray-3)">
+            Order place karke aap hamare <a href="#" style="color:var(--gold)">Terms & Conditions</a>
+            se agree karte hain
+          </div>
+
+          <!-- Accepted payments strip -->
+          <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:1.25rem;flex-wrap:wrap">
+            <span style="background:var(--black-3);border:1px solid var(--black-4);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.7rem;color:var(--gray-3)">📱 UPI</span>
+            <span style="background:var(--black-3);border:1px solid var(--black-4);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.7rem;color:var(--gray-3)">💳 Cards</span>
+            <span style="background:var(--black-3);border:1px solid var(--black-4);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.7rem;color:var(--gray-3)">🏦 NetBanking</span>
+            <span style="background:var(--black-3);border:1px solid var(--black-4);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.7rem;color:var(--gray-3)">💵 COD</span>
+          </div>
+
+          <!-- Delivery info -->
+          <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.5rem">
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.73rem;color:var(--gray-3)">
               <i class="fa fa-truck" style="color:var(--gold)"></i>
-              Estimated delivery: 3–5 business days
+              Free delivery on orders above ₹999
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.73rem;color:var(--gray-3)">
+              <i class="fa fa-undo" style="color:var(--gold)"></i>
+              7-day easy return policy
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.73rem;color:var(--gray-3)">
+              <i class="fa fa-tag" style="color:var(--gold)"></i>
+              All prices include 18% GST
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </form>
 </div>
@@ -268,12 +428,81 @@
   initApp();
   initCheckoutPage();
 
+  // ── Payment select
   window.selectPayment = (el) => {
     document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
+    el.querySelector('input').checked = true;
     const val = el.querySelector('input').value;
-    document.getElementById('card-fields').style.display = val === 'stripe' ? 'block' : 'none';
+
+    document.getElementById('upi-field').style.display   = val === 'upi'  ? 'block' : 'none';
+    document.getElementById('card-fields').style.display = val === 'card' ? 'block' : 'none';
+
+    // Trigger cart.js to recalculate totals
+    if (typeof window._checkoutSelectPayment === 'function') window._checkoutSelectPayment(val);
   };
+
+  // ── PIN code check
+  window.checkPincode = (val) => {
+    const st = document.getElementById('pincode-status');
+    if (val.length === 6) {
+      st.className = 'pincode-status ok';
+      st.textContent = '✓ PIN code valid — "Verify" dabao to city auto-fill karo';
+    } else if (val.length > 0) {
+      st.className = 'pincode-status err';
+      st.textContent = 'PIN code 6 digits ka hona chahiye';
+    } else {
+      st.textContent = '';
+    }
+  };
+
+  // ── Verify pincode → auto fill city/state (using Postal API)
+  window.verifyPincode = async () => {
+    const pin = document.getElementById('pincode-input').value.trim();
+    const st  = document.getElementById('pincode-status');
+    if (pin.length !== 6) { st.className='pincode-status err'; st.textContent='6-digit PIN daalo'; return; }
+
+    st.textContent = '⏳ Verifying...'; st.className = 'pincode-status';
+
+    try {
+      const res  = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      const data = await res.json();
+
+      if (data[0].Status === 'Success') {
+        const po = data[0].PostOffice[0];
+        document.getElementById('city-input').value  = po.District;
+        document.getElementById('state-input').value = po.State;
+
+        st.className = 'pincode-status ok';
+        st.textContent = `✅ ${po.Name}, ${po.District}, ${po.State}`;
+
+        // Show delivery estimate
+        const metros = ['Mumbai','Delhi','Bengaluru','Hyderabad','Chennai','Kolkata','Pune','Ahmedabad','Noida','Surat','Jaipur'];
+        const isMetro = metros.some(m => po.District.toLowerCase().includes(m.toLowerCase()));
+        const today = new Date();
+        const add   = (d, n) => { const x=new Date(d); x.setDate(d.getDate()+n); return x.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); };
+        const min   = isMetro ? 2 : 4;
+        const max   = isMetro ? 4 : 7;
+
+        const badge = document.getElementById('delivery-estimate');
+        document.getElementById('delivery-text').textContent =
+          `Estimated Delivery: ${add(today,min)} – ${add(today,max)}${isMetro?' (Metro City)':''}`;
+        badge.style.display = 'inline-flex';
+      } else {
+        st.className = 'pincode-status err';
+        st.textContent = '❌ Invalid PIN code. Please check and retry.';
+      }
+    } catch {
+      st.className = 'pincode-status err';
+      st.textContent = '⚠ Could not verify — please fill city/state manually.';
+    }
+  };
+
+  // Auto verify when 6 digits typed
+  document.getElementById('pincode-input').addEventListener('input', e => {
+    if (e.target.value.length === 6) verifyPincode();
+  });
 </script>
+
 </body>
 </html>

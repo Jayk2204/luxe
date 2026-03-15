@@ -202,7 +202,10 @@ export function showToast(title, msg, type = 'info', duration = 3500) {
 
 // ── FORMAT HELPERS ────────────────────────────────────────
 export function formatCurrency(n) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n || 0);
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency', currency: 'INR',
+    minimumFractionDigits: 0, maximumFractionDigits: 0,
+  }).format(Math.round(n || 0));
 }
 
 export function formatDate(ts) {
