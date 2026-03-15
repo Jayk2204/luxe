@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Seeder — LUXE Admin</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Syne',sans-serif;background:#070b12;color:#e2e8f0;min-height:100vh;padding:2rem}
+    a{color:inherit;text-decoration:none}
+
+    /* ── Layout ── */
+    .page-header{margin-bottom:2rem}
+    .page-header h1{font-size:2rem;font-weight:800}
+    .page-header h1 span{color:#3b82f6}
+    .page-header p{font-size:0.85rem;color:#475569;margin-top:0.4rem;line-height:1.7}
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start}
+
+    /* ── Cards ── */
+    .card{background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;margin-bottom:1rem}
+    .card-head{padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.07);font-size:0.85rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:0.5rem}
+    .card-body{padding:1.25rem}
+
+    /* ── Product Grid ── */
+    .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.75rem}
+    .prod-card{background:#131920;border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
+    .prod-card:hover{transform:translateY(-3px);border-color:rgba(59,130,246,0.3)}
+    .prod-card.st-done{border-color:rgba(16,185,129,0.4)}
+    .prod-card.st-error{border-color:rgba(239,68,68,0.4)}
+    .prod-card.st-uploading{border-color:rgba(59,130,246,0.4)}
+
+    .prod-img-wrap{position:relative;aspect-ratio:3/4;overflow:hidden;background:#1a2332}
+    .prod-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;display:block}
+    .prod-card:hover .prod-img-wrap img{transform:scale(1.06)}
+
+    .prod-status{position:absolute;top:6px;left:6px;font-size:0.55rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:20px;white-space:nowrap}
+    .s-pending  {background:rgba(71,85,105,0.8);color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+    .s-uploading{background:rgba(59,130,246,0.25);color:#60a5fa;border:1px solid rgba(59,130,246,0.4);animation:blink 1s infinite}
+    .s-done     {background:rgba(16,185,129,0.25);color:#34d399;border:1px solid rgba(16,185,129,0.4)}
+    .s-error    {background:rgba(239,68,68,0.25);color:#f87171;border:1px solid rgba(239,68,68,0.4)}
+
+    .prod-info{padding:0.65rem 0.75rem}
+    .prod-name{font-size:0.75rem;font-weight:700;color:#f1f5f9;line-height:1.3;margin-bottom:0.2rem}
+    .prod-cat{font-size:0.6rem;color:#475569;text-transform:uppercase;letter-spacing:0.1em}
+    .prod-price{font-size:0.78rem;font-weight:700;color:#10b981;font-family:'JetBrains Mono',monospace;margin-top:0.3rem}
+    .prod-size{font-size:0.6rem;color:#334155;font-family:'JetBrains Mono',monospace;margin-top:0.1rem}
+
+    /* ── Controls ── */
+    label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#475569;margin-bottom:0.4rem}
+    input,select{width:100%;background:#131920;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#f1f5f9;font-size:0.85rem;padding:0.6rem 0.9rem;outline:none;font-family:'Syne',sans-serif;margin-bottom:1rem}
+    input:focus,select:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+
+    .btn{width:100%;padding:0.85rem;border:none;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.25s;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.75rem}
+    .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important}
+    .btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover:not(:disabled){background:#2563eb;transform:translateY(-2px)}
+    .btn-danger {background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,0.3)}.btn-danger:hover:not(:disabled){background:rgba(239,68,68,0.1)}
+    .btn-success{background:#10b981;color:#fff}.btn-success:hover:not(:disabled){background:#059669;transform:translateY(-2px)}
+    .btn-amber  {background:transparent;color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}.btn-amber:hover:not(:disabled){background:rgba(245,158,11,0.1)}
+
+    /* ── Stats ── */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem}
+    .stat-box{background:#131920;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.75rem;text-align:center}
+    .stat-val{font-size:1.5rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
+    .stat-lbl{font-size:0.58rem;color:#475569;text-transform:uppercase;letter-spacing:0.1em;margin-top:0.2rem}
+
+    /* ── Progress ── */
+    .prog-wrap{background:#131920;border-radius:6px;height:6px;overflow:hidden;margin:1rem 0}
+    .prog-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#06b6d4);border-radius:6px;width:0%;transition:width 0.4s cubic-bezier(0.4,0,0.2,1)}
+
+    /* ── Log ── */
+    #log{background:#040608;border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:1rem;height:240px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:2}
+    .l-i{color:#60a5fa}.l-s{color:#34d399}.l-e{color:#f87171}.l-d{color:#c9a96e;font-weight:700}
+
+    /* ── Misc ── */
+    .info-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:0.85rem 1rem;font-size:0.8rem;color:#60a5fa;margin-bottom:1rem;line-height:1.7}
+    .warn-box{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:0.85rem 1rem;font-size:0.8rem;color:#fbbf24;margin-bottom:1rem;line-height:1.7}
+
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div style="max-width:1350px;margin:0 auto">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h1>🌱 Product Image <span>Seeder</span></h1>
+        <p>16 relevant fashion products with small optimized images (≈ 40–120 KB each).<br>
+           ImgBB pe upload → Firestore mein save → website pe live!</p>
+      </div>
+      <a href="products.html"
+        style="background:#0d1117;border:1px solid rgba(255,255,255,0.08);color:#94a3b8;font-size:0.8rem;padding:0.6rem 1.2rem;border-radius:8px;display:flex;align-items:center;gap:0.5rem">
+        ← Products Page
+      </a>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ── LEFT: Product Preview Grid ── -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          📦 16 Products Preview
+          <span id="prog-label" style="font-size:0.72rem;color:#475569">0 / 16 complete</span>
+        </div>
+        <div class="card-body">
+          <div class="prog-wrap"><div class="prog-fill" id="prog-bar"></div></div>
+          <div class="prod-grid" id="prod-grid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Controls ── -->
+    <div style="position:sticky;top:1.5rem">
+
+      <!-- API Key -->
+      <div class="card">
+        <div class="card-head">🔑 ImageBB API Key</div>
+        <div class="card-body">
+          <div class="info-box">
+            <strong>Free account pe:</strong><br>
+            • Unlimited uploads<br>
+            • Images permanently hosted<br>
+            • Max 32MB — but hum 40–120 KB images use kar rahe hain ✅
+          </div>
+          <label>Your ImageBB API Key</label>
+          <input type="text" id="api-key"
+            placeholder="Paste key here..."
+            oninput="saveKey(this.value)">
+          <a href="https://api.imgbb.com/" target="_blank"
+            style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.78rem;color:#3b82f6;margin-top:-0.5rem;margin-bottom:1rem">
+            👉 Get Free Key at api.imgbb.com ↗
+          </a>
+
+          <div class="warn-box" id="key-warn" style="display:none">
+            ⚠️ API key nahi hai — direct Unsplash URLs save honge (no ImgBB upload).
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card">
+        <div class="card-body" style="padding:1rem">
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-val" id="s-done" style="color:#10b981">0</div>
+              <div class="stat-lbl">Saved</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val" id="s-fail" style="color:#ef4444">0</div>
+              <div class="stat-lbl">Failed</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val" id="s-skip" style="color:#f59e0b">0</div>
+              <div class="stat-lbl">Skipped</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-head">⚡ Actions</div>
+        <div class="card-body">
+          <button class="btn btn-primary" id="seed-btn" onclick="seedAll()">
+            🚀 Seed All 16 Products
+          </button>
+          <button class="btn btn-amber" id="imgonly-btn" onclick="seedImgOnly()">
+            🖼️ Update Images Only (existing)
+          </button>
+          <button class="btn btn-danger" id="del-btn" onclick="deleteAll()">
+            🗑️ Delete All &amp; Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="card">
+        <div class="card-head">
+          📋 Live Log
+          <button onclick="document.getElementById('log').innerHTML=''"
+            style="background:none;border:none;color:#475569;font-size:0.72rem;cursor:pointer;font-family:'Syne',sans-serif">
+            Clear
+          </button>
+        </div>
+        <div id="log"><span class="l-i">ℹ Ready — press Seed button to start!</span><br></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs,
+  deleteDoc, doc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── Firebase ──────────────────────────────────────────────
+const app = initializeApp({
+  apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+  authDomain:        "shopzz-ca17e.firebaseapp.com",
+  projectId:         "shopzz-ca17e",
+  storageBucket:     "shopzz-ca17e.firebasestorage.app",
+  messagingSenderId: "158388352339",
+  appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6"
+});
+const db = getFirestore(app);
+
+// ══════════════════════════════════════════════════════════
+// 16 PRODUCTS
+// Images: Unsplash w=400&q=75 → ~40–100 KB per image
+// Each category has its own relevant photo
+// ══════════════════════════════════════════════════════════
+const PRODUCTS = [
+
+  // ── JACKETS ───────────────────────────────────────────
+  {
+    name: "Obsidian Noir Jacket",
+    category: "Jackets",
+    price: 289, originalPrice: 389,
+    description: "A masterpiece of refined craftsmanship. Every stitch tells a story of luxury and intention — designed for those who know true style is never accidental.",
+    rating: 4.8, reviews: 124, badge: "New",
+    emoji: "🧥", stock: 15, featured: true,
+    tags: ["jacket","leather","luxury","outerwear"],
+    sizes: ["XS","S","M","L","XL","XXL"],
+    // Black leather jacket — exact relevant image
+    mainImg: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1520975954732-35dd22299614?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── DRESSES ───────────────────────────────────────────
+  {
+    name: "Silk Reverie Dress",
+    category: "Dresses",
+    price: 199, originalPrice: 299,
+    description: "Flowing silk that moves like a second skin. Designed for evenings that demand nothing less than perfection.",
+    rating: 4.9, reviews: 203, badge: "Sale",
+    emoji: "👗", stock: 22, featured: true,
+    tags: ["dress","silk","evening","luxury"],
+    sizes: ["XS","S","M","L","XL"],
+    // Elegant evening dress
+    mainImg: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── BLAZERS ───────────────────────────────────────────
+  {
+    name: "Velvet Dusk Blazer",
+    category: "Blazers",
+    price: 349, originalPrice: null,
+    description: "Rich velvet, architectural cut. The blazer that turns every entrance into a statement of pure confidence.",
+    rating: 4.6, reviews: 87, badge: null,
+    emoji: "🪭", stock: 8, featured: true,
+    tags: ["blazer","velvet","formal","luxury"],
+    sizes: ["XS","S","M","L","XL","XXL"],
+    // Blazer / structured jacket
+    mainImg: "https://images.unsplash.com/photo-1594938298603-c8148c4b4f57?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── TOPS ──────────────────────────────────────────────
+  {
+    name: "Aurum Knit Sweater",
+    category: "Tops",
+    price: 149, originalPrice: 199,
+    description: "Hand-knit from premium merino wool. Effortless warmth without sacrificing elegance.",
+    rating: 4.5, reviews: 341, badge: "Sale",
+    emoji: "🧶", stock: 30, featured: true,
+    tags: ["sweater","knitwear","casual","merino"],
+    sizes: ["XS","S","M","L","XL","XXL"],
+    // Cozy knit sweater
+    mainImg: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1512327428865-8e4e1b2f2baf?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── SUITS ─────────────────────────────────────────────
+  {
+    name: "Graphite Linen Suit",
+    category: "Suits",
+    price: 599, originalPrice: null,
+    description: "Tailored from the finest Italian linen. Where the boardroom meets avant-garde. A suit that speaks before you do.",
+    rating: 4.9, reviews: 78, badge: "New",
+    emoji: "👔", stock: 7, featured: true,
+    tags: ["suit","linen","formal","italian","luxury"],
+    sizes: ["S","M","L","XL","XXL"],
+    // Men's suit - sharp tailored
+    mainImg: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── ACCESSORIES ───────────────────────────────────────
+  {
+    name: "Bronzed Leather Belt",
+    category: "Accessories",
+    price: 89, originalPrice: null,
+    description: "Full-grain leather with an aged brass buckle. The finishing touch that every curated outfit deserves.",
+    rating: 4.7, reviews: 420, badge: "Hot",
+    emoji: "👜", stock: 50, featured: true,
+    tags: ["belt","leather","accessories","brass"],
+    sizes: ["S","M","L","XL"],
+    // Leather belt/accessories flat lay
+    mainImg: "https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── TOPS 2 ────────────────────────────────────────────
+  {
+    name: "Ivory Crepe Blouse",
+    category: "Tops",
+    price: 115, originalPrice: 150,
+    description: "Fluid crepe in timeless ivory. Effortless, refined, endlessly versatile — from desk to dinner.",
+    rating: 4.4, reviews: 190, badge: null,
+    emoji: "👘", stock: 25, featured: false,
+    tags: ["blouse","crepe","casual","ivory"],
+    sizes: ["XS","S","M","L","XL"],
+    // White/ivory elegant blouse
+    mainImg: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── COATS ─────────────────────────────────────────────
+  {
+    name: "Midnight Trench Coat",
+    category: "Coats",
+    price: 459, originalPrice: null,
+    description: "A classic reborn in midnight black. Structured shoulders, dramatic length. Zero compromise on style.",
+    rating: 4.7, reviews: 56, badge: "Hot",
+    emoji: "🧥", stock: 5, featured: false,
+    tags: ["coat","trench","outerwear","classic"],
+    sizes: ["XS","S","M","L","XL","XXL"],
+    // Trench coat
+    mainImg: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1543087903-1ac2364e7988?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── DRESSES 2 ─────────────────────────────────────────
+  {
+    name: "Onyx Wrap Dress",
+    category: "Dresses",
+    price: 175, originalPrice: 240,
+    description: "A body-conscious wrap silhouette in deep onyx. Flattering on every figure, unforgettable at every occasion.",
+    rating: 4.7, reviews: 156, badge: "Sale",
+    emoji: "👗", stock: 18, featured: true,
+    tags: ["dress","wrap","black","evening"],
+    sizes: ["XS","S","M","L"],
+    // Black wrap dress
+    mainImg: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── TOPS 3 ────────────────────────────────────────────
+  {
+    name: "Cobalt Oxford Shirt",
+    category: "Tops",
+    price: 98, originalPrice: null,
+    description: "Crisp cotton Oxford in electric cobalt. The shirt that makes minimalism feel exciting.",
+    rating: 4.3, reviews: 231, badge: null,
+    emoji: "👕", stock: 40, featured: false,
+    tags: ["shirt","oxford","casual","cotton"],
+    sizes: ["XS","S","M","L","XL","XXL"],
+    // Oxford / casual shirt
+    mainImg: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── COATS 2 ───────────────────────────────────────────
+  {
+    name: "Camel Wool Overcoat",
+    category: "Coats",
+    price: 520, originalPrice: 680,
+    description: "Timeless camel wool. Heavyweight warmth, featherweight elegance. The coat that outlasts every trend.",
+    rating: 4.8, reviews: 94, badge: "Sale",
+    emoji: "🧥", stock: 9, featured: true,
+    tags: ["coat","wool","camel","winter","luxury"],
+    sizes: ["S","M","L","XL"],
+    // Camel / tan overcoat
+    mainImg: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1559551409-dadc959f76b8?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── TOPS 4 ────────────────────────────────────────────
+  {
+    name: "Pearl Satin Camisole",
+    category: "Tops",
+    price: 79, originalPrice: null,
+    description: "Liquid satin in lustrous pearl. Wears under a blazer as effortlessly as it does on its own at midnight.",
+    rating: 4.5, reviews: 178, badge: "New",
+    emoji: "👘", stock: 35, featured: false,
+    tags: ["camisole","satin","pearl","elegant"],
+    sizes: ["XS","S","M","L"],
+    // Satin top / cami
+    mainImg: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── SUITS 2 ───────────────────────────────────────────
+  {
+    name: "Noir Wide-Leg Trousers",
+    category: "Suits",
+    price: 189, originalPrice: 249,
+    description: "Fluid wide-leg silhouette in jet noir. Palazzo-inspired proportions with a modern power-dressing edge.",
+    rating: 4.6, reviews: 112, badge: "Sale",
+    emoji: "👖", stock: 20, featured: true,
+    tags: ["trousers","wide-leg","formal","noir"],
+    sizes: ["XS","S","M","L","XL"],
+    // Wide leg trousers / formal pants
+    mainImg: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── ACCESSORIES 2 ─────────────────────────────────────
+  {
+    name: "Cognac Leather Tote",
+    category: "Accessories",
+    price: 245, originalPrice: null,
+    description: "Hand-stitched Italian leather in warm cognac. Spacious enough for your world. Elegant enough for any stage.",
+    rating: 4.9, reviews: 67, badge: "New",
+    emoji: "👜", stock: 12, featured: true,
+    tags: ["bag","tote","leather","cognac","italian"],
+    sizes: ["One Size"],
+    // Leather tote bag
+    mainImg: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=533&fit=crop&q=75",
+    extraImgs: [
+      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=533&fit=crop&q=75"
+    ]
+  },
+
+  // ── SUITS 3 ───────────────────────────────────────────
+  {
+    name: "Bordeaux Velvet Suit",
+    category: "Suits",
+    price: 649, originalPrice: null,
+    description: "Deep bordeaux velvet tailored to perfection. Reserved for those who understand that dressing is truly an art form.",
+    rating: 4.8, reviews: 43, badge: "Hot",
+    emoji: "🪭", stock: 6, featured: true,
+    tags: ["suit","velvet","bordeaux","luxury","evening"],
+    sizes: ["XS","S","M","L","XL"],
+    // Deep coloured velvet suit
+    mainImg: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+
+  // ── DRESSES 3 ─────────────────────────────────────────
+  {
+    name: "Sculptural Mini Dress",
+    category: "Dresses",
+    price: 229, originalPrice: 310,
+    description: "Architectural silhouette in structured ivory. Worn by those who treat every outfit as a creative statement.",
+    rating: 4.7, reviews: 88, badge: "Sale",
+    emoji: "👗", stock: 14, featured: true,
+    tags: ["dress","mini","sculptural","ivory","editorial"],
+    sizes: ["XS","S","M","L"],
+    // Structured/sculptural fashion dress
+    mainImg: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=533&fit=crop&q=75",
+    extraImgs: []
+  },
+];
+
+// ══════════════════════════════════════════════════════════
+// RENDER PREVIEW CARDS
+// ══════════════════════════════════════════════════════════
+function renderCards() {
+  document.getElementById('prod-grid').innerHTML = PRODUCTS.map((p, i) => `
+    <div class="prod-card" id="pc-${i}">
+      <div class="prod-img-wrap">
+        <img
+          src="${p.mainImg}"
+          alt="${p.name}"
+          loading="lazy"
+          onerror="this.src='https://placehold.co/400x533/131920/3b82f6?text=📦'"
+        >
+        <div class="prod-status s-pending" id="st-${i}">Pending</div>
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-cat">${p.category}</div>
+        <div class="prod-price">
+          $${p.price}
+          ${p.originalPrice ? `<span style="text-decoration:line-through;color:#334155;font-size:0.68rem;margin-left:0.3rem">$${p.originalPrice}</span>` : ''}
+        </div>
+        <div class="prod-size">${p.sizes.slice(0,4).join(' · ')}</div>
+      </div>
+    </div>`).join('');
+}
+
+renderCards();
+
+// Load saved key
+const saved = localStorage.getItem('imgbb_key') || '';
+if (saved) document.getElementById('api-key').value = saved;
+checkKey(saved);
+
+// ── API KEY ───────────────────────────────────────────────
+window.saveKey = v => { localStorage.setItem('imgbb_key', v.trim()); checkKey(v.trim()); };
+function checkKey(v) {
+  document.getElementById('key-warn').style.display = v ? 'none' : 'block';
+}
+
+// ── LOGGING ───────────────────────────────────────────────
+function log(msg, t = 'i') {
+  const el   = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = 'l-' + t;
+  line.textContent = { s:'✓ ', e:'✗ ', i:'ℹ ', d:'★ ★ ' }[t] + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(i, cls, txt) {
+  const el = document.getElementById('st-' + i);
+  if (!el) return;
+  el.className = 'prod-status ' + cls;
+  el.textContent = txt;
+  const card = document.getElementById('pc-' + i);
+  if (card) {
+    card.className = `prod-card st-${cls === 's-done' ? 'done' : cls === 's-error' ? 'error' : cls === 's-uploading' ? 'uploading' : ''}`;
+  }
+}
+
+function setProgress(done, total) {
+  const pct = Math.round(done / total * 100);
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${done} / ${total} complete`;
+  document.getElementById('s-done').textContent = done;
+}
+
+// ══════════════════════════════════════════════════════════
+// IMGBB UPLOAD — by URL (no file download needed!)
+// ImgBB accepts an image URL directly — instant & small size
+// ══════════════════════════════════════════════════════════
+async function uploadToImgBB(imageUrl, apiKey) {
+  const fd = new FormData();
+  fd.append('key', apiKey);
+  fd.append('image', imageUrl); // ImgBB accepts URL as "image" param
+
+  const res  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
+  const json = await res.json();
+
+  if (!json.success) {
+    throw new Error(json.error?.message || `ImgBB error: ${JSON.stringify(json)}`);
+  }
+
+  return {
+    url:    json.data.url,           // full size
+    thumb:  json.data.thumb?.url || json.data.medium?.url || json.data.url,
+    size:   json.data.size,
+    width:  json.data.width,
+    height: json.data.height,
+  };
+}
+
+// ══════════════════════════════════════════════════════════
+// SEED ALL
+// ══════════════════════════════════════════════════════════
+window.seedAll = async function () {
+  const apiKey  = (document.getElementById('api-key').value.trim()) || localStorage.getItem('imgbb_key') || '';
+  const useImgBB= !!apiKey;
+
+  // Disable all buttons
+  ['seed-btn','imgonly-btn','del-btn'].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById('seed-btn').textContent = '⏳ Seeding...';
+  document.getElementById('s-fail').textContent   = '0';
+  document.getElementById('s-skip').textContent   = '0';
+
+  log(`Starting seed — ${useImgBB ? '✅ ImgBB upload ON' : '⚠ Direct URL mode (no ImgBB key)'}`, 'i');
+  log(`16 products with optimized images (~40–120KB each)`, 'i');
+
+  let done = 0, failed = 0;
+
+  for (let i = 0; i < PRODUCTS.length; i++) {
+    const p = PRODUCTS[i];
+    setStatus(i, 's-uploading', useImgBB ? 'Uploading...' : 'Saving...');
+
+    try {
+      let finalMainImg  = p.mainImg;
+      let finalAllImgs  = [p.mainImg, ...p.extraImgs];
+
+      // ── Upload main image to ImgBB ──
+      if (useImgBB) {
+        log(`[${i+1}/16] Uploading "${p.name}" → ImgBB...`, 'i');
+        try {
+          const result   = await uploadToImgBB(p.mainImg, apiKey);
+          finalMainImg   = result.url;
+          finalAllImgs   = [result.url];
+          const kb       = result.size ? Math.round(result.size / 1024) : '?';
+          log(`✓ ImgBB done — ${kb} KB — ${result.width}×${result.height}`, 's');
+
+          // Also upload extra images if any
+          for (const extraUrl of p.extraImgs) {
+            try {
+              const er = await uploadToImgBB(extraUrl, apiKey);
+              finalAllImgs.push(er.url);
+            } catch { finalAllImgs.push(extraUrl); } // fallback to original
+          }
+        } catch (upErr) {
+          log(`ImgBB failed for "${p.name}" → using Unsplash URL. Reason: ${upErr.message}`, 'e');
+          // keep original URLs
+        }
+        await new Promise(r => setTimeout(r, 500)); // ImgBB rate limit
+      } else {
+        log(`[${i+1}/16] Saving "${p.name}" with Unsplash URL`, 'i');
+      }
+
+      // ── Build Firestore document ──
+      const docData = {
+        name:        p.name,
+        category:    p.category,
+        price:       p.price,
+        description: p.description,
+        rating:      p.rating,
+        reviews:     p.reviews,
+        badge:       p.badge   || null,
+        emoji:       p.emoji,
+        stock:       p.stock,
+        featured:    p.featured,
+        tags:        p.tags,
+        sizes:       p.sizes,
+        images:      finalAllImgs,
+        imageUrl:    finalMainImg,   // primary image
+        active:      true,
+        sales:       0,
+        views:       0,
+        createdAt:   serverTimestamp(),
+      };
+
+      // Remove nulls
+      Object.keys(docData).forEach(k => { if (docData[k] === null) delete docData[k]; });
+      if (p.originalPrice) docData.originalPrice = p.originalPrice;
+
+      await addDoc(collection(db, 'products'), docData);
+      done++;
+      setStatus(i, 's-done', '✓ Done');
+      setProgress(done, PRODUCTS.length);
+      log(`Saved: "${p.name}" — ${p.category} — $${p.price}`, 's');
+
+    } catch (err) {
+      failed++;
+      setStatus(i, 's-error', '✗ Error');
+      document.getElementById('s-fail').textContent = failed;
+      log(`Error "${p.name}": ${err.message}`, 'e');
+      console.error(err);
+    }
+
+    // Small delay between Firestore writes
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // ── Done ──
+  log(``, 'i');
+  log(`COMPLETE! ${done} saved · ${failed} failed`, 'd');
+
+  const btn = document.getElementById('seed-btn');
+  btn.textContent   = failed === 0 ? '✅ All 16 Seeded!' : `⚠ Done (${failed} errors)`;
+  btn.style.background = failed === 0 ? '#10b981' : '#f59e0b';
+
+  ['imgonly-btn','del-btn'].forEach(id => document.getElementById(id).disabled = false);
+  setTimeout(() => {
+    btn.disabled         = false;
+    btn.textContent      = '🚀 Seed All 16 Products';
+    btn.style.background = '';
+  }, 5000);
+};
+
+// ══════════════════════════════════════════════════════════
+// UPDATE IMAGES ONLY (existing products without images)
+// ══════════════════════════════════════════════════════════
+window.seedImgOnly = async function () {
+  const apiKey = (document.getElementById('api-key').value.trim()) || localStorage.getItem('imgbb_key') || '';
+  const btn    = document.getElementById('imgonly-btn');
+  btn.disabled = true; btn.textContent = '⏳ Fixing images...';
+  log('Fetching existing products from Firestore...', 'i');
+
+  try {
+    const snap  = await getDocs(collection(db, 'products'));
+    const docs  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    let updated = 0;
+
+    for (const d of docs) {
+      if (d.images && d.images.length > 0) { continue; } // skip — already has images
+
+      // Find matching product data
+      const match = PRODUCTS.find(p =>
+        p.name.toLowerCase().trim() === (d.name || '').toLowerCase().trim()
+      ) || PRODUCTS.find(p =>
+        p.category === d.category
+      );
+
+      if (!match) continue;
+
+      let imgUrl = match.mainImg;
+
+      if (apiKey) {
+        try {
+          const r = await uploadToImgBB(match.mainImg, apiKey);
+          imgUrl  = r.url;
+          await new Promise(r => setTimeout(r, 500));
+        } catch { /* use unsplash fallback */ }
+      }
+
+      await updateDoc(doc(db, 'products', d.id), {
+        imageUrl: imgUrl,
+        images:   [imgUrl],
+      });
+      updated++;
+      log(`Fixed: "${d.name}"`, 's');
+    }
+
+    log(`Fixed images for ${updated} products.`, 'd');
+  } catch (e) { log('Error: ' + e.message, 'e'); }
+  finally { btn.disabled = false; btn.textContent = '🖼️ Update Images Only (existing)'; }
+};
+
+// ══════════════════════════════════════════════════════════
+// DELETE ALL
+// ══════════════════════════════════════════════════════════
+window.deleteAll = async function () {
+  if (!confirm('Saare products delete karna chahte ho? Ye undo nahi hoga!')) return;
+  const btn = document.getElementById('del-btn');
+  btn.disabled = true; btn.textContent = '⏳ Deleting...';
+  log('Deleting all products...', 'i');
+
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    let n = 0;
+    for (const d of snap.docs) {
+      await deleteDoc(doc(db, 'products', d.id));
+      n++;
+    }
+    log(`Deleted ${n} products. Database is now empty.`, 'd');
+    setProgress(0, PRODUCTS.length);
+    document.getElementById('s-done').textContent = '0';
+    document.getElementById('s-fail').textContent = '0';
+    renderCards(); // reset status badges
+  } catch (e) { log('Error: ' + e.message, 'e'); }
+  finally { btn.disabled = false; btn.textContent = '🗑️ Delete All & Reset'; }
+};
+
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .success-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .success-card {
+      max-width: 560px;
+      width: 100%;
+      background: var(--black-2);
+      border: 1px solid var(--black-4);
+      border-radius: var(--radius-lg);
+      padding: 4rem 3rem;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.8s both;
+    }
+
+    .success-card::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,169,110,0.1);
+      pointer-events: none;
+    }
+
+    .success-icon {
+      width: 80px; height: 80px;
+      background: rgba(39,174,96,0.15);
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 2rem;
+      animation: pulse-gold 2s ease-in-out infinite;
+    }
+
+    .order-id {
+      background: var(--black-3);
+      border: 1px solid var(--black-4);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-accent);
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      flex: 1;
+      min-width: 70px;
+    }
+
+    .step-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--black);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--gold);
+      margin-top: 15px;
+      max-width: 50px;
+    }
+
+    .step-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav class="nav scrolled">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <a href="index.html" class="btn btn-ghost btn-sm">
+      <i class="fa fa-home"></i> Back to Store
+    </a>
+  </div>
+</nav>
+
+<div class="success-page">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+
+    <h4>Order Placed</h4>
+    <h2 style="margin:0.75rem 0 0.5rem">Thank You!</h2>
+    <p>Your order has been confirmed and is being prepared.</p>
+
+    <div class="order-id" id="order-id-display">
+      ORDER #<span id="order-id-text">LOADING…</span>
+    </div>
+
+    <p style="font-size:0.82rem;color:var(--gray-3);margin-bottom:1.5rem">
+      A confirmation email will be sent to your inbox. You can track your order status from your account.
+    </p>
+
+    <!-- Progress Steps -->
+    <div style="display:flex;align-items:center;justify-content:center;margin:1.5rem 0">
+      <div class="step-item">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Confirmed</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-dot" style="background:var(--black-4);color:var(--gray-3);border:1px solid var(--black-4)">2</div>
+        <div class="step-label">Processing</div>
+      </div>
+      <div class="step-line" style="background:var(--black-4)"></div>
+      <div class="step-item">
+        <div class="step-dot" style="background:var(--black-4);color:var(--gray-3);border:1px solid var(--black-4)">3</div>
+        <div class="step-label">Shipped</div>
+      </div>
+      <div class="step-line" style="background:var(--black-4)"></div>
+      <div class="step-item">
+        <div class="step-dot" style="background:var(--black-4);color:var(--gray-3);border:1px solid var(--black-4)">4</div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+      <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+      <a href="index.html" class="btn btn-outline">Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+
+<script type="module">
+  import { initApp } from './js/app.js';
+  initApp();
+
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (id) {
+    document.getElementById('order-id-text').textContent = id.slice(-8).toUpperCase();
+    document.title = `Order #${id.slice(-8).toUpperCase()} Confirmed — LUXE`;
+  } else {
+    document.getElementById('order-id-text').textContent = '—';
+  }
+</script>
+</body>
+</html>

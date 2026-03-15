@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Shop</a></li>
+    </ul>
+    <div class="nav__actions">
+      <button class="nav__icon-btn" id="search-btn"><i class="fa fa-search"></i></button>
+      <a href="auth.html" class="nav__icon-btn"><i class="fa fa-user"></i></a>
+      <a href="cart.html" class="nav__icon-btn active" style="border-color:var(--gold);color:var(--gold)">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge"></span>
+      </a>
+      <button class="nav__burger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu__overlay"></div>
+<div class="mobile-menu">
+  <button class="mobile-menu__close">✕</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Shop</a>
+    <a href="auth.html">Account</a>
+  </nav>
+</div>
+
+<div class="cart-page container">
+  <div style="margin-bottom:2.5rem">
+    <h4>Your Selection</h4>
+    <h1 style="font-size:clamp(2rem,4vw,3rem)">Shopping Cart</h1>
+    <div class="divider"></div>
+    <span id="cart-count-label" style="font-size:0.85rem;color:var(--gray-3)"></span>
+  </div>
+
+  <div class="cart-grid">
+    <!-- Items -->
+    <div>
+      <div id="cart-items">
+        <!-- Rendered by JS -->
+        <div style="text-align:center;padding:3rem">
+          <div class="spin" style="display:inline-block;width:24px;height:24px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+        <a href="products.html" class="btn btn-ghost">
+          <i class="fa fa-arrow-left"></i> Continue Shopping
+        </a>
+        <button onclick="LocalCart.clear(); location.reload()" class="btn btn-ghost"
+          style="font-size:0.75rem;color:var(--gray-3)">
+          Clear Cart
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="cart-summary">
+      <h3>Order Summary</h3>
+      <div id="cart-summary-body">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="promo-input">
+        <input type="text" id="promo-input" placeholder="Promo code" class="form-input">
+        <button class="btn btn-outline btn-sm" id="apply-promo">Apply</button>
+      </div>
+
+      <div style="font-size:0.72rem;color:var(--gray-3);margin-bottom:1rem">
+        Try: LUXE10, WELCOME, VIP20
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" id="checkout-btn">
+        🔒 Proceed to Checkout
+      </button>
+
+      <div style="display:flex;justify-content:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap">
+        <span style="font-size:0.7rem;color:var(--gray-3);display:flex;align-items:center;gap:0.4rem">
+          <i class="fa fa-lock" style="color:var(--gold)"></i> Secure Checkout
+        </span>
+        <span style="font-size:0.7rem;color:var(--gray-3);display:flex;align-items:center;gap:0.4rem">
+          <i class="fa fa-undo" style="color:var(--gold)"></i> 30-Day Returns
+        </span>
+        <span style="font-size:0.7rem;color:var(--gray-3);display:flex;align-items:center;gap:0.4rem">
+          <i class="fa fa-truck" style="color:var(--gold)"></i> Free over $100
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2025 LUXE. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container"></div>
+
+<div class="search-overlay">
+  <div class="search-overlay__inner">
+    <div class="search-input-wrap">
+      <input type="text" placeholder="Search products…" autocomplete="off">
+      <button class="search-close">✕</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initApp, LocalCart } from './js/app.js';
+  import { initCartPage }       from './js/cart.js';
+
+  initApp();
+  initCartPage();
+
+  // Expose LocalCart for inline onclick
+  window.LocalCart = LocalCart;
+</script>
+</body>
+</html>

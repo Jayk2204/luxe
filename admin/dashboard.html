@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — LUXE Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar + Topbar injected by JS -->
+
+  <!-- MAIN -->
+  <main class="main-content" id="main-content" style="display:none">
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card fade-in stagger-1" style="--accent:var(--blue);--icon-bg:var(--blue-glow)">
+        <div class="stat-card__header">
+          <div class="stat-card__icon">💰</div>
+          <span class="stat-card__trend trend-up" id="rev-trend">↑ 12%</span>
+        </div>
+        <div class="stat-card__value" id="stat-revenue">$—</div>
+        <div class="stat-card__label">Total Revenue</div>
+        <div class="stat-card__bar"><div class="stat-card__bar-fill" id="bar-rev" style="width:0%"></div></div>
+      </div>
+
+      <div class="stat-card fade-in stagger-2" style="--accent:var(--green);--icon-bg:var(--green-dim)">
+        <div class="stat-card__header">
+          <div class="stat-card__icon">🛒</div>
+          <span class="stat-card__trend trend-up" id="ord-trend">↑ 8%</span>
+        </div>
+        <div class="stat-card__value" id="stat-orders">—</div>
+        <div class="stat-card__label">Total Orders</div>
+        <div class="stat-card__bar"><div class="stat-card__bar-fill" style="width:0%;background:var(--green)" id="bar-ord"></div></div>
+      </div>
+
+      <div class="stat-card fade-in stagger-3" style="--accent:var(--purple);--icon-bg:rgba(139,92,246,0.15)">
+        <div class="stat-card__header">
+          <div class="stat-card__icon">👥</div>
+          <span class="stat-card__trend trend-up">↑ 24%</span>
+        </div>
+        <div class="stat-card__value" id="stat-users">—</div>
+        <div class="stat-card__label">Registered Users</div>
+        <div class="stat-card__bar"><div class="stat-card__bar-fill" style="width:0%;background:var(--purple)" id="bar-usr"></div></div>
+      </div>
+
+      <div class="stat-card fade-in stagger-4" style="--accent:var(--amber);--icon-bg:var(--amber-dim)">
+        <div class="stat-card__header">
+          <div class="stat-card__icon">📦</div>
+          <span class="stat-card__trend trend-down">— 2%</span>
+        </div>
+        <div class="stat-card__value" id="stat-products">—</div>
+        <div class="stat-card__label">Active Products</div>
+        <div class="stat-card__bar"><div class="stat-card__bar-fill" style="width:0%;background:var(--amber)" id="bar-prod"></div></div>
+      </div>
+    </div>
+
+    <!-- Charts + Quick Actions Row -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:1.25rem;margin-bottom:1.25rem">
+
+      <!-- Revenue Chart -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <span class="card-title"><i class="fa fa-chart-bar" style="color:var(--blue)"></i> Revenue Overview</span>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-sm btn-outline active-period" data-period="week">Week</button>
+            <button class="btn btn-sm btn-outline" data-period="month">Month</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-3);margin-bottom:1rem" id="chart-label">
+            Last 7 days
+          </div>
+          <div class="chart-bars" id="revenue-chart"></div>
+          <div style="height:1.4rem"></div><!-- space for labels -->
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <span class="card-title">⚡ Quick Actions</span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem">
+          <a href="products.html?action=add" class="btn btn-primary" style="justify-content:center">
+            <i class="fa fa-plus"></i> Add New Product
+          </a>
+          <a href="orders.html" class="btn btn-outline" style="justify-content:center">
+            <i class="fa fa-shopping-bag"></i> View All Orders
+          </a>
+          <a href="users.html" class="btn btn-outline" style="justify-content:center">
+            <i class="fa fa-users"></i> Manage Users
+          </a>
+          <a href="../seed.html" target="_blank" class="btn btn-outline" style="justify-content:center;border-color:rgba(245,158,11,0.3);color:var(--amber)">
+            <i class="fa fa-seedling"></i> Seed Products
+          </a>
+
+          <div style="border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.25rem">
+            <div style="font-size:0.7rem;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem">
+              Order Status
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem" id="order-status-summary"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders + Top Products -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+      <!-- Recent Orders -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <span class="card-title"><i class="fa fa-receipt" style="color:var(--green)"></i> Recent Orders</span>
+          <a href="orders.html" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-orders-body">
+              <tr><td colspan="4" style="text-align:center;padding:2rem">
+                <div class="spin-anim" style="display:inline-block;width:20px;height:20px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;"></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Users -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <span class="card-title"><i class="fa fa-user-plus" style="color:var(--purple)"></i> New Users</span>
+          <a href="users.html" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody id="recent-users-body">
+              <tr><td colspan="4" style="text-align:center;padding:2rem">
+                <div class="spin-anim" style="display:inline-block;width:20px;height:20px;border:2px solid var(--purple);border-top-color:transparent;border-radius:50%;"></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container"></div>
+
+<script type="module">
+  import {
+    requireAdmin, adminLogout, getDashboardStats,
+    getOrders, getUsers, formatCurrency, formatDate, statusBadge,
+    showToast, setActiveSidebarLink
+  } from './js/admin-firebase.js';
+  import { injectLayout } from './js/admin-layout.js';
+
+  injectLayout('Dashboard');
+
+  requireAdmin(async (user, profile) => {
+    // Set user info
+    const name = profile.displayName || user.email;
+    document.getElementById('sidebar-user-name').textContent = name;
+    document.getElementById('sidebar-avatar').textContent = name.charAt(0).toUpperCase();
+
+    setActiveSidebarLink();
+
+    // Logout
+    document.getElementById('logout-btn')?.addEventListener('click', async e => {
+      e.preventDefault();
+      await adminLogout();
+    });
+
+    // Show content
+    document.getElementById('main-content').style.display = 'block';
+
+    // Load stats
+    try {
+      const stats = await getDashboardStats();
+
+      // Animate numbers
+      animateNumber('stat-revenue', stats.revenue, v => formatCurrency(v));
+      animateNumber('stat-orders',  stats.orders,   v => Math.round(v));
+      animateNumber('stat-users',   stats.users,    v => Math.round(v));
+      animateNumber('stat-products',stats.products, v => Math.round(v));
+
+      // Bars (relative to max)
+      setTimeout(() => {
+        document.getElementById('bar-rev').style.width  = '72%';
+        document.getElementById('bar-ord').style.width  = '58%';
+        document.getElementById('bar-usr').style.width  = '84%';
+        document.getElementById('bar-prod').style.width = '45%';
+      }, 300);
+
+      // Sidebar counts
+      el('sb-products-count', stats.products);
+      el('sb-orders-count',   stats.orders);
+      el('sb-users-count',    stats.users);
+
+    } catch (err) {
+      showToast('Warning', 'Could not load stats. Check Firestore rules.', 'warning');
+    }
+
+    // Revenue chart (demo bars — replace with real data if needed)
+    const chartData = [
+      {val:'$420', h:45}, {val:'$680', h:62}, {val:'$530', h:52},
+      {val:'$890', h:80}, {val:'$720', h:68}, {val:'$950', h:88},
+      {val:'$1.1k', h:100, highlight:true}
+    ];
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const chartEl = document.getElementById('revenue-chart');
+    if (chartEl) {
+      chartEl.innerHTML = chartData.map((d, i) => `
+        <div class="chart-bar ${d.highlight ? 'highlight' : ''}"
+          style="height:${d.h}%" data-val="${days[i]}"
+          title="${d.val}">
+        </div>`).join('');
+    }
+
+    // Recent orders
+    try {
+      const orders = await getOrders(6);
+      const tbody  = document.getElementById('recent-orders-body');
+      if (!orders.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-state__icon">🛒</div><p>No orders yet</p></div></td></tr>`;
+      } else {
+        tbody.innerHTML = orders.map(o => `
+          <tr>
+            <td><span style="font-family:var(--mono);font-size:0.75rem;color:var(--blue)">#${o.id.slice(-6).toUpperCase()}</span></td>
+            <td><strong>${o.userEmail || o.shippingAddress?.name || '—'}</strong></td>
+            <td><strong>${formatCurrency(o.total)}</strong></td>
+            <td>${statusBadge(o.status)}</td>
+          </tr>`).join('');
+      }
+
+      // Order status summary
+      const statusCount = {};
+      orders.forEach(o => { statusCount[o.status] = (statusCount[o.status]||0)+1; });
+      const statusEl = document.getElementById('order-status-summary');
+      if (statusEl) {
+        statusEl.innerHTML = Object.entries(statusCount).map(([s,c]) => `
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem">
+            <span>${statusBadge(s)}</span>
+            <span style="color:var(--text-2);font-family:var(--mono)">${c}</span>
+          </div>`).join('') || '<div style="font-size:0.8rem;color:var(--text-3)">No orders yet</div>';
+      }
+    } catch {}
+
+    // Recent users
+    try {
+      const users = await getUsers(6);
+      const tbody = document.getElementById('recent-users-body');
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:2rem"><div class="empty-state__icon">👥</div><p>No users yet</p></div></td></tr>`;
+      } else {
+        tbody.innerHTML = users.map(u => `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.6rem">
+                <div class="user-avatar-sm">${(u.displayName||u.email||'U').charAt(0).toUpperCase()}</div>
+                <strong>${u.displayName || 'User'}</strong>
+              </div>
+            </td>
+            <td style="font-size:0.78rem">${u.email || '—'}</td>
+            <td>${u.role === 'admin'
+              ? '<span class="badge badge-blue">Admin</span>'
+              : '<span class="badge badge-gray">Customer</span>'}</td>
+            <td style="font-size:0.75rem;font-family:var(--mono)">${formatDate(u.createdAt)}</td>
+          </tr>`).join('');
+      }
+    } catch {}
+  });
+
+  function el(id, val) {
+    const e = document.getElementById(id);
+    if (e) e.textContent = val;
+  }
+
+  function animateNumber(id, target, format) {
+    const el   = document.getElementById(id);
+    if (!el) return;
+    const start = 0;
+    const dur   = 1200;
+    const begin = performance.now();
+
+    function step(now) {
+      const p = Math.min((now - begin) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = format(start + (target - start) * ease);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LUXE — Premium Fashion & Lifestyle Store. Discover curated luxury pieces for the discerning individual.">
+  <title>LUXE — Premium Fashion Store</title>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- ══════════════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════════════ -->
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+
+    <ul class="nav__links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="products.html">Shop</a></li>
+      <li><a href="products.html?cat=New">New In</a></li>
+      <li><a href="products.html?cat=Sale">Sale</a></li>
+      <li><a href="#">Collections</a></li>
+    </ul>
+
+    <div class="nav__actions">
+      <button class="nav__icon-btn" id="search-btn" title="Search (Ctrl+K)">
+        <i class="fa fa-search"></i>
+      </button>
+      <a href="auth.html" class="nav__icon-btn" id="nav-login-link" title="Account">
+        <i class="fa fa-user"></i>
+      </a>
+      <a href="#" class="nav__icon-btn hidden" id="nav-profile-link" title="My Account">
+        <i class="fa fa-user-circle"></i>
+      </a>
+      <a href="cart.html" class="nav__icon-btn" title="Cart">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu__overlay"></div>
+<div class="mobile-menu">
+  <button class="mobile-menu__close">✕</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Shop</a>
+    <a href="products.html?cat=New">New In</a>
+    <a href="products.html?cat=Sale">Sale</a>
+    <a href="auth.html">Account</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+  <div style="margin-top:3rem">
+    <div style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem">Follow Us</div>
+    <div class="footer__social">
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-pinterest"></i></a>
+      <a href="#"><i class="fab fa-tiktok"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__grid-lines"></div>
+
+  <div class="hero__inner container">
+    <div class="hero__content">
+      <div class="hero__eyebrow">New Collection 2025</div>
+      <h1 class="hero__title">
+        <span class="line">Wear</span>
+        <span class="line">Your</span>
+        <span class="line">Truth.</span>
+      </h1>
+      <p class="hero__desc">
+        Curated luxury pieces for those who understand that true style is never accidental. Every garment, a statement.
+      </p>
+      <div class="hero__actions">
+        <a href="products.html" class="btn btn-primary btn-lg">
+          <i class="fa fa-arrow-right"></i> Shop Collection
+        </a>
+        <button class="btn btn-ghost btn-lg" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
+          Explore ↓
+        </button>
+      </div>
+    </div>
+
+    <div class="hero__image-wrap">
+      <div class="hero__image-frame">
+        <div class="hero__placeholder">✦</div>
+      </div>
+      <div class="hero__image-tag">
+        <div class="tag-label">Featured</div>
+        <div class="tag-val">New Arrivals</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="hero__scroll">
+    <div class="hero__scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     MARQUEE STRIP
+══════════════════════════════════════════════════ -->
+<div class="marquee-strip">
+  <div class="marquee-strip__inner">
+    <!-- Duplicated for seamless loop -->
+    <span class="marquee-strip__item">Free Shipping Over $100</span>
+    <span class="marquee-strip__item">New Collection Drop</span>
+    <span class="marquee-strip__item">Exclusive Members-Only Sale</span>
+    <span class="marquee-strip__item">Handcrafted Luxury</span>
+    <span class="marquee-strip__item">30-Day Free Returns</span>
+    <span class="marquee-strip__item">Sustainably Sourced</span>
+    <span class="marquee-strip__item">Free Shipping Over $100</span>
+    <span class="marquee-strip__item">New Collection Drop</span>
+    <span class="marquee-strip__item">Exclusive Members-Only Sale</span>
+    <span class="marquee-strip__item">Handcrafted Luxury</span>
+    <span class="marquee-strip__item">30-Day Free Returns</span>
+    <span class="marquee-strip__item">Sustainably Sourced</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CATEGORIES
+══════════════════════════════════════════════════ -->
+<section class="section" id="categories">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__left">
+        <h4>Curated For You</h4>
+        <h2 class="reveal">Shop by Category</h2>
+        <div class="divider"></div>
+      </div>
+      <a href="products.html" class="btn btn-ghost reveal reveal-delay-2">
+        All Categories <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="categories-grid">
+      <div class="cat-item reveal" data-href="products.html?cat=Jackets">
+        <div class="cat-item__bg" style="background:linear-gradient(135deg,#1a1a1a,#0a0a0a)"></div>
+        <div class="cat-item__overlay"></div>
+        <div class="cat-item__emoji">🧥</div>
+        <div class="cat-item__content">
+          <div class="cat-item__label">Outerwear</div>
+          <div class="cat-item__name">Jackets &amp; Coats</div>
+          <a href="products.html?cat=Jackets" class="cat-item__link">
+            Explore <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-item reveal reveal-delay-1" data-href="products.html?cat=Dresses">
+        <div class="cat-item__bg" style="background:linear-gradient(135deg,#1f1a1a,#0a0a0a)"></div>
+        <div class="cat-item__overlay"></div>
+        <div class="cat-item__emoji">👗</div>
+        <div class="cat-item__content">
+          <div class="cat-item__label">Feminine</div>
+          <div class="cat-item__name">Dresses</div>
+          <a href="products.html?cat=Dresses" class="cat-item__link">
+            Explore <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-item reveal reveal-delay-2" data-href="products.html?cat=Accessories">
+        <div class="cat-item__bg" style="background:linear-gradient(135deg,#1a1a15,#0a0a0a)"></div>
+        <div class="cat-item__overlay"></div>
+        <div class="cat-item__emoji">👜</div>
+        <div class="cat-item__content">
+          <div class="cat-item__label">Complete the Look</div>
+          <div class="cat-item__name">Accessories</div>
+          <a href="products.html?cat=Accessories" class="cat-item__link">
+            Explore <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-item reveal reveal-delay-3" data-href="products.html?cat=Suits">
+        <div class="cat-item__bg" style="background:linear-gradient(135deg,#151a1a,#0a0a0a)"></div>
+        <div class="cat-item__overlay"></div>
+        <div class="cat-item__emoji">👔</div>
+        <div class="cat-item__content">
+          <div class="cat-item__label">Tailored</div>
+          <div class="cat-item__name">Suits &amp; Blazers</div>
+          <a href="products.html?cat=Suits" class="cat-item__link">
+            Explore <i class="fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FEATURED PRODUCTS
+══════════════════════════════════════════════════ -->
+<section class="section" id="featured" style="background:var(--black-2);border-top:1px solid var(--black-4)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__left">
+        <h4>Handpicked</h4>
+        <h2 class="reveal">Featured Pieces</h2>
+        <div class="divider"></div>
+      </div>
+      <a href="products.html" class="btn btn-ghost reveal reveal-delay-2">
+        View All <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="products-grid" id="featured-grid">
+      <!-- Loaded by JS -->
+      <div class="product-card">
+        <div class="product-card__img-wrap"><div class="skeleton" style="width:100%;aspect-ratio:3/4;"></div></div>
+        <div class="product-card__info"><div class="skeleton" style="height:14px;width:80%;margin:0.5rem 0"></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card__img-wrap"><div class="skeleton" style="width:100%;aspect-ratio:3/4;"></div></div>
+        <div class="product-card__info"><div class="skeleton" style="height:14px;width:80%;margin:0.5rem 0"></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card__img-wrap"><div class="skeleton" style="width:100%;aspect-ratio:3/4;"></div></div>
+        <div class="product-card__info"><div class="skeleton" style="height:14px;width:80%;margin:0.5rem 0"></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card__img-wrap"><div class="skeleton" style="width:100%;aspect-ratio:3/4;"></div></div>
+        <div class="product-card__info"><div class="skeleton" style="height:14px;width:80%;margin:0.5rem 0"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     BRAND STATEMENT
+══════════════════════════════════════════════════ -->
+<section class="section text-center" style="padding:7rem 0; background:var(--black)">
+  <div class="container" style="max-width:900px">
+    <h4 class="reveal">Our Philosophy</h4>
+    <h2 class="reveal reveal-delay-1" style="font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.15;margin:1.5rem 0">
+      "Luxury is not about price.<br>
+      <em style="color:var(--gold)">It's about intention."</em>
+    </h2>
+    <div class="divider reveal reveal-delay-2" style="margin:2rem auto;"></div>
+    <p class="reveal reveal-delay-3" style="max-width:550px;margin:0 auto 2.5rem;font-size:1rem;line-height:2">
+      Every piece in our collection is selected by hand — crafted from exceptional materials, designed to transcend seasons and trends.
+    </p>
+    <a href="products.html" class="btn btn-outline btn-lg reveal reveal-delay-4">Discover The Collection</a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     STATS / TRUST
+══════════════════════════════════════════════════ -->
+<section class="section-sm" style="background:var(--black-3);border-top:1px solid var(--black-4);border-bottom:1px solid var(--black-4)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center">
+      <div class="reveal">
+        <div style="font-family:var(--font-display);font-size:3rem;color:var(--gold);line-height:1">12K+</div>
+        <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-top:0.5rem">Happy Clients</div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div style="font-family:var(--font-display);font-size:3rem;color:var(--gold);line-height:1">500+</div>
+        <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-top:0.5rem">Curated Pieces</div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div style="font-family:var(--font-display);font-size:3rem;color:var(--gold);line-height:1">48</div>
+        <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-top:0.5rem">Countries Served</div>
+      </div>
+      <div class="reveal reveal-delay-3">
+        <div style="font-family:var(--font-display);font-size:3rem;color:var(--gold);line-height:1">4.9★</div>
+        <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-top:0.5rem">Average Rating</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     NEW ARRIVALS
+══════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--black-2)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__left">
+        <h4>Just Dropped</h4>
+        <h2 class="reveal">New Arrivals</h2>
+        <div class="divider"></div>
+      </div>
+      <a href="products.html?cat=New" class="btn btn-ghost reveal reveal-delay-2">
+        See All New <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="products-grid" id="new-arrivals-grid">
+      <!-- Loaded by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     NEWSLETTER
+══════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--black);overflow:hidden">
+  <div class="container">
+    <div style="position:relative;background:var(--black-2);border:1px solid var(--black-4);border-radius:var(--radius-lg);padding:5rem;text-align:center;overflow:hidden">
+      <!-- Decorative circles -->
+      <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(201,169,110,0.08);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;border:1px solid rgba(201,169,110,0.05);pointer-events:none"></div>
+
+      <div style="position:relative;z-index:1">
+        <h4 class="reveal">Stay in the loop</h4>
+        <h2 class="reveal reveal-delay-1" style="margin:1rem 0">Join the Inner Circle</h2>
+        <p class="reveal reveal-delay-2" style="max-width:450px;margin:0 auto 2.5rem">
+          Be the first to know about new collections, exclusive offers, and private events. No spam — ever.
+        </p>
+        <form class="reveal reveal-delay-3" id="newsletter-form"
+          style="display:flex;gap:0.75rem;max-width:460px;margin:0 auto"
+          onsubmit="handleNewsletter(event)">
+          <input type="email" placeholder="Your email address" class="form-input" required style="flex:1">
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+        </form>
+        <p style="font-size:0.72rem;color:var(--gray-3);margin-top:1rem">
+          By subscribing you agree to our Privacy Policy. Unsubscribe at any time.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <span class="nav__logo">LU<span>X</span>E</span>
+        <p>Redefining luxury for the modern age. Every piece curated with intention, crafted with care.</p>
+        <div class="footer__social" style="margin-top:1.5rem">
+          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" title="Pinterest"><i class="fab fa-pinterest"></i></a>
+          <a href="#" title="TikTok"><i class="fab fa-tiktok"></i></a>
+          <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+
+      <div class="footer__col">
+        <h5>Shop</h5>
+        <ul class="footer__links">
+          <li><a href="products.html">All Products</a></li>
+          <li><a href="products.html?cat=New">New Arrivals</a></li>
+          <li><a href="products.html?cat=Sale">Sale</a></li>
+          <li><a href="products.html?cat=Jackets">Jackets</a></li>
+          <li><a href="products.html?cat=Accessories">Accessories</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h5>Help</h5>
+        <ul class="footer__links">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns &amp; Exchanges</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h5>Newsletter</h5>
+        <p style="margin-bottom:1rem">Get 10% off your first order when you join.</p>
+        <form class="footer__newsletter-form" onsubmit="handleNewsletter(event)">
+          <input type="email" placeholder="Email address" class="form-input" required style="flex:1;font-size:0.8rem">
+          <button type="submit" class="btn btn-primary btn-sm">Join</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2025 LUXE. All rights reserved. Designed with ♥</div>
+      <div style="display:flex;gap:1.5rem">
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Privacy Policy</a>
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Terms of Service</a>
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Search Overlay -->
+<div class="search-overlay">
+  <div class="search-overlay__inner">
+    <div class="search-input-wrap">
+      <input type="text" placeholder="Search products…" id="search-input" autocomplete="off">
+      <button class="search-close">✕</button>
+    </div>
+    <div class="search-suggestions">
+      <h5>Popular Searches</h5>
+      <div>
+        <span class="search-tag" onclick="setSearch('Jacket')">🧥 Jacket</span>
+        <span class="search-tag" onclick="setSearch('Dress')">👗 Dress</span>
+        <span class="search-tag" onclick="setSearch('Blazer')">🪭 Blazer</span>
+        <span class="search-tag" onclick="setSearch('Accessories')">👜 Accessories</span>
+        <span class="search-tag" onclick="setSearch('Sale')">🏷️ Sale</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════ -->
+<script type="module">
+  import { initApp, showToast } from './js/app.js';
+  import { fetchFeatured, renderProductGrid, renderSkeletons } from './js/products.js';
+  import { observeAuth, updateNavForUser } from './js/auth.js';
+
+  // Init global app
+  initApp();
+
+  // Observe auth state
+  observeAuth(user => updateNavForUser(user));
+
+  // Load featured products
+  async function loadFeatured() {
+    const grid = document.getElementById('featured-grid');
+    if (!grid) return;
+    renderSkeletons(grid, 4);
+    try {
+      const products = await fetchFeatured(4);
+      if (products.length) {
+        renderProductGrid(grid, products);
+      } else {
+        // Show demo cards when Firebase is not yet configured
+        grid.innerHTML = getDemoCards();
+      }
+    } catch {
+      grid.innerHTML = getDemoCards();
+    }
+  }
+
+  // Load new arrivals (reuse featured for demo)
+  async function loadNewArrivals() {
+    const grid = document.getElementById('new-arrivals-grid');
+    if (!grid) return;
+    try {
+      const products = await fetchFeatured(4);
+      if (products.length) {
+        renderProductGrid(grid, products.slice(0, 4));
+      } else {
+        grid.innerHTML = getDemoCards(4);
+      }
+    } catch {
+      grid.innerHTML = getDemoCards(4);
+    }
+  }
+
+  function getDemoCards(count = 4) {
+    const demos = [
+      { id:'d1', name:'Obsidian Noir Jacket',  category:'Jackets',     price:289, originalPrice:389, rating:4.8, reviews:124, badge:'New',  emoji:'🧥' },
+      { id:'d2', name:'Velvet Dusk Blazer',    category:'Blazers',     price:349, originalPrice:null,rating:4.6, reviews:87,  badge:null,    emoji:'🪭' },
+      { id:'d3', name:'Silk Reverie Dress',    category:'Dresses',     price:199, originalPrice:299, rating:4.9, reviews:203, badge:'Sale',  emoji:'👗' },
+      { id:'d4', name:'Aurum Knit Sweater',    category:'Tops',        price:149, originalPrice:199, rating:4.5, reviews:341, badge:'Sale',  emoji:'🧶' },
+      { id:'d5', name:'Graphite Linen Suit',   category:'Suits',       price:599, originalPrice:null,rating:4.9, reviews:78,  badge:'New',   emoji:'👔' },
+      { id:'d6', name:'Bronzed Leather Belt',  category:'Accessories', price:89,  originalPrice:null,rating:4.7, reviews:420, badge:'Hot',   emoji:'👜' },
+    ];
+    import('./js/products.js').then(m => {
+      import('./js/app.js').then(app => {
+        const grid4 = document.getElementById('featured-grid');
+        const grid5 = document.getElementById('new-arrivals-grid');
+        if (grid4 && grid4.innerHTML.includes('getDemoCards')) {
+          m.renderProductGrid(grid4, demos.slice(0, count));
+        }
+        if (grid5 && grid5.innerHTML === '') {
+          m.renderProductGrid(grid5, demos.slice(0, count));
+        }
+      });
+    });
+    return '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--gray-3)">Connecting to Firebase... Add your config in firebase-config.js</div>';
+  }
+
+  loadFeatured();
+  loadNewArrivals();
+
+  // Category click
+  document.querySelectorAll('.cat-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const href = item.dataset.href;
+      if (href) window.location.href = href;
+    });
+  });
+
+  // Search tag helper
+  window.setSearch = (val) => {
+    document.getElementById('search-input').value = val;
+    window.location.href = `products.html?q=${val}`;
+  };
+
+  // Newsletter handler
+  window.handleNewsletter = (e) => {
+    e.preventDefault();
+    const email = e.target.querySelector('input[type=email]').value;
+    showToast({ title: '🎉 Subscribed!', msg: `Welcome! We'll be in touch at ${email}`, type: 'success' });
+    e.target.reset();
+  };
+</script>
+
+</body>
+</html>

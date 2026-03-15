@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .checkout-card {
+      background: var(--black-2);
+      border: 1px solid var(--black-4);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .checkout-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--black-4);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .checkout-card h3 .step {
+      width: 28px; height: 28px;
+      background: var(--gold);
+      color: var(--black);
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--black-3);
+      border: 1px solid var(--black-4);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      cursor: none;
+      transition: var(--transition-fast);
+    }
+
+    .payment-option:hover { border-color: var(--gold-dim); }
+    .payment-option.selected {
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.05);
+    }
+
+    .payment-option input[type=radio] { accent-color: var(--gold); }
+
+    .payment-option .method-name {
+      font-size: 0.85rem;
+      color: var(--cream);
+      font-weight: 500;
+    }
+
+    .payment-option .method-desc {
+      font-size: 0.75rem;
+      color: var(--gray-3);
+    }
+
+    @media (max-width: 900px) {
+      .checkout-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav class="nav scrolled" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <!-- Checkout progress -->
+    <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem">
+      <span style="color:var(--gold)">Cart</span>
+      <span style="color:var(--black-4)">→</span>
+      <span style="color:var(--cream);font-weight:500">Checkout</span>
+      <span style="color:var(--black-4)">→</span>
+      <span style="color:var(--gray-3)">Confirmation</span>
+    </div>
+    <a href="cart.html" class="btn btn-ghost btn-sm">
+      <i class="fa fa-arrow-left"></i> Back to Cart
+    </a>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:calc(var(--nav-h) + 3rem);padding-bottom:6rem">
+  <div style="margin-bottom:2.5rem">
+    <h4>Almost there</h4>
+    <h1 style="font-size:clamp(2rem,4vw,3rem)">Checkout</h1>
+    <div class="divider"></div>
+  </div>
+
+  <form id="checkout-form">
+    <div class="checkout-grid">
+      <div>
+        <!-- Contact Info -->
+        <div class="checkout-card">
+          <h3><span class="step">1</span> Contact Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" type="text" name="full-name" placeholder="John Doe" required style="width:100%">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input class="form-input" type="email" name="email" placeholder="john@example.com" required style="width:100%">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input class="form-input" type="tel" name="phone" placeholder="+1 (555) 000-0000" style="width:100%">
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="checkout-card">
+          <h3><span class="step">2</span> Shipping Address</h3>
+          <div class="form-group">
+            <label class="form-label">Street Address</label>
+            <input class="form-input" type="text" name="address" placeholder="123 Main Street, Apt 4B" required style="width:100%">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <input class="form-input" type="text" name="city" placeholder="New York" required style="width:100%">
+            </div>
+            <div class="form-group">
+              <label class="form-label">State / Province</label>
+              <input class="form-input" type="text" name="state" placeholder="NY" required style="width:100%">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">ZIP / Postal Code</label>
+              <input class="form-input" type="text" name="zip" placeholder="10001" required style="width:100%">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Country</label>
+              <select class="form-input" name="country" style="width:100%">
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="AU">Australia</option>
+                <option value="IN">India</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="checkout-card">
+          <h3><span class="step">3</span> Payment Method</h3>
+
+          <label class="payment-option selected" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="cod" checked>
+            <div>
+              <div class="method-name">💵 Cash on Delivery</div>
+              <div class="method-desc">Pay when your order arrives</div>
+            </div>
+          </label>
+
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="stripe">
+            <div>
+              <div class="method-name">💳 Credit / Debit Card</div>
+              <div class="method-desc">Visa, Mastercard, Amex — powered by Stripe</div>
+            </div>
+          </label>
+
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="payment" value="paypal">
+            <div>
+              <div class="method-name">🅿️ PayPal</div>
+              <div class="method-desc">Fast and secure PayPal checkout</div>
+            </div>
+          </label>
+
+          <div id="card-fields" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--black-4)">
+            <div class="form-group">
+              <label class="form-label">Card Number</label>
+              <input class="form-input" type="text" placeholder="1234 5678 9012 3456" maxlength="19" style="width:100%"
+                oninput="this.value=this.value.replace(/\D/g,'').replace(/(\d{4})/g,'$1 ').trim()">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Expiry Date</label>
+                <input class="form-input" type="text" placeholder="MM / YY" maxlength="7" style="width:100%">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input class="form-input" type="text" placeholder="123" maxlength="4" style="width:100%">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary (sidebar) -->
+      <div>
+        <div class="cart-summary">
+          <h3>Order Summary</h3>
+          <div id="checkout-summary">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--black-4)">
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="place-order-btn">
+              🔒 Place Order
+            </button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.5rem">
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
+              <i class="fa fa-shield-alt" style="color:var(--gold)"></i>
+              SSL Encrypted &amp; Secure
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
+              <i class="fa fa-undo" style="color:var(--gold)"></i>
+              30-day hassle-free returns
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:var(--gray-3)">
+              <i class="fa fa-truck" style="color:var(--gold)"></i>
+              Estimated delivery: 3–5 business days
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="toast-container"></div>
+
+<script type="module">
+  import { initApp }          from './js/app.js';
+  import { initCheckoutPage } from './js/cart.js';
+
+  initApp();
+  initCheckoutPage();
+
+  window.selectPayment = (el) => {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const val = el.querySelector('input').value;
+    document.getElementById('card-fields').style.display = val === 'stripe' ? 'block' : 'none';
+  };
+</script>
+</body>
+</html>

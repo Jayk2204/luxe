@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Setup — LUXE</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI',sans-serif; background:#070b12; color:#e2e8f0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+    .card { background:#0d1117; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:2.5rem; max-width:500px; width:100%; }
+    h1 { font-size:1.5rem; font-weight:800; margin-bottom:0.5rem; }
+    h1 span { color:#3b82f6; }
+    p { font-size:0.85rem; color:#64748b; line-height:1.7; margin-bottom:1.5rem; }
+    .form-group { margin-bottom:1rem; }
+    label { display:block; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#475569; margin-bottom:0.4rem; }
+    input { width:100%; background:#131920; border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#f1f5f9; font-size:0.9rem; padding:0.7rem 1rem; outline:none; font-family:inherit; }
+    input:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+    .btn { width:100%; padding:0.85rem; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem; }
+    .btn:hover:not(:disabled) { background:#2563eb; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    #log { background:#040608; border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:1rem; margin-top:1.25rem; font-family:'Courier New',monospace; font-size:0.78rem; line-height:2; min-height:80px; max-height:200px; overflow-y:auto; }
+    .success { color:#10b981; } .error { color:#ef4444; } .info { color:#3b82f6; }
+    .warning { background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); border-radius:8px; padding:0.75rem 1rem; font-size:0.82rem; color:#f59e0b; margin-bottom:1.25rem; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🛡️ Admin <span>Setup</span></h1>
+  <p>Register your account and give it admin role. Run this <strong>once</strong> to set up your first admin user.</p>
+
+  <div class="warning">
+    ⚠️ Run this file only once, then delete it or restrict access.
+  </div>
+
+  <div class="form-group">
+    <label>Admin Email</label>
+    <input type="email" id="email" placeholder="your@email.com">
+  </div>
+  <div class="form-group">
+    <label>Password (min 6 chars)</label>
+    <input type="password" id="password" placeholder="••••••••">
+  </div>
+  <div class="form-group">
+    <label>Your Name</label>
+    <input type="text" id="name" placeholder="Admin Name">
+  </div>
+
+  <button class="btn" id="setup-btn" onclick="setupAdmin()">
+    🚀 Create Admin Account
+  </button>
+
+  <button class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#94a3b8" onclick="makeExistingAdmin()">
+    👑 Make Existing Account Admin
+  </button>
+
+  <div id="log"><span class="info">ℹ Ready. Fill the form and click the button.</span></div>
+</div>
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, updateDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+    authDomain:        "shopzz-ca17e.firebaseapp.com",
+    projectId:         "shopzz-ca17e",
+    storageBucket:     "shopzz-ca17e.firebasestorage.app",
+    messagingSenderId: "158388352339",
+    appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  function log(msg, type = 'info') {
+    const el   = document.getElementById('log');
+    const span = document.createElement('div');
+    span.className = type;
+    span.textContent = (type === 'success' ? '✓ ' : type === 'error' ? '✗ ' : 'ℹ ') + msg;
+    el.appendChild(span);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  // Create NEW admin account
+  window.setupAdmin = async function() {
+    const btn   = document.getElementById('setup-btn');
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('password').value;
+    const name  = document.getElementById('name').value.trim() || 'Admin';
+
+    if (!email || !pass) { log('Email and password required.', 'error'); return; }
+    if (pass.length < 6) { log('Password must be at least 6 characters.', 'error'); return; }
+
+    btn.disabled     = true;
+    btn.textContent  = '⏳ Creating...';
+
+    try {
+      log('Creating Firebase Auth account...');
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      log(`Auth account created: ${cred.user.uid}`);
+
+      log('Setting display name...');
+      await updateProfile(cred.user, { displayName: name });
+
+      log('Writing admin profile to Firestore...');
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        uid:         cred.user.uid,
+        email:       email,
+        displayName: name,
+        role:        'admin',
+        createdAt:   serverTimestamp(),
+      });
+
+      log(`✅ Admin account created successfully!`, 'success');
+      log(`Email: ${email}`, 'success');
+      log(`Now go to: admin/login.html`, 'success');
+
+      btn.textContent  = '✅ Done! Go to Login →';
+      btn.style.background = '#10b981';
+      btn.onclick = () => window.location.href = 'login.html';
+      btn.disabled = false;
+
+    } catch (err) {
+      const msgs = {
+        'auth/email-already-in-use': 'This email is already registered. Use "Make Existing Admin" button below.',
+        'auth/weak-password': 'Password too weak.',
+      };
+      log(msgs[err.code] || err.message, 'error');
+      btn.disabled    = false;
+      btn.textContent = '🚀 Create Admin Account';
+    }
+  };
+
+  // Make EXISTING account admin
+  window.makeExistingAdmin = async function() {
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('password').value;
+    const name  = document.getElementById('name').value.trim() || 'Admin';
+
+    if (!email || !pass) { log('Enter email and password of existing account.', 'error'); return; }
+
+    try {
+      log('Signing in to existing account...');
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+
+      log('Updating role to admin in Firestore...');
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        uid:         cred.user.uid,
+        email:       email,
+        displayName: name || cred.user.displayName || 'Admin',
+        role:        'admin',
+        createdAt:   serverTimestamp(),
+      }, { merge: true });
+
+      log('Admin role assigned successfully!', 'success');
+      log('Go to: admin/login.html', 'success');
+
+    } catch (err) {
+      log(err.message, 'error');
+    }
+  };
+</script>
+</body>
+</html>

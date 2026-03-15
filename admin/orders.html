@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — LUXE Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <main class="main-content" id="main-content" style="display:none">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <div>
+        <h2 style="font-size:1.2rem;font-weight:800">Orders</h2>
+        <p style="font-size:0.78rem;color:var(--text-3);margin-top:0.1rem" id="order-count-label">Loading...</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <div class="search-bar">
+          <i class="fa fa-search icon"></i>
+          <input type="text" id="search-input" placeholder="Search by order ID or email...">
+        </div>
+        <select id="status-filter" class="form-control" style="width:auto;font-size:0.82rem">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Status Stats -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.75rem;margin-bottom:1.5rem" id="order-stats"></div>
+
+    <!-- Orders Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Date</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            <tr>
+              <td colspan="8" style="text-align:center;padding:3rem">
+                <div class="spin-anim" style="display:inline-block;width:24px;height:24px;border:2px solid var(--green);border-top-color:transparent;border-radius:50%;"></div>
+                <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-3)">Loading orders...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3>🛒 Order Details</h3>
+      <button class="modal-close" onclick="document.getElementById('order-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="order-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('order-modal').classList.remove('open')">Close</button>
+      <div id="status-change-wrap" style="display:flex;gap:0.5rem;align-items:center">
+        <select id="new-status" class="form-control" style="width:auto;font-size:0.82rem">
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="refunded">Refunded</option>
+        </select>
+        <button class="btn btn-primary" id="update-status-btn">
+          <i class="fa fa-check"></i> Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+
+<script type="module">
+  import {
+    requireAdmin, adminLogout,
+    getOrders, updateOrderStatus,
+    showToast, setLoading, setActiveSidebarLink, debounce,
+    formatCurrency, formatDate, timeAgo, statusBadge
+  } from './js/admin-firebase.js';
+  import { injectLayout } from './js/admin-layout.js';
+
+  injectLayout('Orders');
+
+  let allOrders    = [];
+  let currentOrder = null;
+
+  requireAdmin(async (user, profile) => {
+    const name = profile.displayName || user.email;
+    document.getElementById('sidebar-user-name').textContent = name;
+    document.getElementById('sidebar-avatar').textContent = name.charAt(0).toUpperCase();
+    setActiveSidebarLink();
+    document.getElementById('logout-btn')?.addEventListener('click', async e => { e.preventDefault(); await adminLogout(); });
+    document.getElementById('main-content').style.display = 'block';
+    await loadOrders();
+  });
+
+  async function loadOrders() {
+    try {
+      allOrders = await getOrders(200);
+      renderStats(allOrders);
+      document.getElementById('order-count-label').textContent = `${allOrders.length} orders total`;
+      renderTable(allOrders);
+    } catch (err) {
+      showToast('Error', 'Could not load orders. ' + err.message, 'error');
+    }
+  }
+
+  function renderStats(orders) {
+    const counts = { pending:0, processing:0, shipped:0, delivered:0, cancelled:0 };
+    orders.forEach(o => { if (counts[o.status] !== undefined) counts[o.status]++; });
+
+    const cfg = {
+      pending:    { color:'var(--amber)',  icon:'⏳' },
+      processing: { color:'var(--blue)',   icon:'⚙️' },
+      shipped:    { color:'var(--purple)', icon:'🚚' },
+      delivered:  { color:'var(--green)',  icon:'✅' },
+      cancelled:  { color:'var(--red)',    icon:'❌' },
+    };
+
+    document.getElementById('order-stats').innerHTML = Object.entries(counts).map(([s, c]) => `
+      <div class="card" style="padding:1rem;border-top:2px solid ${cfg[s].color}">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem">${cfg[s].icon}</div>
+        <div style="font-size:1.5rem;font-weight:800;font-family:var(--mono);color:${cfg[s].color}">${c}</div>
+        <div style="font-size:0.68rem;color:var(--text-3);text-transform:capitalize;margin-top:0.15rem">${s}</div>
+      </div>`).join('');
+  }
+
+  function renderTable(orders) {
+    const tbody = document.getElementById('orders-table-body');
+    if (!orders.length) {
+      tbody.innerHTML = `<tr><td colspan="8">
+        <div class="empty-state">
+          <div class="empty-state__icon">🛒</div>
+          <h3>No orders found</h3>
+          <p>Orders will appear here once customers place them.</p>
+        </div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = orders.map(o => `
+      <tr class="fade-in">
+        <td>
+          <span style="font-family:var(--mono);font-size:0.78rem;color:var(--blue);cursor:pointer"
+            onclick="openOrderModal('${o.id}')">#${o.id.slice(-8).toUpperCase()}</span>
+        </td>
+        <td>
+          <div>
+            <strong>${o.shippingAddress?.name || o.userEmail || '—'}</strong>
+            <div style="font-size:0.72rem;color:var(--text-3)">${o.userEmail || ''}</div>
+          </div>
+        </td>
+        <td style="font-family:var(--mono);font-size:0.8rem">${o.items?.length || 0}</td>
+        <td><strong style="color:var(--green)">${formatCurrency(o.total)}</strong></td>
+        <td>${statusBadge(o.status)}</td>
+        <td>
+          <span class="badge badge-gray" style="text-transform:capitalize">${o.paymentMethod || 'cod'}</span>
+        </td>
+        <td style="font-size:0.75rem;color:var(--text-3);font-family:var(--mono)">${timeAgo(o.createdAt)}</td>
+        <td>
+          <div style="display:flex;gap:0.4rem;justify-content:flex-end">
+            <button class="btn btn-icon" onclick="openOrderModal('${o.id}')" title="View Details">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // ── Search + Filter
+  const searchInput = document.getElementById('search-input');
+  const statusFilter= document.getElementById('status-filter');
+
+  function applyFilters() {
+    const q      = searchInput.value.toLowerCase().trim();
+    const status = statusFilter.value;
+    const filtered = allOrders.filter(o => {
+      const matchQ = !q || o.id.toLowerCase().includes(q)
+        || (o.userEmail||'').toLowerCase().includes(q)
+        || (o.shippingAddress?.name||'').toLowerCase().includes(q);
+      const matchS = !status || o.status === status;
+      return matchQ && matchS;
+    });
+    renderTable(filtered);
+    document.getElementById('order-count-label').textContent = `${filtered.length} of ${allOrders.length} orders`;
+  }
+
+  searchInput?.addEventListener('input', debounce(applyFilters, 250));
+  statusFilter?.addEventListener('change', applyFilters);
+
+  // ── Order Detail Modal
+  window.openOrderModal = (id) => {
+    const o = allOrders.find(o => o.id === id);
+    if (!o) return;
+    currentOrder = o;
+
+    document.getElementById('new-status').value = o.status || 'pending';
+
+    document.getElementById('order-modal-body').innerHTML = `
+      <!-- Order Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <div>
+          <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--blue)">#${o.id.slice(-8).toUpperCase()}</div>
+          <div style="font-size:0.75rem;color:var(--text-3);margin-top:0.25rem">${formatDate(o.createdAt)}</div>
+        </div>
+        <div style="text-align:right">
+          ${statusBadge(o.status)}
+          <div style="font-size:1.2rem;font-weight:800;color:var(--green);margin-top:0.5rem">${formatCurrency(o.total)}</div>
+        </div>
+      </div>
+
+      <!-- Customer Info -->
+      <div style="background:var(--bg-3);border-radius:var(--radius);padding:1rem;margin-bottom:1rem">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.6rem">Customer</div>
+        <strong>${o.shippingAddress?.name || o.userEmail || '—'}</strong>
+        <div style="font-size:0.8rem;color:var(--text-2);margin-top:0.2rem">${o.userEmail || '—'}</div>
+        ${o.shippingAddress?.phone ? `<div style="font-size:0.8rem;color:var(--text-2)">${o.shippingAddress.phone}</div>` : ''}
+      </div>
+
+      <!-- Shipping Address -->
+      ${o.shippingAddress ? `
+      <div style="background:var(--bg-3);border-radius:var(--radius);padding:1rem;margin-bottom:1rem">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.6rem">Ship To</div>
+        <div style="font-size:0.82rem;color:var(--text-2);line-height:1.6">
+          ${o.shippingAddress.address || ''}<br>
+          ${o.shippingAddress.city || ''}, ${o.shippingAddress.state || ''} ${o.shippingAddress.zip || ''}<br>
+          ${o.shippingAddress.country || ''}
+        </div>
+      </div>` : ''}
+
+      <!-- Items -->
+      <div style="background:var(--bg-3);border-radius:var(--radius);padding:1rem;margin-bottom:1rem">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:0.75rem">
+          Items (${o.items?.length || 0})
+        </div>
+        ${(o.items || []).map(item => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.83rem">
+            <div>
+              <strong>${item.name}</strong>
+              ${item.variant?.size ? `<span style="color:var(--text-3);margin-left:0.5rem">Size: ${item.variant.size}</span>` : ''}
+              <div style="color:var(--text-3);font-size:0.72rem">Qty: ${item.qty}</div>
+            </div>
+            <strong>${formatCurrency(item.price * item.qty)}</strong>
+          </div>`).join('') || '<div style="color:var(--text-3);font-size:0.82rem">No items</div>'}
+      </div>
+
+      <!-- Totals -->
+      <div style="background:var(--bg-3);border-radius:var(--radius);padding:1rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.4rem">
+          <span style="color:var(--text-3)">Subtotal</span><span>${formatCurrency(o.subtotal)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.4rem">
+          <span style="color:var(--text-3)">Shipping</span><span>${o.shipping === 0 ? '<span style="color:var(--green)">Free</span>' : formatCurrency(o.shipping)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.75rem">
+          <span style="color:var(--text-3)">Tax</span><span>${formatCurrency(o.tax)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;padding-top:0.75rem;border-top:1px solid var(--border)">
+          <span>Total</span><span style="color:var(--green)">${formatCurrency(o.total)}</span>
+        </div>
+      </div>`;
+
+    document.getElementById('order-modal').classList.add('open');
+  };
+
+  // Update Status
+  document.getElementById('update-status-btn')?.addEventListener('click', async () => {
+    if (!currentOrder) return;
+    const btn    = document.getElementById('update-status-btn');
+    const status = document.getElementById('new-status').value;
+    setLoading(btn, true);
+    try {
+      await updateOrderStatus(currentOrder.id, status);
+      showToast('Updated!', `Order status set to "${status}".`, 'success');
+      document.getElementById('order-modal').classList.remove('open');
+      await loadOrders();
+    } catch (err) {
+      showToast('Error', err.message, 'error');
+    } finally {
+      setLoading(btn, false, '<i class="fa fa-check"></i> Update Status');
+    }
+  });
+
+  document.getElementById('order-modal')?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+</script>
+</body>
+</html>

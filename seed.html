@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUXE — Database Seeder</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #080808;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #252525;
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: #c9a96e;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 { font-size: 1.3rem; color: #f5f0e8; margin-bottom: 0.5rem; }
+    p  { font-size: 0.85rem; color: #666; margin-bottom: 2rem; line-height: 1.7; }
+
+    .btn {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: #c9a96e;
+      color: #080808;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+    .btn:hover:not(:disabled) { background: #e2c998; transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-delete {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      color: #c0392b;
+      border: 1px solid #c0392b;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+    .btn-delete:hover:not(:disabled) { background: rgba(192,57,43,0.1); }
+    .btn-delete:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    #log {
+      background: #0a0a0a;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 1.25rem;
+      height: 260px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+    }
+
+    .log-line { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .log-line.success .icon { color: #27ae60; }
+    .log-line.error   .icon { color: #c0392b; }
+    .log-line.info    .icon { color: #c9a96e; }
+    .log-line.done    .icon { color: #9b59b6; }
+    .log-line .msg    { color: #b0b0b0; }
+    .log-line.success .msg { color: #e8e8e8; }
+    .log-line.done    .msg { color: #c9a96e; font-weight: bold; }
+
+    .progress {
+      height: 4px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, #c9a96e, #e2c998);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .stat-val { font-size: 1.5rem; font-weight: 700; color: #c9a96e; }
+    .stat-label { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
+
+    .product-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .chip {
+      background: #1a1a1a;
+      border: 1px solid #252525;
+      border-radius: 2rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      color: #b0b0b0;
+    }
+    .chip.added { background: rgba(39,174,96,0.1); border-color: rgba(39,174,96,0.3); color: #27ae60; }
+    .chip.error { background: rgba(192,57,43,0.1); border-color: rgba(192,57,43,0.3); color: #c0392b; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">LUXE</div>
+  <h2>🌱 Database Seeder</h2>
+  <p>
+    Ek click mein <strong style="color:#c9a96e">8 products + categories</strong> Firestore mein add ho jayenge.<br>
+    Project: <span style="color:#c9a96e">shopzz-ca17e</span>
+  </p>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="total-count">8</div>
+      <div class="stat-label">Total Products</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="added-count" style="color:#27ae60">0</div>
+      <div class="stat-label">Added</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="error-count" style="color:#c0392b">0</div>
+      <div class="stat-label">Errors</div>
+    </div>
+  </div>
+
+  <!-- Product chips preview -->
+  <div class="product-preview" id="product-chips">
+    <span class="chip" id="chip-0">🧥 Jacket</span>
+    <span class="chip" id="chip-1">👗 Dress</span>
+    <span class="chip" id="chip-2">🪭 Blazer</span>
+    <span class="chip" id="chip-3">🧶 Sweater</span>
+    <span class="chip" id="chip-4">👔 Suit</span>
+    <span class="chip" id="chip-5">👜 Belt</span>
+    <span class="chip" id="chip-6">👘 Blouse</span>
+    <span class="chip" id="chip-7">🧥 Trench</span>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+
+  <!-- Buttons -->
+  <button class="btn" id="seed-btn" onclick="seedAll()">
+    🚀 Seed All Products to Firestore
+  </button>
+
+  <button class="btn-delete" id="delete-btn" onclick="deleteAll()">
+    🗑️ Delete All Products (Reset)
+  </button>
+
+  <!-- Log -->
+  <div id="log">
+    <div class="log-line info">
+      <span class="icon">ℹ</span>
+      <span class="msg">Ready hai. "Seed" button dabao...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase CDN -->
+<script type="module">
+  import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ── YOUR CONFIG ──────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+    authDomain:        "shopzz-ca17e.firebaseapp.com",
+    projectId:         "shopzz-ca17e",
+    storageBucket:     "shopzz-ca17e.firebasestorage.app",
+    messagingSenderId: "158388352339",
+    appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
+    measurementId:     "G-F3RSKJT6N4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── ALL 8 PRODUCTS ────────────────────────────────────────
+  const products = [
+    {
+      name:          "Obsidian Noir Jacket",
+      category:      "Jackets",
+      price:         289,
+      originalPrice: 389,
+      description:   "A masterpiece of refined craftsmanship. Every stitch tells a story of luxury and intention.",
+      rating:        4.8,
+      reviews:       124,
+      badge:         "New",
+      emoji:         "🧥",
+      stock:         15,
+      featured:      true,
+      tags:          ["jacket", "luxury", "outerwear"],
+      sizes:         ["XS","S","M","L","XL","XXL"],
+      colors:        ["#111111","#2c2c2c","#1a1a2e"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Silk Reverie Dress",
+      category:      "Dresses",
+      price:         199,
+      originalPrice: 299,
+      description:   "Flowing silk that moves like a second skin. Designed for evenings that demand perfection.",
+      rating:        4.9,
+      reviews:       203,
+      badge:         "Sale",
+      emoji:         "👗",
+      stock:         22,
+      featured:      true,
+      tags:          ["dress", "silk", "evening"],
+      sizes:         ["XS","S","M","L","XL"],
+      colors:        ["#1a0a0a","#2d1515","#f5f0e8"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Velvet Dusk Blazer",
+      category:      "Blazers",
+      price:         349,
+      originalPrice: null,
+      description:   "Rich velvet, architectural cut. The blazer that turns every entrance into a statement.",
+      rating:        4.6,
+      reviews:       87,
+      badge:         null,
+      emoji:         "🪭",
+      stock:         8,
+      featured:      true,
+      tags:          ["blazer", "velvet", "formal"],
+      sizes:         ["XS","S","M","L","XL","XXL"],
+      colors:        ["#1a0f2e","#2d1b4e","#111111"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Aurum Knit Sweater",
+      category:      "Tops",
+      price:         149,
+      originalPrice: 199,
+      description:   "Hand-knit from premium merino wool. Warmth without sacrificing elegance.",
+      rating:        4.5,
+      reviews:       341,
+      badge:         "Sale",
+      emoji:         "🧶",
+      stock:         30,
+      featured:      true,
+      tags:          ["sweater", "knitwear", "casual"],
+      sizes:         ["XS","S","M","L","XL","XXL"],
+      colors:        ["#c9a96e","#8a6f42","#e8e8e8"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Graphite Linen Suit",
+      category:      "Suits",
+      price:         599,
+      originalPrice: null,
+      description:   "Tailored from the finest Italian linen. Where boardroom meets avant-garde.",
+      rating:        4.9,
+      reviews:       78,
+      badge:         "New",
+      emoji:         "👔",
+      stock:         7,
+      featured:      true,
+      tags:          ["suit", "linen", "formal", "italian"],
+      sizes:         ["S","M","L","XL","XXL"],
+      colors:        ["#2a2a2a","#3d3d3d","#1a1a1a"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Bronzed Leather Belt",
+      category:      "Accessories",
+      price:         89,
+      originalPrice: null,
+      description:   "Full-grain leather with an aged brass buckle. The finishing touch every outfit deserves.",
+      rating:        4.7,
+      reviews:       420,
+      badge:         "Hot",
+      emoji:         "👜",
+      stock:         50,
+      featured:      true,
+      tags:          ["belt", "leather", "accessories"],
+      sizes:         ["S","M","L","XL"],
+      colors:        ["#3d2b1a","#5a3e28","#c9a96e"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Ivory Crepe Blouse",
+      category:      "Tops",
+      price:         115,
+      originalPrice: 150,
+      description:   "Fluid crepe in timeless ivory. Effortless, refined, endlessly versatile.",
+      rating:        4.4,
+      reviews:       190,
+      badge:         null,
+      emoji:         "👘",
+      stock:         25,
+      featured:      false,
+      tags:          ["blouse", "crepe", "casual", "tops"],
+      sizes:         ["XS","S","M","L","XL"],
+      colors:        ["#f5f0e8","#e8e0d0","#d4c9b5"],
+      sales:         0,
+      views:         0,
+    },
+    {
+      name:          "Midnight Trench Coat",
+      category:      "Coats",
+      price:         459,
+      originalPrice: null,
+      description:   "A classic reborn in midnight black. Structured shoulders, dramatic length, zero compromise.",
+      rating:        4.7,
+      reviews:       56,
+      badge:         "Hot",
+      emoji:         "🧥",
+      stock:         5,
+      featured:      false,
+      tags:          ["coat", "trench", "outerwear", "luxury"],
+      sizes:         ["XS","S","M","L","XL","XXL"],
+      colors:        ["#080808","#111111","#1a1a1a"],
+      sales:         0,
+      views:         0,
+    },
+  ];
+
+  // ── LOG HELPER ────────────────────────────────────────────
+  function log(msg, type = 'info') {
+    const icons = { info: 'ℹ', success: '✓', error: '✗', done: '★' };
+    const logEl = document.getElementById('log');
+    const line  = document.createElement('div');
+    line.className = `log-line ${type}`;
+    line.innerHTML = `<span class="icon">${icons[type]}</span><span class="msg">${msg}</span>`;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function setProgress(done, total) {
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('added-count').textContent  = done;
+  }
+
+  function setChipStatus(idx, status) {
+    const chip = document.getElementById('chip-' + idx);
+    if (chip) chip.classList.add(status);
+  }
+
+  // ── SEED ALL ─────────────────────────────────────────────
+  window.seedAll = async function() {
+    const btn    = document.getElementById('seed-btn');
+    const delBtn = document.getElementById('delete-btn');
+    btn.disabled    = true;
+    delBtn.disabled = true;
+    btn.textContent = '⏳ Seeding...';
+
+    let added = 0, errors = 0;
+    const col = collection(db, 'products');
+
+    log('Firebase se connect ho raha hai...', 'info');
+    log(`Total ${products.length} products add karne hain...`, 'info');
+
+    for (let i = 0; i < products.length; i++) {
+      const p = { ...products[i], createdAt: serverTimestamp() };
+
+      // Remove null fields
+      Object.keys(p).forEach(k => { if (p[k] === null) delete p[k]; });
+
+      try {
+        const ref = await addDoc(col, p);
+        added++;
+        log(`✓ "${p.name}" added! (ID: ${ref.id.slice(0,8)}...)`, 'success');
+        setChipStatus(i, 'added');
+        setProgress(added, products.length);
+        document.getElementById('added-count').textContent = added;
+      } catch (err) {
+        errors++;
+        log(`✗ "${p.name}" failed: ${err.message}`, 'error');
+        setChipStatus(i, 'error');
+        document.getElementById('error-count').textContent = errors;
+      }
+
+      // Small delay to avoid rate limiting
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Done!
+    if (errors === 0) {
+      log(`🎉 DONE! ${added}/${products.length} products successfully added!`, 'done');
+      log('Ab apni website reload karo — products dikhenge!', 'done');
+      btn.textContent = '✅ All Done!';
+      btn.style.background = '#27ae60';
+      btn.style.color = '#fff';
+    } else {
+      log(`⚠ ${added} added, ${errors} failed. Rules check karo.`, 'error');
+      btn.textContent = '⚠ Done with errors';
+      btn.disabled = false;
+    }
+
+    delBtn.disabled = false;
+  };
+
+  // ── DELETE ALL ────────────────────────────────────────────
+  window.deleteAll = async function() {
+    if (!confirm('Pakka? Saare products delete ho jayenge!')) return;
+
+    const btn    = document.getElementById('delete-btn');
+    const seedBtn= document.getElementById('seed-btn');
+    btn.disabled    = true;
+    seedBtn.disabled= true;
+    btn.textContent = '⏳ Deleting...';
+
+    log('Saare products delete ho rahe hain...', 'info');
+
+    try {
+      const snap = await getDocs(collection(db, 'products'));
+      let count  = 0;
+
+      for (const d of snap.docs) {
+        await deleteDoc(doc(db, 'products', d.id));
+        count++;
+        log(`Deleted: ${d.data().name || d.id}`, 'error');
+      }
+
+      log(`✓ ${count} products delete ho gaye!`, 'done');
+
+      // Reset UI
+      document.getElementById('added-count').textContent = '0';
+      document.getElementById('error-count').textContent = '0';
+      document.getElementById('progress-bar').style.width = '0%';
+      document.querySelectorAll('.chip').forEach(c => { c.classList.remove('added','error'); });
+
+      btn.textContent  = '🗑️ Delete All Products (Reset)';
+      seedBtn.disabled = false;
+      seedBtn.textContent = '🚀 Seed All Products to Firestore';
+      seedBtn.style.background = '#c9a96e';
+      seedBtn.style.color = '#080808';
+    } catch (err) {
+      log(`Error: ${err.message}`, 'error');
+      log('Firestore Rules mein write permission check karo!', 'info');
+    }
+
+    btn.disabled = false;
+  };
+</script>
+
+</body>
+</html>

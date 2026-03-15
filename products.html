@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .products-page-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: calc(var(--nav-h) + 1.5rem);
+      background: var(--black-2);
+      border: 1px solid var(--black-4);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+    }
+
+    .sidebar__section { margin-bottom: 2rem; }
+    .sidebar__section:last-child { margin-bottom: 0; }
+
+    .sidebar__title {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-links { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; }
+    .sidebar-links a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      color: var(--gray-2);
+      border-radius: var(--radius);
+      transition: var(--transition-fast);
+    }
+    .sidebar-links a:hover, .sidebar-links a.active {
+      background: var(--black-4);
+      color: var(--cream);
+    }
+    .sidebar-links a.active { color: var(--gold); }
+
+    .price-range { display: flex; flex-direction: column; gap: 0.75rem; }
+    .price-range input[type=range] {
+      width: 100%; accent-color: var(--gold);
+    }
+    .price-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray-2); }
+
+    .toggle-sidebar { display: none; }
+
+    @media (max-width: 900px) {
+      .products-page-grid { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        top: 0; left: -300px;
+        width: 280px; height: 100vh;
+        overflow-y: auto;
+        z-index: 3000;
+        border-radius: 0;
+        transition: left 0.4s cubic-bezier(0.77,0,0.175,1);
+      }
+      .sidebar.open { left: 0; }
+      .toggle-sidebar { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html" class="active">Shop</a></li>
+      <li><a href="products.html?cat=New">New In</a></li>
+      <li><a href="products.html?cat=Sale">Sale</a></li>
+    </ul>
+    <div class="nav__actions">
+      <button class="nav__icon-btn" id="search-btn"><i class="fa fa-search"></i></button>
+      <a href="auth.html" class="nav__icon-btn"><i class="fa fa-user"></i></a>
+      <a href="cart.html" class="nav__icon-btn">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge"></span>
+      </a>
+      <button class="nav__burger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu__overlay"></div>
+<div class="mobile-menu">
+  <button class="mobile-menu__close">✕</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Shop</a>
+    <a href="auth.html">Account</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+</div>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h4>Explore</h4>
+    <h1 id="page-title">The Collection</h1>
+    <p id="page-subtitle">Timeless pieces for the modern wardrobe</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" style="padding-bottom:6rem">
+
+  <!-- Top bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+    <button class="btn btn-outline btn-sm toggle-sidebar" id="filter-toggle">
+      <i class="fa fa-sliders"></i> Filters
+    </button>
+    <span id="product-count" style="font-size:0.8rem;color:var(--gray-3)">Loading products…</span>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <label style="font-size:0.75rem;color:var(--gray-3)">Sort:</label>
+      <select id="sort-select" class="form-input" style="width:auto;padding:0.4rem 0.75rem;font-size:0.8rem">
+        <option value="createdAt">Newest</option>
+        <option value="price">Price: Low to High</option>
+        <option value="rating">Best Rated</option>
+        <option value="sales">Best Selling</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="products-page-grid">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <button style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray-3);font-size:1.2rem;display:none" id="sidebar-close">✕</button>
+
+      <div class="sidebar__section">
+        <div class="sidebar__title">Categories</div>
+        <ul class="sidebar-links" id="category-links">
+          <li><a href="?cat=all" class="active" data-cat="all">All <span style="color:var(--gray-3)">—</span></a></li>
+          <li><a href="?cat=Jackets"     data-cat="Jackets">Jackets &amp; Coats</a></li>
+          <li><a href="?cat=Blazers"     data-cat="Blazers">Blazers</a></li>
+          <li><a href="?cat=Dresses"     data-cat="Dresses">Dresses</a></li>
+          <li><a href="?cat=Tops"        data-cat="Tops">Tops &amp; Blouses</a></li>
+          <li><a href="?cat=Suits"       data-cat="Suits">Suits</a></li>
+          <li><a href="?cat=Accessories" data-cat="Accessories">Accessories</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__title">Price Range</div>
+        <div class="price-range">
+          <input type="range" id="price-range" min="0" max="1000" value="1000" step="10"
+            oninput="document.getElementById('price-max-label').textContent = '$'+this.value">
+          <div class="price-labels">
+            <span>$0</span>
+            <span id="price-max-label">$1000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar__section">
+        <div class="sidebar__title">Availability</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:none">
+            <input type="checkbox" checked style="accent-color:var(--gold)"> In Stock
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:none">
+            <input type="checkbox" style="accent-color:var(--gold)"> Sale Items
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:none">
+            <input type="checkbox" style="accent-color:var(--gold)"> New Arrivals
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-outline btn-sm btn-block" onclick="clearFilters()">Clear Filters</button>
+    </aside>
+
+    <!-- Grid -->
+    <div>
+      <!-- Quick filter chips -->
+      <div class="filter-bar" id="filter-chips" style="border-top:1px solid var(--black-4)">
+        <span class="filter-bar__label">Filter:</span>
+        <button class="filter-chip active" data-cat="all">All</button>
+        <button class="filter-chip" data-cat="Jackets">Jackets</button>
+        <button class="filter-chip" data-cat="Dresses">Dresses</button>
+        <button class="filter-chip" data-cat="Tops">Tops</button>
+        <button class="filter-chip" data-cat="Accessories">Accessories</button>
+        <button class="filter-chip" data-cat="Suits">Suits</button>
+      </div>
+
+      <div class="products-grid" id="products-grid"></div>
+
+      <!-- Load More -->
+      <div style="text-align:center;margin-top:3rem">
+        <button class="btn btn-outline btn-lg" id="load-more-btn" style="display:none">
+          Load More <i class="fa fa-chevron-down"></i>
+        </button>
+        <div id="all-loaded-msg" style="display:none;font-size:0.8rem;color:var(--gray-3)">
+          — You've seen everything —
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER (same as index.html) -->
+<footer class="footer" style="margin-top:0">
+  <div class="container">
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2025 LUXE. All rights reserved.</div>
+      <div class="footer__social">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-pinterest"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container"></div>
+
+<!-- Search Overlay -->
+<div class="search-overlay">
+  <div class="search-overlay__inner">
+    <div class="search-input-wrap">
+      <input type="text" placeholder="Search products…" autocomplete="off">
+      <button class="search-close">✕</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initApp }          from './js/app.js';
+  import { initProductsPage, renderProductGrid, renderSkeletons, DEMO_PRODUCTS } from './js/products.js';
+
+  initApp();
+
+  // Handle URL params
+  const params  = new URLSearchParams(window.location.search);
+  const catParam= params.get('cat');
+  const qParam  = params.get('q');
+
+  if (catParam && catParam !== 'all') {
+    document.getElementById('page-title').textContent = catParam;
+    // Activate relevant filter
+    document.querySelectorAll('.filter-chip, [data-cat]').forEach(el => {
+      el.classList.toggle('active', el.dataset.cat === catParam);
+    });
+  }
+
+  if (qParam) {
+    document.getElementById('page-title').textContent = `"${qParam}"`;
+    document.getElementById('page-subtitle').textContent = 'Search results';
+  }
+
+  // Try Firebase; show demo if not configured
+  try {
+    await initProductsPage();
+  } catch {
+    // Demo fallback
+    const grid = document.getElementById('products-grid');
+    renderProductGrid(grid, DEMO_PRODUCTS);
+    document.getElementById('product-count').textContent = `${DEMO_PRODUCTS.length} products`;
+  }
+
+  // Sidebar mobile toggle
+  const sidebar      = document.getElementById('sidebar');
+  const filterToggle = document.getElementById('filter-toggle');
+  const sidebarClose = document.getElementById('sidebar-close');
+
+  filterToggle?.addEventListener('click', () => {
+    sidebar.classList.add('open');
+    sidebarClose.style.display = 'block';
+  });
+  sidebarClose?.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+  });
+
+  // Sidebar category links (no page reload)
+  document.querySelectorAll('#category-links a').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('#category-links a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      // Sync with filter chips
+      const cat = link.dataset.cat;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+    });
+  });
+
+  // Clear filters
+  window.clearFilters = () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+    document.querySelectorAll('#category-links a').forEach(l => l.classList.toggle('active', l.dataset.cat === 'all'));
+    document.getElementById('price-range').value = 1000;
+    document.getElementById('price-max-label').textContent = '$1000';
+  };
+</script>
+
+</body>
+</html>

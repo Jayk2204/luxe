@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html" class="active">Shop</a></li>
+    </ul>
+    <div class="nav__actions">
+      <button class="nav__icon-btn" id="search-btn"><i class="fa fa-search"></i></button>
+      <a href="auth.html" class="nav__icon-btn"><i class="fa fa-user"></i></a>
+      <a href="cart.html" class="nav__icon-btn">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge"></span>
+      </a>
+      <button class="nav__burger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu__overlay"></div>
+<div class="mobile-menu">
+  <button class="mobile-menu__close">✕</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Shop</a>
+    <a href="auth.html">Account</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+</div>
+
+<!-- Main Content -->
+<main class="product-detail container" id="product-detail-root">
+  <!-- Rendered by JS -->
+  <div style="padding-top:5rem;text-align:center">
+    <div class="spin" style="display:inline-block;width:30px;height:30px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;"></div>
+  </div>
+</main>
+
+<!-- Related Products -->
+<section class="section" style="background:var(--black-2);border-top:1px solid var(--black-4)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__left">
+        <h4>You May Also Like</h4>
+        <h2>Related Pieces</h2>
+        <div class="divider"></div>
+      </div>
+    </div>
+    <div class="products-grid" id="related-grid"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2025 LUXE. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container"></div>
+
+<div class="search-overlay">
+  <div class="search-overlay__inner">
+    <div class="search-input-wrap">
+      <input type="text" placeholder="Search products…" autocomplete="off">
+      <button class="search-close">✕</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initApp }              from './js/app.js';
+  import { initProductDetailPage } from './js/products.js';
+
+  initApp();
+  initProductDetailPage();
+</script>
+</body>
+</html>

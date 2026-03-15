@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users — LUXE Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <main class="main-content" id="main-content" style="display:none">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <div>
+        <h2 style="font-size:1.2rem;font-weight:800">Users</h2>
+        <p style="font-size:0.78rem;color:var(--text-3);margin-top:0.1rem" id="user-count-label">Loading...</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <div class="search-bar">
+          <i class="fa fa-search icon"></i>
+          <input type="text" id="search-input" placeholder="Search by name or email...">
+        </div>
+        <select id="role-filter" class="form-control" style="width:auto;font-size:0.82rem">
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="customer">Customer</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem" id="user-stats"></div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            <tr>
+              <td colspan="6" style="text-align:center;padding:3rem">
+                <div class="spin-anim" style="display:inline-block;width:24px;height:24px;border:2px solid var(--purple);border-top-color:transparent;border-radius:50%;"></div>
+                <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-3)">Loading users...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3>👤 User Details</h3>
+      <button class="modal-close" onclick="document.getElementById('user-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="user-modal-body">
+      <!-- filled by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('user-modal').classList.remove('open')">Close</button>
+      <button class="btn btn-primary" id="user-modal-action-btn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+
+<script type="module">
+  import {
+    requireAdmin, adminLogout,
+    getUsers, makeAdmin, revokeAdmin, banUser, unbanUser,
+    showToast, setLoading, setActiveSidebarLink, debounce, formatDate
+  } from './js/admin-firebase.js';
+  import { injectLayout } from './js/admin-layout.js';
+
+  injectLayout('Users');
+
+  let allUsers    = [];
+  let selectedUser= null;
+
+  requireAdmin(async (user, profile) => {
+    const name = profile.displayName || user.email;
+    document.getElementById('sidebar-user-name').textContent = name;
+    document.getElementById('sidebar-avatar').textContent = name.charAt(0).toUpperCase();
+    setActiveSidebarLink();
+    document.getElementById('logout-btn')?.addEventListener('click', async e => { e.preventDefault(); await adminLogout(); });
+    document.getElementById('main-content').style.display = 'block';
+    await loadUsers();
+  });
+
+  async function loadUsers() {
+    try {
+      allUsers = await getUsers(200);
+      updateStats(allUsers);
+      document.getElementById('user-count-label').textContent = `${allUsers.length} registered users`;
+      renderTable(allUsers);
+    } catch (err) {
+      showToast('Error', 'Could not load users. ' + err.message, 'error');
+    }
+  }
+
+  function updateStats(users) {
+    const admins    = users.filter(u => u.role === 'admin').length;
+    const banned    = users.filter(u => u.banned).length;
+    const customers = users.length - admins;
+
+    document.getElementById('user-stats').innerHTML = `
+      <div class="card" style="padding:1.25rem">
+        <div style="font-size:1.8rem;font-weight:800;font-family:var(--mono);color:var(--blue)">${users.length}</div>
+        <div style="font-size:0.72rem;color:var(--text-3);letter-spacing:0.05em;margin-top:0.25rem">Total Users</div>
+      </div>
+      <div class="card" style="padding:1.25rem">
+        <div style="font-size:1.8rem;font-weight:800;font-family:var(--mono);color:var(--purple)">${admins}</div>
+        <div style="font-size:0.72rem;color:var(--text-3);letter-spacing:0.05em;margin-top:0.25rem">Admins</div>
+      </div>
+      <div class="card" style="padding:1.25rem">
+        <div style="font-size:1.8rem;font-weight:800;font-family:var(--mono);color:${banned > 0 ? 'var(--red)' : 'var(--green)'}">${banned}</div>
+        <div style="font-size:0.72rem;color:var(--text-3);letter-spacing:0.05em;margin-top:0.25rem">Banned</div>
+      </div>`;
+  }
+
+  function renderTable(users) {
+    const tbody = document.getElementById('users-table-body');
+    if (!users.length) {
+      tbody.innerHTML = `<tr><td colspan="6">
+        <div class="empty-state">
+          <div class="empty-state__icon">👥</div>
+          <h3>No users found</h3>
+          <p>Users will appear here after they register.</p>
+        </div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+      const initials = (u.displayName || u.email || 'U').charAt(0).toUpperCase();
+      const colors   = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4'];
+      const color    = colors[initials.charCodeAt(0) % colors.length];
+
+      return `
+        <tr class="fade-in">
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              <div class="user-avatar-sm" style="background:${color}">${initials}</div>
+              <div>
+                <strong>${u.displayName || 'User'}</strong>
+                ${u.banned ? '<div style="font-size:0.65rem;color:var(--red)">⚠ Banned</div>' : ''}
+              </div>
+            </div>
+          </td>
+          <td style="font-size:0.8rem;color:var(--text-2)">${u.email || '—'}</td>
+          <td>${u.role === 'admin'
+            ? '<span class="badge badge-blue">Admin</span>'
+            : '<span class="badge badge-gray">Customer</span>'}</td>
+          <td>${u.banned
+            ? '<span class="badge badge-red">Banned</span>'
+            : '<span class="badge badge-green">Active</span>'}</td>
+          <td style="font-size:0.75rem;font-family:var(--mono);color:var(--text-3)">${formatDate(u.createdAt)}</td>
+          <td>
+            <div style="display:flex;gap:0.4rem;justify-content:flex-end">
+              <button class="btn btn-icon" title="View Details"
+                onclick="openUserModal('${u.id}')">
+                <i class="fa fa-eye"></i>
+              </button>
+              <button class="btn btn-icon" title="${u.role==='admin'?'Revoke Admin':'Make Admin'}"
+                style="color:var(--purple);border-color:rgba(139,92,246,0.2)"
+                onclick="toggleRole('${u.id}','${u.role||'customer'}')">
+                <i class="fa fa-${u.role==='admin'?'user-minus':'user-shield'}"></i>
+              </button>
+              <button class="btn btn-icon" title="${u.banned?'Unban User':'Ban User'}"
+                style="color:${u.banned?'var(--green)':'var(--red)'};border-color:${u.banned?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'}"
+                onclick="toggleBan('${u.id}',${!!u.banned})">
+                <i class="fa fa-${u.banned?'unlock':'ban'}"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  // ── Search + Filter
+  const searchInput = document.getElementById('search-input');
+  const roleFilter  = document.getElementById('role-filter');
+
+  function applyFilters() {
+    const q    = searchInput.value.toLowerCase().trim();
+    const role = roleFilter.value;
+    const filtered = allUsers.filter(u => {
+      const matchQ    = !q    || (u.displayName||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+      const matchRole = !role || u.role === role;
+      return matchQ && matchRole;
+    });
+    renderTable(filtered);
+    document.getElementById('user-count-label').textContent = `${filtered.length} of ${allUsers.length} users`;
+  }
+
+  searchInput?.addEventListener('input',  debounce(applyFilters, 250));
+  roleFilter?.addEventListener('change',  applyFilters);
+
+  // ── Toggle Admin Role
+  window.toggleRole = async (uid, currentRole) => {
+    try {
+      if (currentRole === 'admin') {
+        await revokeAdmin(uid);
+        showToast('Role Updated', 'Admin privileges revoked.', 'warning');
+      } else {
+        await makeAdmin(uid);
+        showToast('Role Updated', 'User is now an Admin.', 'success');
+      }
+      await loadUsers();
+    } catch (err) { showToast('Error', err.message, 'error'); }
+  };
+
+  // ── Toggle Ban
+  window.toggleBan = async (uid, isBanned) => {
+    try {
+      if (isBanned) {
+        await unbanUser(uid);
+        showToast('Unbanned', 'User has been restored.', 'success');
+      } else {
+        await banUser(uid);
+        showToast('Banned', 'User has been banned.', 'warning');
+      }
+      await loadUsers();
+    } catch (err) { showToast('Error', err.message, 'error'); }
+  };
+
+  // ── User Detail Modal
+  window.openUserModal = (uid) => {
+    const u = allUsers.find(u => u.id === uid);
+    if (!u) return;
+    selectedUser = u;
+
+    const initials = (u.displayName || u.email || 'U').charAt(0).toUpperCase();
+    document.getElementById('user-modal-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;margin-bottom:1.5rem">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700">
+          ${initials}
+        </div>
+        <h3 style="font-size:1.1rem">${u.displayName || 'User'}</h3>
+        <span class="badge ${u.role==='admin'?'badge-blue':'badge-gray'}">${u.role||'customer'}</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        ${row('Email',   u.email)}
+        ${row('User ID', u.id.slice(0,16) + '...')}
+        ${row('Joined',  formatDate(u.createdAt))}
+        ${row('Status',  u.banned ? '🚫 Banned' : '✅ Active')}
+        ${row('Role',    u.role || 'customer')}
+      </div>`;
+
+    // Modal action button
+    const actionBtn = document.getElementById('user-modal-action-btn');
+    if (u.banned) {
+      actionBtn.textContent = '✅ Unban User';
+      actionBtn.className   = 'btn btn-success';
+      actionBtn.onclick     = async () => { await toggleBan(u.id, true); document.getElementById('user-modal').classList.remove('open'); };
+    } else {
+      actionBtn.textContent = '🚫 Ban User';
+      actionBtn.className   = 'btn btn-danger';
+      actionBtn.onclick     = async () => { await toggleBan(u.id, false); document.getElementById('user-modal').classList.remove('open'); };
+    }
+
+    document.getElementById('user-modal').classList.add('open');
+  };
+
+  function row(label, val) {
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.83rem">
+      <span style="color:var(--text-3)">${label}</span>
+      <span style="color:var(--text-1);font-family:${label==='User ID'?'var(--mono)':'inherit'}">${val||'—'}</span>
+    </div>`;
+  }
+
+  document.getElementById('user-modal')?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+</script>
+</body>
+</html>
