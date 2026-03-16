@@ -3,496 +3,328 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LUXE — Database Seeder</title>
+  <title>Seed Products — LUXE Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #080808;
-      color: #e8e8e8;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .card {
-      background: #111;
-      border: 1px solid #252525;
-      border-radius: 16px;
-      padding: 2.5rem;
-      max-width: 640px;
-      width: 100%;
-    }
-
-    .logo {
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 0.2em;
-      color: #c9a96e;
-      margin-bottom: 0.5rem;
-    }
-
-    h2 { font-size: 1.3rem; color: #f5f0e8; margin-bottom: 0.5rem; }
-    p  { font-size: 0.85rem; color: #666; margin-bottom: 2rem; line-height: 1.7; }
-
-    .btn {
-      width: 100%;
-      padding: 1rem 2rem;
-      background: #c9a96e;
-      color: #080808;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 1.5rem;
-    }
-    .btn:hover:not(:disabled) { background: #e2c998; transform: translateY(-2px); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .btn-delete {
-      width: 100%;
-      padding: 0.75rem;
-      background: transparent;
-      color: #c0392b;
-      border: 1px solid #c0392b;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 1.5rem;
-    }
-    .btn-delete:hover:not(:disabled) { background: rgba(192,57,43,0.1); }
-    .btn-delete:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    #log {
-      background: #0a0a0a;
-      border: 1px solid #1a1a1a;
-      border-radius: 8px;
-      padding: 1.25rem;
-      height: 260px;
-      overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 0.78rem;
-      line-height: 1.8;
-    }
-
-    .log-line { display: flex; align-items: flex-start; gap: 0.5rem; }
-    .log-line.success .icon { color: #27ae60; }
-    .log-line.error   .icon { color: #c0392b; }
-    .log-line.info    .icon { color: #c9a96e; }
-    .log-line.done    .icon { color: #9b59b6; }
-    .log-line .msg    { color: #b0b0b0; }
-    .log-line.success .msg { color: #e8e8e8; }
-    .log-line.done    .msg { color: #c9a96e; font-weight: bold; }
-
-    .progress {
-      height: 4px;
-      background: #1a1a1a;
-      border-radius: 2px;
-      margin-bottom: 1.5rem;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(to right, #c9a96e, #e2c998);
-      border-radius: 2px;
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .stat {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      border-radius: 8px;
-      padding: 0.75rem;
-      text-align: center;
-    }
-    .stat-val { font-size: 1.5rem; font-weight: 700; color: #c9a96e; }
-    .stat-label { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
-
-    .product-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .chip {
-      background: #1a1a1a;
-      border: 1px solid #252525;
-      border-radius: 2rem;
-      padding: 0.3rem 0.8rem;
-      font-size: 0.75rem;
-      color: #b0b0b0;
-    }
-    .chip.added { background: rgba(39,174,96,0.1); border-color: rgba(39,174,96,0.3); color: #27ae60; }
-    .chip.error { background: rgba(192,57,43,0.1); border-color: rgba(192,57,43,0.3); color: #c0392b; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#070b12;color:#f1f5f9;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    .card{background:#0d1117;border:1px solid rgba(59,130,246,.2);border-radius:16px;padding:2.5rem;width:100%;max-width:600px}
+    h1{font-size:1.5rem;font-weight:700;margin-bottom:.4rem}
+    h1 span{color:#3b82f6}
+    .sub{color:#64748b;font-size:.82rem;margin-bottom:2rem;line-height:1.6}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+    .stat{background:#131920;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:.9rem;text-align:center}
+    .stat-val{font-size:1.5rem;font-weight:700;color:#3b82f6}
+    .stat-lbl{font-size:.65rem;color:#475569;margin-top:.15rem;text-transform:uppercase;letter-spacing:.05em}
+    .progress{background:#131920;border-radius:99px;height:6px;margin-bottom:1.25rem;overflow:hidden}
+    .progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#06b6d4);border-radius:99px;width:0;transition:width .3s}
+    .log{background:#070b12;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1rem;height:220px;overflow-y:auto;font-size:.72rem;font-family:monospace;margin-bottom:1.25rem;line-height:2}
+    .log-item{border-bottom:1px solid rgba(255,255,255,.03)}
+    .ok{color:#22c55e}.err{color:#ef4444}.info{color:#60a5fa}.warn{color:#f59e0b}
+    .btn{width:100%;padding:.85rem;border:none;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;font-family:'DM Sans',sans-serif;margin-bottom:.75rem}
+    .btn-danger{background:#ef4444;color:#fff}.btn-danger:hover:not(:disabled){background:#dc2626}
+    .btn-primary{background:#3b82f6;color:#fff;box-shadow:0 0 20px rgba(59,130,246,.2)}
+    .btn-primary:hover:not(:disabled){background:#2563eb;transform:translateY(-1px)}
+    .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+    .spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+    @keyframes sp{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-
 <div class="card">
-  <div class="logo">LUXE</div>
-  <h2>🌱 Database Seeder</h2>
-  <p>
-    Ek click mein <strong style="color:#c9a96e">8 products + categories</strong> Firestore mein add ho jayenge.<br>
-    Project: <span style="color:#c9a96e">shopzz-ca17e</span>
-  </p>
+  <h1>LUXE <span>Product Seeder</span></h1>
+  <p class="sub">Deletes all existing products, then adds 21 fresh products (3 per category) — each with a unique, accurate image.</p>
 
-  <!-- Stats -->
   <div class="stats">
-    <div class="stat">
-      <div class="stat-val" id="total-count">8</div>
-      <div class="stat-label">Total Products</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="added-count" style="color:#27ae60">0</div>
-      <div class="stat-label">Added</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="error-count" style="color:#c0392b">0</div>
-      <div class="stat-label">Errors</div>
-    </div>
+    <div class="stat"><div class="stat-val">21</div><div class="stat-lbl">Products</div></div>
+    <div class="stat"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Added</div></div>
+    <div class="stat"><div class="stat-val">7</div><div class="stat-lbl">Categories</div></div>
   </div>
 
-  <!-- Product chips preview -->
-  <div class="product-preview" id="product-chips">
-    <span class="chip" id="chip-0">🧥 Jacket</span>
-    <span class="chip" id="chip-1">👗 Dress</span>
-    <span class="chip" id="chip-2">🪭 Blazer</span>
-    <span class="chip" id="chip-3">🧶 Sweater</span>
-    <span class="chip" id="chip-4">👔 Suit</span>
-    <span class="chip" id="chip-5">👜 Belt</span>
-    <span class="chip" id="chip-6">👘 Blouse</span>
-    <span class="chip" id="chip-7">🧥 Trench</span>
-  </div>
+  <div class="progress"><div class="progress-bar" id="prog-bar"></div></div>
+  <div class="log" id="log"><div class="log-item info">Ready — click Step 1 then Step 2.</div></div>
 
-  <!-- Progress Bar -->
-  <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
-
-  <!-- Buttons -->
-  <button class="btn" id="seed-btn" onclick="seedAll()">
-    🚀 Seed All Products to Firestore
-  </button>
-
-  <button class="btn-delete" id="delete-btn" onclick="deleteAll()">
-    🗑️ Delete All Products (Reset)
-  </button>
-
-  <!-- Log -->
-  <div id="log">
-    <div class="log-line info">
-      <span class="icon">ℹ</span>
-      <span class="msg">Ready hai. "Seed" button dabao...</span>
-    </div>
-  </div>
+  <button class="btn btn-danger"  id="delete-btn" onclick="deleteAll()">🗑️  Step 1 — Delete ALL Existing Products</button>
+  <button class="btn btn-primary" id="seed-btn"   onclick="seedAll()">🚀  Step 2 — Seed 21 Fresh Products</button>
 </div>
 
-<!-- Firebase CDN -->
 <script type="module">
-  import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    deleteDoc,
-    doc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp, getApps }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, writeBatch, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ── YOUR CONFIG ──────────────────────────────────────────
-  const firebaseConfig = {
-    apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
-    authDomain:        "shopzz-ca17e.firebaseapp.com",
-    projectId:         "shopzz-ca17e",
-    storageBucket:     "shopzz-ca17e.firebasestorage.app",
-    messagingSenderId: "158388352339",
-    appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
-    measurementId:     "G-F3RSKJT6N4"
-  };
+const FC = {
+  apiKey:"AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+  authDomain:"shopzz-ca17e.firebaseapp.com",
+  projectId:"shopzz-ca17e",
+  storageBucket:"shopzz-ca17e.firebasestorage.app",
+  messagingSenderId:"158388352339",
+  appId:"1:158388352339:web:2c1016ed5c782ed6e6dda6"
+};
+const app = getApps().length ? getApps()[0] : initializeApp(FC);
+const db  = getFirestore(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+// ─────────────────────────────────────────────────────────
+//  21 PRODUCTS — 3 per category — ALL UNIQUE PHOTO IDs
+//  Every imageUrl is a different real Unsplash photo
+// ─────────────────────────────────────────────────────────
+const PRODUCTS = [
 
-  // ── ALL 8 PRODUCTS ────────────────────────────────────────
-  const products = [
-    {
-      name:          "Obsidian Noir Jacket",
-      category:      "Jackets",
-      price:         289,
-      originalPrice: 389,
-      description:   "A masterpiece of refined craftsmanship. Every stitch tells a story of luxury and intention.",
-      rating:        4.8,
-      reviews:       124,
-      badge:         "New",
-      emoji:         "🧥",
-      stock:         15,
-      featured:      true,
-      tags:          ["jacket", "luxury", "outerwear"],
-      sizes:         ["XS","S","M","L","XL","XXL"],
-      colors:        ["#111111","#2c2c2c","#1a1a2e"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Silk Reverie Dress",
-      category:      "Dresses",
-      price:         199,
-      originalPrice: 299,
-      description:   "Flowing silk that moves like a second skin. Designed for evenings that demand perfection.",
-      rating:        4.9,
-      reviews:       203,
-      badge:         "Sale",
-      emoji:         "👗",
-      stock:         22,
-      featured:      true,
-      tags:          ["dress", "silk", "evening"],
-      sizes:         ["XS","S","M","L","XL"],
-      colors:        ["#1a0a0a","#2d1515","#f5f0e8"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Velvet Dusk Blazer",
-      category:      "Blazers",
-      price:         349,
-      originalPrice: null,
-      description:   "Rich velvet, architectural cut. The blazer that turns every entrance into a statement.",
-      rating:        4.6,
-      reviews:       87,
-      badge:         null,
-      emoji:         "🪭",
-      stock:         8,
-      featured:      true,
-      tags:          ["blazer", "velvet", "formal"],
-      sizes:         ["XS","S","M","L","XL","XXL"],
-      colors:        ["#1a0f2e","#2d1b4e","#111111"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Aurum Knit Sweater",
-      category:      "Tops",
-      price:         149,
-      originalPrice: 199,
-      description:   "Hand-knit from premium merino wool. Warmth without sacrificing elegance.",
-      rating:        4.5,
-      reviews:       341,
-      badge:         "Sale",
-      emoji:         "🧶",
-      stock:         30,
-      featured:      true,
-      tags:          ["sweater", "knitwear", "casual"],
-      sizes:         ["XS","S","M","L","XL","XXL"],
-      colors:        ["#c9a96e","#8a6f42","#e8e8e8"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Graphite Linen Suit",
-      category:      "Suits",
-      price:         599,
-      originalPrice: null,
-      description:   "Tailored from the finest Italian linen. Where boardroom meets avant-garde.",
-      rating:        4.9,
-      reviews:       78,
-      badge:         "New",
-      emoji:         "👔",
-      stock:         7,
-      featured:      true,
-      tags:          ["suit", "linen", "formal", "italian"],
-      sizes:         ["S","M","L","XL","XXL"],
-      colors:        ["#2a2a2a","#3d3d3d","#1a1a1a"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Bronzed Leather Belt",
-      category:      "Accessories",
-      price:         89,
-      originalPrice: null,
-      description:   "Full-grain leather with an aged brass buckle. The finishing touch every outfit deserves.",
-      rating:        4.7,
-      reviews:       420,
-      badge:         "Hot",
-      emoji:         "👜",
-      stock:         50,
-      featured:      true,
-      tags:          ["belt", "leather", "accessories"],
-      sizes:         ["S","M","L","XL"],
-      colors:        ["#3d2b1a","#5a3e28","#c9a96e"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Ivory Crepe Blouse",
-      category:      "Tops",
-      price:         115,
-      originalPrice: 150,
-      description:   "Fluid crepe in timeless ivory. Effortless, refined, endlessly versatile.",
-      rating:        4.4,
-      reviews:       190,
-      badge:         null,
-      emoji:         "👘",
-      stock:         25,
-      featured:      false,
-      tags:          ["blouse", "crepe", "casual", "tops"],
-      sizes:         ["XS","S","M","L","XL"],
-      colors:        ["#f5f0e8","#e8e0d0","#d4c9b5"],
-      sales:         0,
-      views:         0,
-    },
-    {
-      name:          "Midnight Trench Coat",
-      category:      "Coats",
-      price:         459,
-      originalPrice: null,
-      description:   "A classic reborn in midnight black. Structured shoulders, dramatic length, zero compromise.",
-      rating:        4.7,
-      reviews:       56,
-      badge:         "Hot",
-      emoji:         "🧥",
-      stock:         5,
-      featured:      false,
-      tags:          ["coat", "trench", "outerwear", "luxury"],
-      sizes:         ["XS","S","M","L","XL","XXL"],
-      colors:        ["#080808","#111111","#1a1a1a"],
-      sales:         0,
-      views:         0,
-    },
-  ];
+  // ── JACKETS ── (3 unique jacket photos)
+  {
+    name: 'Obsidian Leather Biker Jacket',
+    category: 'Jackets', price: 4990, originalPrice: 6490,
+    badge: 'New', rating: 4.8, reviews: 124, stock: 12, featured: true,
+    tags: ['jacket','leather','biker'],
+    imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop&q=85',
+    description: 'Premium black leather biker jacket with asymmetric zip, quilted lining, and silver matte hardware. A wardrobe essential that gets better with age.'
+  },
+  {
+    name: 'Slate Grey Bomber',
+    category: 'Jackets', price: 3490, originalPrice: 4290,
+    badge: 'Sale', rating: 4.6, reviews: 98, stock: 18, featured: false,
+    tags: ['jacket','bomber','grey'],
+    imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop&q=85',
+    description: 'Classic MA-1 silhouette in slate grey nylon. Ribbed cuffs and collar, signature orange satin lining. Lightweight and endlessly versatile.'
+  },
+  {
+    name: 'Camel Wool Overcoat',
+    category: 'Jackets', price: 8490, originalPrice: null,
+    badge: null, rating: 4.9, reviews: 67, stock: 8, featured: true,
+    tags: ['jacket','wool','overcoat'],
+    imageUrl: 'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=600&h=800&fit=crop&q=85',
+    description: 'Double-faced premium wool overcoat in classic camel. Notch lapels, belted waist, and deep side pockets. Timeless investment piece.'
+  },
 
-  // ── LOG HELPER ────────────────────────────────────────────
-  function log(msg, type = 'info') {
-    const icons = { info: 'ℹ', success: '✓', error: '✗', done: '★' };
-    const logEl = document.getElementById('log');
-    const line  = document.createElement('div');
-    line.className = `log-line ${type}`;
-    line.innerHTML = `<span class="icon">${icons[type]}</span><span class="msg">${msg}</span>`;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
+  // ── DRESSES ── (3 unique dress photos)
+  {
+    name: 'Champagne Silk Slip Dress',
+    category: 'Dresses', price: 4490, originalPrice: 5990,
+    badge: 'Sale', rating: 4.9, reviews: 203, stock: 15, featured: true,
+    tags: ['dress','silk','slip','midi'],
+    imageUrl: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=800&fit=crop&q=85',
+    description: 'Bias-cut pure silk slip dress in champagne. Adjustable spaghetti straps, delicate lace trim at hem. Effortless day-to-night elegance.'
+  },
+  {
+    name: 'Ivory Lace Midi Dress',
+    category: 'Dresses', price: 5490, originalPrice: 6990,
+    badge: 'Hot', rating: 4.8, reviews: 87, stock: 9, featured: true,
+    tags: ['dress','lace','midi','ivory'],
+    imageUrl: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop&q=85',
+    description: 'Delicate Chantilly lace midi dress with sweetheart neckline and fully boned lining. The one dress you will wear forever.'
+  },
+  {
+    name: 'Emerald Satin Evening Gown',
+    category: 'Dresses', price: 7990, originalPrice: null,
+    badge: 'New', rating: 4.9, reviews: 41, stock: 5, featured: true,
+    tags: ['dress','satin','gown','formal'],
+    imageUrl: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&h=800&fit=crop&q=85',
+    description: 'Floor-length emerald satin gown with deep cowl neck and open back. Pure, understated glamour for the most special occasions.'
+  },
 
-  function setProgress(done, total) {
-    const pct = Math.round((done / total) * 100);
-    document.getElementById('progress-bar').style.width = pct + '%';
-    document.getElementById('added-count').textContent  = done;
-  }
+  // ── TOPS ── (3 unique tops photos)
+  {
+    name: 'Ivory Silk Pussy-Bow Blouse',
+    category: 'Tops', price: 2490, originalPrice: 2990,
+    badge: 'Sale', rating: 4.6, reviews: 189, stock: 25, featured: false,
+    tags: ['top','silk','blouse','office'],
+    imageUrl: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=600&h=800&fit=crop&q=85',
+    description: 'Fluid ivory silk blouse with an elegant pussy-bow neckline and barrel cuffs. Tucks beautifully into high-waist trousers or skirts.'
+  },
+  {
+    name: 'Gold Chunky Knit Sweater',
+    category: 'Tops', price: 2990, originalPrice: 3490,
+    badge: 'Sale', rating: 4.5, reviews: 234, stock: 30, featured: true,
+    tags: ['top','knit','sweater','gold'],
+    imageUrl: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=800&fit=crop&q=85',
+    description: 'Chunky cable-knit sweater in warm gold. Relaxed oversized fit with ribbed hem and cuffs. The perfect autumn layering piece.'
+  },
+  {
+    name: 'Black Bardot Bodysuit',
+    category: 'Tops', price: 1990, originalPrice: null,
+    badge: 'Hot', rating: 4.7, reviews: 312, stock: 22, featured: true,
+    tags: ['top','bodysuit','bardot','night'],
+    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&h=800&fit=crop&q=85',
+    description: 'Sleek black off-shoulder bardot bodysuit in scuba fabric. Invisible back zip and press-stud crotch closure. Pairs with everything.'
+  },
 
-  function setChipStatus(idx, status) {
-    const chip = document.getElementById('chip-' + idx);
-    if (chip) chip.classList.add(status);
-  }
+  // ── SUITS ── (3 unique suit photos)
+  {
+    name: 'Graphite Linen Suit',
+    category: 'Suits', price: 11990, originalPrice: null,
+    badge: 'New', rating: 4.9, reviews: 78, stock: 7, featured: true,
+    tags: ['suit','linen','graphite'],
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&h=800&fit=crop&q=85',
+    description: 'Impeccably tailored graphite linen two-piece suit. Slim notch lapels, side vents, and flat-front trousers. Breathable luxury.'
+  },
+  {
+    name: 'Midnight Blue Tuxedo Suit',
+    category: 'Suits', price: 15990, originalPrice: null,
+    badge: 'Hot', rating: 4.9, reviews: 44, stock: 4, featured: true,
+    tags: ['suit','tuxedo','navy','formal'],
+    imageUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&h=800&fit=crop&q=85',
+    description: 'Midnight blue tuxedo with satin peak lapels and matching slim trousers. Fully canvassed construction. Crafted for unforgettable nights.'
+  },
+  {
+    name: 'Ivory Power Suit',
+    category: 'Suits', price: 13990, originalPrice: 15990,
+    badge: 'Sale', rating: 4.8, reviews: 56, stock: 6, featured: false,
+    tags: ['suit','ivory','power','office'],
+    imageUrl: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&h=800&fit=crop&q=85',
+    description: 'Commanding ivory power suit in stretch crepe. Padded shoulders, single-button blazer, and wide-leg high-rise trousers. Walk in, own the room.'
+  },
 
-  // ── SEED ALL ─────────────────────────────────────────────
-  window.seedAll = async function() {
-    const btn    = document.getElementById('seed-btn');
-    const delBtn = document.getElementById('delete-btn');
-    btn.disabled    = true;
-    delBtn.disabled = true;
-    btn.textContent = '⏳ Seeding...';
+  // ── BLAZERS ── (3 unique blazer photos)
+  {
+    name: 'Black Structured Blazer',
+    category: 'Blazers', price: 4990, originalPrice: 5990,
+    badge: 'Sale', rating: 4.8, reviews: 164, stock: 15, featured: true,
+    tags: ['blazer','black','structured'],
+    imageUrl: 'https://images.unsplash.com/photo-1563630423918-b58f07336ac9?w=600&h=800&fit=crop&q=85',
+    description: 'The essential black blazer — fully structured with padded shoulders, welt pockets and a clean single-button fastening. Dresses up or down effortlessly.'
+  },
+  {
+    name: 'Cream Bouclé Blazer',
+    category: 'Blazers', price: 6490, originalPrice: null,
+    badge: 'New', rating: 4.9, reviews: 71, stock: 6, featured: true,
+    tags: ['blazer','bouclé','cream','chanel'],
+    imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4f57?w=600&h=800&fit=crop&q=85',
+    description: 'Chanel-inspired cream bouclé blazer with gold chain trim and jewel buttons. Crafted from premium Italian bouclé fabric.'
+  },
+  {
+    name: 'Cobalt Oversized Blazer',
+    category: 'Blazers', price: 4490, originalPrice: 5490,
+    badge: 'Hot', rating: 4.7, reviews: 95, stock: 10, featured: false,
+    tags: ['blazer','cobalt','oversized','bold'],
+    imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&h=800&fit=crop&q=85',
+    description: 'Head-turning cobalt blue oversized blazer in stretch crepe. Wear over a mini dress or with tailored trousers for instant impact.'
+  },
 
-    let added = 0, errors = 0;
-    const col = collection(db, 'products');
+  // ── ACCESSORIES ── (3 unique accessory photos)
+  {
+    name: 'Gold Chunky Chain Necklace',
+    category: 'Accessories', price: 1990, originalPrice: null,
+    badge: 'New', rating: 4.8, reviews: 312, stock: 40, featured: true,
+    tags: ['accessory','necklace','gold','chain'],
+    imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop&q=85',
+    description: '18k gold-plated chunky chain necklace with oversized interlocking links. 45cm length with lobster clasp. Bold, architectural, and luxurious.'
+  },
+  {
+    name: 'Tan Structured Leather Tote',
+    category: 'Accessories', price: 5490, originalPrice: null,
+    badge: null, rating: 4.8, reviews: 87, stock: 14, featured: true,
+    tags: ['accessory','tote','leather','tan'],
+    imageUrl: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&h=800&fit=crop&q=85',
+    description: 'Structured tan full-grain leather tote with interior laptop compartment, zip pocket, and adjustable shoulder strap. Gold hardware throughout.'
+  },
+  {
+    name: 'Freshwater Pearl Drop Earrings',
+    category: 'Accessories', price: 1790, originalPrice: null,
+    badge: 'New', rating: 4.9, reviews: 145, stock: 35, featured: false,
+    tags: ['accessory','earrings','pearl','elegant'],
+    imageUrl: 'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=600&h=800&fit=crop&q=85',
+    description: 'Baroque freshwater pearl drop earrings on 18k gold vermeil hooks. 8-9mm pearls with natural lustre. Timeless, minimal elegance.'
+  },
 
-    log('Firebase se connect ho raha hai...', 'info');
-    log(`Total ${products.length} products add karne hain...`, 'info');
+  // ── COATS ── (3 unique coat photos)
+  {
+    name: 'Oatmeal Teddy Coat',
+    category: 'Coats', price: 7490, originalPrice: 8990,
+    badge: 'Sale', rating: 4.8, reviews: 143, stock: 10, featured: true,
+    tags: ['coat','teddy','oatmeal','winter'],
+    imageUrl: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600&h=800&fit=crop&q=85',
+    description: 'Cloud-soft oatmeal teddy coat with oversized shawl lapels and deep patch pockets. Wrap in warmth without sacrificing style.'
+  },
+  {
+    name: 'Red Statement Wool Coat',
+    category: 'Coats', price: 9490, originalPrice: null,
+    badge: 'Hot', rating: 4.9, reviews: 62, stock: 5, featured: true,
+    tags: ['coat','red','wool','statement'],
+    imageUrl: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?w=600&h=800&fit=crop&q=85',
+    description: 'Bold cherry-red pure wool wrap coat with self-tie belt. Floor-grazing length and clean minimal construction. The coat that stops traffic.'
+  },
+  {
+    name: 'Black Leather Longline Trench',
+    category: 'Coats', price: 12990, originalPrice: null,
+    badge: 'New', rating: 4.9, reviews: 38, stock: 4, featured: true,
+    tags: ['coat','leather','trench','black'],
+    imageUrl: 'https://images.unsplash.com/photo-1520975954964-e7e0d5bf4f9d?w=600&h=800&fit=crop&q=85',
+    description: 'Buttery black lambskin leather trench coat. Double-breasted with self-belt, knee length with back vent. An investment coat for life.'
+  },
 
-    for (let i = 0; i < products.length; i++) {
-      const p = { ...products[i], createdAt: serverTimestamp() };
+];
 
-      // Remove null fields
-      Object.keys(p).forEach(k => { if (p[k] === null) delete p[k]; });
+// ── Helpers ───────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const box = document.getElementById('log');
+  const d   = document.createElement('div');
+  d.className = `log-item ${type}`;
+  d.textContent = `[${new Date().toLocaleTimeString()}]  ${msg}`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function setProgress(n) {
+  document.getElementById('prog-bar').style.width = `${(n / PRODUCTS.length) * 100}%`;
+  document.getElementById('s-done').textContent = n;
+}
 
-      try {
-        const ref = await addDoc(col, p);
-        added++;
-        log(`✓ "${p.name}" added! (ID: ${ref.id.slice(0,8)}...)`, 'success');
-        setChipStatus(i, 'added');
-        setProgress(added, products.length);
-        document.getElementById('added-count').textContent = added;
-      } catch (err) {
-        errors++;
-        log(`✗ "${p.name}" failed: ${err.message}`, 'error');
-        setChipStatus(i, 'error');
-        document.getElementById('error-count').textContent = errors;
-      }
-
-      // Small delay to avoid rate limiting
-      await new Promise(r => setTimeout(r, 300));
-    }
-
-    // Done!
-    if (errors === 0) {
-      log(`🎉 DONE! ${added}/${products.length} products successfully added!`, 'done');
-      log('Ab apni website reload karo — products dikhenge!', 'done');
-      btn.textContent = '✅ All Done!';
-      btn.style.background = '#27ae60';
-      btn.style.color = '#fff';
-    } else {
-      log(`⚠ ${added} added, ${errors} failed. Rules check karo.`, 'error');
-      btn.textContent = '⚠ Done with errors';
+// ── Step 1: Delete all ────────────────────────────────────
+window.deleteAll = async () => {
+  const btn = document.getElementById('delete-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin"></div>  Deleting…';
+  log('Fetching existing products…', 'warn');
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    if (snap.empty) {
+      log('Collection already empty — nothing to delete.', 'info');
+      btn.innerHTML = '✓  Already Empty';
       btn.disabled = false;
+      return;
     }
-
-    delBtn.disabled = false;
-  };
-
-  // ── DELETE ALL ────────────────────────────────────────────
-  window.deleteAll = async function() {
-    if (!confirm('Pakka? Saare products delete ho jayenge!')) return;
-
-    const btn    = document.getElementById('delete-btn');
-    const seedBtn= document.getElementById('seed-btn');
-    btn.disabled    = true;
-    seedBtn.disabled= true;
-    btn.textContent = '⏳ Deleting...';
-
-    log('Saare products delete ho rahe hain...', 'info');
-
-    try {
-      const snap = await getDocs(collection(db, 'products'));
-      let count  = 0;
-
-      for (const d of snap.docs) {
-        await deleteDoc(doc(db, 'products', d.id));
-        count++;
-        log(`Deleted: ${d.data().name || d.id}`, 'error');
-      }
-
-      log(`✓ ${count} products delete ho gaye!`, 'done');
-
-      // Reset UI
-      document.getElementById('added-count').textContent = '0';
-      document.getElementById('error-count').textContent = '0';
-      document.getElementById('progress-bar').style.width = '0%';
-      document.querySelectorAll('.chip').forEach(c => { c.classList.remove('added','error'); });
-
-      btn.textContent  = '🗑️ Delete All Products (Reset)';
-      seedBtn.disabled = false;
-      seedBtn.textContent = '🚀 Seed All Products to Firestore';
-      seedBtn.style.background = '#c9a96e';
-      seedBtn.style.color = '#080808';
-    } catch (err) {
-      log(`Error: ${err.message}`, 'error');
-      log('Firestore Rules mein write permission check karo!', 'info');
+    log(`Deleting ${snap.size} products…`, 'warn');
+    let batch = writeBatch(db), count = 0, total = 0;
+    for (const d of snap.docs) {
+      batch.delete(d.ref);
+      count++; total++;
+      if (count === 499) { await batch.commit(); batch = writeBatch(db); count = 0; }
     }
-
+    if (count > 0) await batch.commit();
+    log(`✓  Deleted ${total} products successfully.`, 'ok');
+    btn.innerHTML = '✓  Step 1 Done — All Deleted';
+  } catch (e) {
+    log(`Error: ${e.message}`, 'err');
     btn.disabled = false;
-  };
-</script>
+    btn.innerHTML = '🗑️  Step 1 — Delete ALL Existing Products';
+  }
+};
 
+// ── Step 2: Seed ──────────────────────────────────────────
+window.seedAll = async () => {
+  const btn = document.getElementById('seed-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin"></div>  Seeding products…';
+  log(`Seeding ${PRODUCTS.length} products…`, 'info');
+  let done = 0;
+  for (const p of PRODUCTS) {
+    try {
+      await addDoc(collection(db, 'products'), {
+        ...p,
+        createdAt:  serverTimestamp(),
+        sales: Math.floor(Math.random() * 200),
+        views: Math.floor(Math.random() * 2000),
+      });
+      done++;
+      setProgress(done);
+      log(`✓  [${done}/${PRODUCTS.length}]  ${p.category}  —  ${p.name}`, 'ok');
+    } catch (e) {
+      log(`✗  ${p.name}: ${e.message}`, 'err');
+    }
+  }
+  log(`🎉  Done! ${done} of ${PRODUCTS.length} products seeded.`, 'ok');
+  btn.innerHTML = `✅  ${done} Products Seeded — Go check your store!`;
+};
+</script>
 </body>
 </html>
