@@ -4,214 +4,618 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign In — LUXE</title>
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .hidden { display: none !important; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .auth-visual-circles {
-      position: absolute; inset: 0;
+    :root {
+      --gold: #c9a96e; --gold-light: #e2c998; --gold-dim: rgba(201,169,110,.12);
+      --bg: #080808; --bg2: #0f0f0f; --bg3: #161616; --bg4: #1e1e1e;
+      --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12);
+      --text1: #f5f0e8; --text2: #a0a0a0; --text3: #444;
+      --green: #22c55e; --red: #ef4444;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text1);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ══ LEFT PANEL ══════════════════════════════════════ */
+    .left {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      pointer-events: none;
+      background: var(--bg2);
     }
-    .auth-visual-circles span {
+
+    @media (max-width: 860px) { .left { display: none; } }
+
+    /* moving grid */
+    .left-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(201,169,110,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,169,110,.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+      animation: gridMove 18s linear infinite;
+    }
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to   { background-position: 56px 56px; }
+    }
+
+    /* glow orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(90px); opacity: .1;
+      animation: orbPulse 7s ease-in-out infinite;
+    }
+    .orb1 { width: 500px; height: 500px; background: #c9a96e; top: -15%; left: -15%; }
+    .orb2 { width: 350px; height: 350px; background: #7c5c2a; bottom: 5%; right: -10%; animation-delay: -3.5s; }
+    @keyframes orbPulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.08) translateY(-20px); }
+    }
+
+    /* floating cards */
+    .float-cards { position: absolute; inset: 0; pointer-events: none; }
+    .fc {
       position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(201,169,110,0.1);
-      animation: pulse-gold 4s ease-in-out infinite;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(201,169,110,.12);
+      border-radius: 12px;
+      padding: .85rem 1rem;
+      animation: fcFloat 6s ease-in-out infinite;
+      backdrop-filter: blur(4px);
     }
+    .fc:nth-child(1) { top: 18%; left:  8%; animation-delay: 0s; }
+    .fc:nth-child(2) { top: 40%; right: 8%; animation-delay: -2s; }
+    .fc:nth-child(3) { bottom: 22%; left: 12%; animation-delay: -4s; }
+    @keyframes fcFloat {
+      0%,100% { transform: translateY(0)  rotate(-1.5deg); }
+      50%      { transform: translateY(-14px) rotate(1.5deg); }
+    }
+    .fc .fc-emoji { font-size: 1.8rem; }
+    .fc .fc-name  { font-size: .68rem; color: var(--gold); margin-top: .3rem; }
+    .fc .fc-price { font-size: .72rem; color: var(--text3); }
+
+    .left-content {
+      position: relative; z-index: 1;
+      text-align: center; padding: 3rem;
+      max-width: 460px;
+    }
+
+    .left-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem; letter-spacing: .2em;
+      color: var(--text1); display: block; margin-bottom: .3rem;
+    }
+    .left-logo span { color: var(--gold); }
+
+    .left-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300;
+      font-style: italic; color: var(--text1);
+      line-height: 1.45; margin-bottom: 1.25rem;
+    }
+
+    .left-sub { font-size: .82rem; color: var(--text3); line-height: 1.9; margin-bottom: 2.5rem; }
+
+    .features { display: flex; flex-direction: column; gap: .7rem; text-align: left; }
+    .feature {
+      display: flex; align-items: center; gap: .75rem;
+      font-size: .8rem; color: var(--text2);
+    }
+    .feature-icon {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,169,110,.18);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+    }
+
+    /* ══ RIGHT PANEL ═════════════════════════════════════ */
+    .right {
+      width: 460px; flex-shrink: 0;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 2.5rem;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 860px) {
+      .right { width: 100%; border-left: none; }
+    }
+
+    .form-wrap {
+      width: 100%; max-width: 360px;
+      animation: slideUp .45s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-head { margin-bottom: 1.75rem; }
+    .form-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 400; color: var(--text1);
+    }
+    .form-head p { font-size: .8rem; color: var(--text3); margin-top: .35rem; }
+
+    /* tabs */
+    .tabs {
+      display: flex; gap: 0; margin-bottom: 1.75rem;
+      background: var(--bg3); border-radius: 9px; padding: 4px;
+      border: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1; padding: .65rem; background: transparent; border: none;
+      border-radius: 6px; font-family: 'DM Sans', sans-serif;
+      font-size: .8rem; font-weight: 600; color: var(--text3);
+      cursor: pointer; transition: all .22s;
+    }
+    .tab.on { background: var(--bg4); color: var(--gold); box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+
+    /* alerts */
+    .alert {
+      border-radius: 8px; padding: .7rem 1rem;
+      font-size: .78rem; margin-bottom: 1rem;
+      display: none; align-items: center; gap: .5rem;
+    }
+    .alert.err  { background: rgba(239,68,68,.08);  border: 1px solid rgba(239,68,68,.2);  color: #f87171; }
+    .alert.ok   { background: rgba(34,197,94,.08);  border: 1px solid rgba(34,197,94,.2);  color: #4ade80; }
+
+    /* google btn */
+    .g-btn {
+      width: 100%; padding: .75rem;
+      background: var(--bg3); border: 1.5px solid var(--bg4);
+      border-radius: 9px; color: #ccc;
+      font-family: 'DM Sans', sans-serif; font-size: .84rem; font-weight: 600;
+      cursor: pointer; transition: all .22s;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+    }
+    .g-btn:hover { background: var(--bg4); border-color: var(--border2); color: #fff; }
+
+    /* divider */
+    .div-or {
+      text-align: center; font-size: .7rem; color: var(--text3);
+      margin: 1.1rem 0; position: relative;
+    }
+    .div-or::before, .div-or::after {
+      content: ''; position: absolute; top: 50%;
+      width: calc(50% - 1.4rem); height: 1px; background: var(--bg4);
+    }
+    .div-or::before { left: 0; }
+    .div-or::after  { right: 0; }
+
+    /* form fields */
+    .fg { margin-bottom: .95rem; }
+    .fl {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: .4rem;
+    }
+    .fl label, label.fl {
+      font-size: .67rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--text3);
+    }
+    .f-link { font-size: .72rem; color: var(--gold); background: none; border: none; cursor: pointer; }
+    .f-link:hover { text-decoration: underline; }
+
+    .fi-wrap { position: relative; }
+    .fi-icon {
+      position: absolute; left: .9rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3); font-size: .8rem; pointer-events: none;
+      transition: color .2s;
+    }
+    .fi-inp {
+      width: 100%; background: var(--bg3);
+      border: 1.5px solid var(--bg4); border-radius: 9px;
+      color: var(--text1); font-family: 'DM Sans', sans-serif;
+      font-size: .87rem; padding: .72rem 1rem .72rem 2.5rem;
+      outline: none; transition: all .22s;
+    }
+    .fi-inp:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,.08); }
+    .fi-inp:focus + .fi-icon { color: var(--gold); }
+    .fi-inp::placeholder { color: var(--text3); }
+    .fi-eye {
+      position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text3); cursor: pointer;
+      font-size: .82rem; transition: color .2s;
+    }
+    .fi-eye:hover { color: var(--gold); }
+
+    /* password strength */
+    .pwd-bars { display: flex; gap: 3px; margin-top: 6px; }
+    .pwd-bar { flex: 1; height: 3px; background: var(--bg4); border-radius: 2px; transition: background .3s; }
+    .bar-weak   { background: #ef4444; }
+    .bar-medium { background: #f59e0b; }
+    .bar-strong { background: #22c55e; }
+
+    /* submit */
+    .submit-btn {
+      width: 100%; padding: .82rem;
+      background: var(--gold); color: #080808;
+      border: none; border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 700;
+      cursor: pointer; transition: all .25s;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(201,169,110,.28);
+    }
+    .submit-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    /* spinner */
+    .spin {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(8,8,8,.3); border-top-color: #080808;
+      border-radius: 50%; animation: sp .7s linear infinite;
+    }
+    @keyframes sp { to { transform: rotate(360deg); } }
+
+    .switch-link { text-align: center; margin-top: 1.25rem; font-size: .78rem; color: var(--text3); }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<!-- ════ LEFT ════════════════════════════════════════════ -->
+<div class="left">
+  <div class="left-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-<!-- Minimal Nav -->
-<nav class="nav" id="main-nav" style="background:transparent">
-  <div class="nav__inner">
-    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
-    <div style="font-size:0.8rem;color:var(--gray-3)">
-      Have an account? Sign in below
-    </div>
-    <a href="index.html" class="btn btn-ghost btn-sm">
-      <i class="fa fa-arrow-left"></i> Back to Store
-    </a>
-  </div>
-</nav>
-
-<div class="auth-page">
-  <!-- Visual Side -->
-  <div class="auth-page__visual">
-    <div class="auth-page__visual-bg"></div>
-
-    <!-- Animated circles -->
-    <div class="auth-visual-circles">
-      <span style="width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:0s"></span>
-      <span style="width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:1s"></span>
-      <span style="width:200px;height:200px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:2s"></span>
-    </div>
-
-    <div class="auth-page__visual-content">
-      <div style="font-size:5rem;margin-bottom:1.5rem;animation:fadeIn 1s both">✦</div>
-      <h2 style="animation:fadeInUp 1s 0.2s both">Welcome<br><em style="color:var(--gold)">Back.</em></h2>
-      <div class="divider" style="margin:2rem auto"></div>
-      <p style="animation:fadeInUp 1s 0.4s both;max-width:320px">
-        Sign in to access your wishlist, track orders, and enjoy a personalized experience.
-      </p>
-
-      <div style="margin-top:3rem;display:flex;flex-direction:column;gap:1rem;animation:fadeInUp 1s 0.6s both">
-        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--gray-2)">
-          <span style="color:var(--gold)">✓</span> Exclusive member discounts
-        </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--gray-2)">
-          <span style="color:var(--gold)">✓</span> Early access to new collections
-        </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--gray-2)">
-          <span style="color:var(--gold)">✓</span> Order history &amp; tracking
-        </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--gray-2)">
-          <span style="color:var(--gold)">✓</span> Saved wishlist across devices
-        </div>
-      </div>
-    </div>
+  <div class="float-cards">
+    <div class="fc"><div class="fc-emoji">🧥</div><div class="fc-name">Noir Jacket</div><div class="fc-price">₹2,890</div></div>
+    <div class="fc"><div class="fc-emoji">👗</div><div class="fc-name">Silk Dress</div><div class="fc-price">₹1,990</div></div>
+    <div class="fc"><div class="fc-emoji">👔</div><div class="fc-name">Linen Suit</div><div class="fc-price">₹5,990</div></div>
   </div>
 
-  <!-- Form Side -->
-  <div class="auth-page__form-side">
-    <div class="auth-form-wrap">
-
-      <!-- Tabs -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">Sign In</button>
-        <button class="auth-tab" data-tab="register">Create Account</button>
-      </div>
-
-      <!-- Social Buttons -->
-      <div class="social-btns" style="margin-bottom:1.5rem">
-        <button class="btn-social btn-google">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18Z" fill="#4285F4"/><path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17Z" fill="#34A853"/><path d="M4.5 10.48a4.76 4.76 0 0 1 0-3.04V5.37H1.83a8 8 0 0 0 0 7.18l2.67-2.07Z" fill="#FBBC05"/><path d="M8.98 3.76a4.35 4.35 0 0 1 3.08 1.2L14.17 2.8A7.7 7.7 0 0 0 8.98 1a8 8 0 0 0-7.15 4.37l2.67 2.07a4.78 4.78 0 0 1 4.48-3.68Z" fill="#EA4335"/></svg>
-          Continue with Google
-        </button>
-      </div>
-
-      <div class="auth-divider">or</div>
-
-      <!-- Login Form -->
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label" for="login-email">Email Address</label>
-          <div class="form-input-wrap">
-            <i class="fa fa-envelope icon"></i>
-            <input class="form-input" type="email" id="login-email" name="email"
-              placeholder="you@example.com" required autocomplete="email">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
-            <label class="form-label" style="margin:0" for="login-password">Password</label>
-            <a href="#" id="forgot-pass" style="font-size:0.72rem;color:var(--gold)">Forgot password?</a>
-          </div>
-          <div class="form-input-wrap">
-            <i class="fa fa-lock icon"></i>
-            <input class="form-input" type="password" id="login-password" name="password"
-              placeholder="Your password" required autocomplete="current-password">
-            <button type="button" class="form-toggle-pass">👁️</button>
-          </div>
-        </div>
-
-        <div style="margin-bottom:1.5rem">
-          <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--gray-2);cursor:none">
-            <input type="checkbox" style="accent-color:var(--gold)"> Remember me
-          </label>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block btn-lg">
-          Sign In
-        </button>
-
-        <p style="text-align:center;margin-top:1.5rem;font-size:0.82rem;color:var(--gray-3)">
-          Don't have an account?
-          <a href="#" onclick="switchTab('register')" style="color:var(--gold)">Create one</a>
-        </p>
-      </form>
-
-      <!-- Register Form -->
-      <form id="register-form" class="hidden">
-        <div class="form-group">
-          <label class="form-label" for="reg-name">Full Name</label>
-          <div class="form-input-wrap">
-            <i class="fa fa-user icon"></i>
-            <input class="form-input" type="text" id="reg-name" name="name"
-              placeholder="Your full name" required autocomplete="name">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="reg-email">Email Address</label>
-          <div class="form-input-wrap">
-            <i class="fa fa-envelope icon"></i>
-            <input class="form-input" type="email" id="reg-email" name="email"
-              placeholder="you@example.com" required autocomplete="email">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="reg-password">Password</label>
-          <div class="form-input-wrap">
-            <i class="fa fa-lock icon"></i>
-            <input class="form-input" type="password" id="reg-password"
-              placeholder="Min. 6 characters" required autocomplete="new-password">
-            <button type="button" class="form-toggle-pass">👁️</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="reg-password2">Confirm Password</label>
-          <div class="form-input-wrap">
-            <i class="fa fa-lock icon"></i>
-            <input class="form-input" type="password" id="reg-password2"
-              placeholder="Repeat your password" required autocomplete="new-password">
-          </div>
-        </div>
-
-        <div style="margin-bottom:1.5rem">
-          <label style="display:flex;align-items:flex-start;gap:0.5rem;font-size:0.8rem;color:var(--gray-2);cursor:none">
-            <input type="checkbox" required style="accent-color:var(--gold);margin-top:0.15rem">
-            I agree to the <a href="#" style="color:var(--gold)">Terms</a> and
-            <a href="#" style="color:var(--gold)">Privacy Policy</a>
-          </label>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block btn-lg">
-          Create Account
-        </button>
-
-        <p style="text-align:center;margin-top:1.5rem;font-size:0.82rem;color:var(--gray-3)">
-          Already have an account?
-          <a href="#" onclick="switchTab('login')" style="color:var(--gold)">Sign in</a>
-        </p>
-      </form>
-
+  <div class="left-content">
+    <span class="left-logo">LU<span>X</span>E</span>
+    <div class="left-tagline">"Where luxury<br>meets intention."</div>
+    <p class="left-sub">India's most curated fashion destination.<br>Free delivery above ₹999 · Easy 7-day returns.</p>
+    <div class="features">
+      <div class="feature"><div class="feature-icon">✨</div><span>Handpicked luxury pieces, new every week</span></div>
+      <div class="feature"><div class="feature-icon">🚚</div><span>Free delivery pan-India above ₹999</span></div>
+      <div class="feature"><div class="feature-icon">📱</div><span>Pay via UPI, Cards, NetBanking or COD</span></div>
+      <div class="feature"><div class="feature-icon">🔒</div><span>100% secure checkout — SSL encrypted</span></div>
     </div>
   </div>
 </div>
 
-<div class="toast-container"></div>
+<!-- ════ RIGHT — FORM ════════════════════════════════════ -->
+<div class="right">
+  <div class="form-wrap">
 
+    <div class="form-head">
+      <h2 id="fh-title">Welcome Back</h2>
+      <p id="fh-sub">Sign in to continue shopping</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab on" id="tab-login"    onclick="go('login')">Sign In</button>
+      <button class="tab"    id="tab-register" onclick="go('register')">Create Account</button>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert err" id="a-err"><i class="fa fa-exclamation-circle"></i><span id="a-err-msg"></span></div>
+    <div class="alert ok"  id="a-ok"><i class="fa fa-check-circle"></i><span id="a-ok-msg"></span></div>
+
+    <!-- Google -->
+    <button class="g-btn" onclick="doGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6A7.8 7.8 0 0 0 16.87 9.1c0-.57-.05-.8-.15-1.1z" fill="#4285F4"/>
+        <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z" fill="#34A853"/>
+        <path d="M4.5 10.48a4.76 4.76 0 0 1 0-3.04V5.37H1.83a8 8 0 0 0 0 7.18l2.67-2.07z" fill="#FBBC05"/>
+        <path d="M8.98 3.76a4.35 4.35 0 0 1 3.08 1.2l2.11-2.16A7.7 7.7 0 0 0 8.98 1a8 8 0 0 0-7.15 4.37l2.67 2.07a4.78 4.78 0 0 1 4.48-3.68z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="div-or">or</div>
+
+    <!-- ── LOGIN FORM ────────────────────────────────── -->
+    <form id="f-login" onsubmit="doLogin(event)">
+
+      <div class="fg">
+        <label class="fl">Email Address</label>
+        <div class="fi-wrap">
+          <input type="email" class="fi-inp" id="l-email"
+            placeholder="aap@example.com" required autocomplete="email">
+          <i class="fi-icon fa fa-envelope"></i>
+        </div>
+      </div>
+
+      <div class="fg">
+        <div class="fl">
+          <label>Password</label>
+          <button type="button" class="f-link" onclick="doForgot()">Forgot password?</button>
+        </div>
+        <div class="fi-wrap">
+          <input type="password" class="fi-inp" id="l-pass"
+            placeholder="••••••••" required autocomplete="current-password">
+          <i class="fi-icon fa fa-lock"></i>
+          <button type="button" class="fi-eye" onclick="toggleEye('l-pass',this)"><i class="fa fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="btn-login" type="submit">
+        Sign In &nbsp;<i class="fa fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <!-- ── REGISTER FORM ─────────────────────────────── -->
+    <form id="f-reg" class="hidden" onsubmit="doRegister(event)">
+
+      <div class="fg">
+        <label class="fl">Full Name</label>
+        <div class="fi-wrap">
+          <input type="text" class="fi-inp" id="r-name"
+            placeholder="Aapka poora naam" required autocomplete="name">
+          <i class="fi-icon fa fa-user"></i>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Email Address</label>
+        <div class="fi-wrap">
+          <input type="email" class="fi-inp" id="r-email"
+            placeholder="aap@example.com" required autocomplete="email">
+          <i class="fi-icon fa fa-envelope"></i>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Password</label>
+        <div class="fi-wrap">
+          <input type="password" class="fi-inp" id="r-pass"
+            placeholder="Min. 6 characters" required oninput="pwdStr(this.value)">
+          <i class="fi-icon fa fa-lock"></i>
+          <button type="button" class="fi-eye" onclick="toggleEye('r-pass',this)"><i class="fa fa-eye"></i></button>
+        </div>
+        <div class="pwd-bars">
+          <div class="pwd-bar" id="pb1"></div><div class="pwd-bar" id="pb2"></div>
+          <div class="pwd-bar" id="pb3"></div><div class="pwd-bar" id="pb4"></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Confirm Password</label>
+        <div class="fi-wrap">
+          <input type="password" class="fi-inp" id="r-confirm"
+            placeholder="Password dobara likhein" required>
+          <i class="fi-icon fa fa-lock"></i>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:1.1rem">
+        <input type="checkbox" id="r-terms" required
+          style="accent-color:var(--gold);margin-top:3px;flex-shrink:0">
+        <label for="r-terms" style="font-size:.74rem;color:var(--text3);line-height:1.5;cursor:pointer">
+          I agree to the Terms of Service and Privacy Policy
+        </label>
+      </div>
+
+      <button class="submit-btn" id="btn-reg" type="submit">
+        Create Account &nbsp;<i class="fa fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <p class="switch-link" id="sw-txt">
+      Pehli baar aa rahe ho?
+      <button class="f-link" onclick="go('register')">Account banao</button>
+    </p>
+
+  </div>
+</div>
+
+<!-- ════ SCRIPT ══════════════════════════════════════════ -->
 <script type="module">
-  import { initApp }      from './js/app.js';
-  import { initAuthPage } from './js/auth.js';
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  updateProfile,
+  sendPasswordResetEmail,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  initApp();
-  initAuthPage();
+// ── Firebase (same config as rest of site) ────────────────
+const FC = {
+  apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+  authDomain:        "shopzz-ca17e.firebaseapp.com",
+  projectId:         "shopzz-ca17e",
+  storageBucket:     "shopzz-ca17e.firebasestorage.app",
+  messagingSenderId: "158388352339",
+  appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
+};
 
-  window.switchTab = (tab) => {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-    document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
-    document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
-  };
+let _app;
+try       { _app = initializeApp(FC); }
+catch (e) { _app = initializeApp(FC, 'auth_page'); }
+const auth = getAuth(_app);
+const db   = getFirestore(_app);
+
+// ── Where to go after success ─────────────────────────────
+const params  = new URLSearchParams(location.search);
+const nextUrl = params.get('next') || 'index.html';
+
+// If already logged in → skip straight to destination
+onAuthStateChanged(auth, user => {
+  if (user) window.location.replace(nextUrl);
+});
+
+// ── Save user profile ─────────────────────────────────────
+async function saveProfile(user, extra = {}) {
+  const ref  = doc(db, 'users', user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid, email: user.email,
+      displayName: user.displayName || extra.name || '',
+      photoURL: user.photoURL || '',
+      role: 'customer',
+      createdAt: serverTimestamp(),
+    });
+  }
+}
+
+// ── Tab switch ────────────────────────────────────────────
+window.go = (tab) => {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('on', isLogin);
+  document.getElementById('tab-register').classList.toggle('on', !isLogin);
+  document.getElementById('f-login').classList.toggle('hidden', !isLogin);
+  document.getElementById('f-reg').classList.toggle('hidden', isLogin);
+  document.getElementById('fh-title').textContent = isLogin ? 'Welcome Back' : 'Create Account';
+  document.getElementById('fh-sub').textContent   = isLogin ? 'Sign in to continue shopping' : "Join LUXE — it's free!";
+  document.getElementById('sw-txt').innerHTML     = isLogin
+    ? 'Pehli baar aa rahe ho? <button class="f-link" onclick="go(\'register\')">Account banao</button>'
+    : 'Already account hai? <button class="f-link" onclick="go(\'login\')">Sign in karo</button>';
+  clearAlerts();
+};
+
+// ── Login ─────────────────────────────────────────────────
+window.doLogin = async (e) => {
+  e.preventDefault();
+  const btn   = document.getElementById('btn-login');
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  clearAlerts(); setLoad(btn, true);
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    showOk('Login successful! Redirecting…');
+    setTimeout(() => window.location.replace(nextUrl), 700);
+  } catch (err) {
+    showErr(msg(err.code));
+    setLoad(btn, false, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
+  }
+};
+
+// ── Register ──────────────────────────────────────────────
+window.doRegister = async (e) => {
+  e.preventDefault();
+  const btn    = document.getElementById('btn-reg');
+  const name   = document.getElementById('r-name').value.trim();
+  const email  = document.getElementById('r-email').value.trim();
+  const pass   = document.getElementById('r-pass').value;
+  const conf   = document.getElementById('r-confirm').value;
+  clearAlerts();
+  if (pass !== conf)   { showErr('Passwords match nahi kar rahe!'); return; }
+  if (pass.length < 6) { showErr('Password kam se kam 6 characters ka hona chahiye.'); return; }
+  setLoad(btn, true);
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await saveProfile(cred.user, { name });
+    showOk(`Welcome ${name}! Account ban gaya ✅ Redirecting…`);
+    setTimeout(() => window.location.replace(nextUrl), 900);
+  } catch (err) {
+    showErr(msg(err.code));
+    setLoad(btn, false, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
+  }
+};
+
+// ── Google ────────────────────────────────────────────────
+window.doGoogle = async () => {
+  clearAlerts();
+  try {
+    const res = await signInWithPopup(auth, new GoogleAuthProvider());
+    await saveProfile(res.user);
+    showOk('Google se login ho gaya! Redirecting…');
+    setTimeout(() => window.location.replace(nextUrl), 700);
+  } catch (err) {
+    if (err.code !== 'auth/popup-closed-by-user') showErr(msg(err.code));
+  }
+};
+
+// ── Forgot password ───────────────────────────────────────
+window.doForgot = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  if (!email) { showErr('Pehle email address daalo.'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showOk(`Reset email bhej diya ${email} pe! Inbox check karo.`);
+  } catch (err) { showErr(msg(err.code)); }
+};
+
+// ── Password strength ─────────────────────────────────────
+window.pwdStr = (v) => {
+  const bars = ['pb1','pb2','pb3','pb4'].map(id => document.getElementById(id));
+  bars.forEach(b => b.className = 'pwd-bar');
+  let s = 0;
+  if (v.length >= 6) s++;
+  if (v.length >= 10) s++;
+  if (/[A-Z]/.test(v) && /[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const cls = s <= 1 ? 'bar-weak' : s <= 2 ? 'bar-medium' : 'bar-strong';
+  for (let i = 0; i < s; i++) bars[i].className = `pwd-bar ${cls}`;
+};
+
+// ── Helpers ───────────────────────────────────────────────
+window.toggleEye = (id, btn) => {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.querySelector('i').className = `fa fa-eye${inp.type === 'password' ? '' : '-slash'}`;
+};
+
+function setLoad(btn, on, html = '') {
+  btn.disabled = on;
+  btn.innerHTML = on ? '<div class="spin"></div>' : html;
+}
+function showErr(text) {
+  const el = document.getElementById('a-err');
+  document.getElementById('a-err-msg').textContent = text;
+  el.style.display = 'flex';
+}
+function showOk(text) {
+  const el = document.getElementById('a-ok');
+  document.getElementById('a-ok-msg').textContent = text;
+  el.style.display = 'flex';
+}
+function clearAlerts() {
+  document.getElementById('a-err').style.display = 'none';
+  document.getElementById('a-ok').style.display  = 'none';
+}
+function msg(code) {
+  return ({
+    'auth/user-not-found':      'Is email pe koi account nahi mila.',
+    'auth/wrong-password':      'Password galat hai.',
+    'auth/invalid-credential':  'Email ya password galat hai.',
+    'auth/email-already-in-use':'Yeh email already registered hai.',
+    'auth/invalid-email':       'Valid email daalo.',
+    'auth/weak-password':       'Password zyada strong banao.',
+    'auth/too-many-requests':   'Bahut attempts ho gaye. Thodi der baad try karo.',
+    'auth/network-request-failed': 'Network error. Internet check karo.',
+  })[code] || 'Kuch gadbad ho gayi. Dobara try karo.';
+}
 </script>
 </body>
 </html>

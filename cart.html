@@ -21,7 +21,10 @@
     </ul>
     <div class="nav__actions">
       <button class="nav__icon-btn" id="search-btn"><i class="fa fa-search"></i></button>
-      <a href="auth.html" class="nav__icon-btn"><i class="fa fa-user"></i></a>
+      <button class="nav__icon-btn" id="nav-user-btn" title="My Account"
+        style="font-size:.75rem;font-weight:700;color:var(--gold)"><i class="fa fa-user"></i></button>
+      <button class="nav__icon-btn" id="nav-logout-btn" style="display:none;font-size:.9rem"
+        title="Sign Out"><i class="fa fa-sign-out-alt"></i></button>
       <a href="cart.html" class="nav__icon-btn active" style="border-color:var(--gold);color:var(--gold)">
         <i class="fa fa-shopping-bag"></i>
         <span class="nav__cart-badge"></span>
@@ -124,6 +127,7 @@
   </div>
 </div>
 
+<script type="module" src="./js/auth-guard.js"></script>
 <script type="module">
   import { initApp, LocalCart } from './js/app.js';
   import { initCartPage }       from './js/cart.js';
