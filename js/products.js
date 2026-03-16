@@ -7,7 +7,6 @@ import { LocalCart, Wishlist, formatPrice, starsHTML, showToast, debounce } from
 import {
   collection, doc, getDocs, getDoc,
   addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, limit, startAfter,
   serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -35,19 +34,41 @@ export const DEMO_PRODUCTS = [
 ];
 
 // ── Fetch All / Paginated ─────────────────────────────────
+// NOTE: All filtering & sorting is done CLIENT-SIDE to avoid
+// Firestore composite index requirements. Simple getDocs on
+// the whole collection, then filter/sort/paginate in JS.
 export async function fetchProducts({ category = null, sort = 'createdAt', lastDoc = null, pageSize = PAGE_SIZE, featured = null } = {}) {
-  const q           = collection(db, PRODUCTS_COL);
-  const constraints = [];
-  if (category)        constraints.push(where('category', '==', category));
-  if (featured !== null) constraints.push(where('featured', '==', featured));
-  constraints.push(orderBy(sort, sort === 'price' ? 'asc' : 'desc'));
-  constraints.push(limit(pageSize));
-  if (lastDoc)         constraints.push(startAfter(lastDoc));
+  // Fetch everything — no compound where+orderBy = no index needed
+  const snap = await getDocs(collection(db, PRODUCTS_COL));
+  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  const snap = await getDocs(query(q, ...constraints));
-  const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  const last = snap.docs[snap.docs.length - 1] || null;
-  return { products: docs, lastDoc: last, hasMore: docs.length === pageSize };
+  // ── Filter ──
+  if (category)          docs = docs.filter(p => p.category === category);
+  if (featured !== null) docs = docs.filter(p => p.featured === featured);
+
+  // ── Sort ──
+  docs.sort((a, b) => {
+    if (sort === 'price')      return (a.price || 0) - (b.price || 0);
+    if (sort === 'price_desc') return (b.price || 0) - (a.price || 0);
+    if (sort === 'rating')     return (b.rating || 0) - (a.rating || 0);
+    if (sort === 'name')       return (a.name || '').localeCompare(b.name || '');
+    // default: createdAt desc
+    const aT = a.createdAt?.toMillis?.() ?? a.createdAt ?? 0;
+    const bT = b.createdAt?.toMillis?.() ?? b.createdAt ?? 0;
+    return bT - aT;
+  });
+
+  // ── Paginate using id-based offset ──
+  let startIdx = 0;
+  if (lastDoc) {
+    const idx = docs.findIndex(p => p.id === lastDoc);
+    if (idx !== -1) startIdx = idx + 1;
+  }
+  const page    = docs.slice(startIdx, startIdx + pageSize);
+  const lastItem = page.length ? page[page.length - 1].id : null;
+  const hasMore  = startIdx + pageSize < docs.length;
+
+  return { products: page, lastDoc: lastItem, hasMore };
 }
 
 // ── Fetch Single ──────────────────────────────────────────
@@ -58,21 +79,25 @@ export async function fetchProduct(id) {
 
 // ── Fetch by Category ─────────────────────────────────────
 export async function fetchByCategory(category, count = 4) {
-  const q    = query(collection(db, PRODUCTS_COL), where('category', '==', category), limit(count));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const snap = await getDocs(collection(db, PRODUCTS_COL));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(p => p.category === category)
+    .slice(0, count);
 }
 
 // ── Fetch Featured ────────────────────────────────────────
 export async function fetchFeatured(count = 6) {
-  const q    = query(collection(db, PRODUCTS_COL), where('featured', '==', true), limit(count));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const snap = await getDocs(collection(db, PRODUCTS_COL));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(p => p.featured === true)
+    .slice(0, count);
 }
 
 // ── Search (client-side) ──────────────────────────────────
 export async function searchProducts(queryStr, count = 20) {
-  const snap = await getDocs(query(collection(db, PRODUCTS_COL), limit(50)));
+  const snap = await getDocs(collection(db, PRODUCTS_COL));
   const all  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   const q    = queryStr.toLowerCase();
   return all
