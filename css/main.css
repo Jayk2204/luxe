@@ -54,9 +54,12 @@ body {
   overflow-x: hidden;
 }
 
+<<<<<<< HEAD
 /* ── Custom Cursor removed — using default OS cursor ── */
 #cursor, #cursor-ring { display: none; }
 
+=======
+>>>>>>> abd48409ae1432aae6cc7a7728426fb2bf6a61d2
 a, button, [role="button"] { cursor: pointer; }
 
 /* ── Scrollbar ── */
