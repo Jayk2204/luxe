@@ -6,236 +6,134 @@
   <title>Products — LUXE Admin</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    .img-upload-zone {
-      border: 2px dashed var(--border-2);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      background: var(--bg-3);
-      position: relative;
-      overflow: hidden;
-    }
-    .img-upload-zone:hover, .img-upload-zone.drag-over {
-      border-color: var(--blue);
-      background: var(--blue-glow);
-    }
-    .img-upload-zone input[type=file] {
-      position: absolute; inset: 0;
-      opacity: 0; cursor: pointer;
-      width: 100%; height: 100%;
-    }
-    .upload-progress {
-      height: 3px; background: var(--bg-5);
-      border-radius: 2px; margin-top: 0.6rem;
-      overflow: hidden; display: none;
-    }
-    .upload-progress-bar {
-      height: 100%; background: var(--blue);
-      border-radius: 2px; width: 0%; transition: width 0.3s ease;
-    }
-    .img-multi-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; min-height: 10px; }
-    .img-multi-item { position: relative; }
-    .img-multi-item img {
-      width: 72px; height: 86px; object-fit: cover;
-      border-radius: 6px; border: 2px solid var(--border); display: block;
-    }
-    .img-multi-item.primary img { border-color: var(--blue); }
-    .img-multi-item .del-img-btn {
-      position: absolute; top: -7px; right: -7px;
-      width: 20px; height: 20px;
-      background: var(--red); color: #fff;
-      border: none; border-radius: 50%;
-      font-size: 0.6rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 2;
-    }
-    .product-img-thumb {
-      width: 44px; height: 52px; object-fit: cover;
-      border-radius: 6px; border: 1px solid var(--border); display: block;
-    }
-    .product-emoji-thumb {
-      width: 44px; height: 52px;
-      background: var(--bg-4); border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; border: 1px solid var(--border);
-    }
-    .apikey-bar {
-      background: var(--amber-dim);
-      border: 1px solid rgba(245,158,11,0.25);
-      border-radius: var(--radius);
-      padding: 0.75rem 1rem;
-      margin-bottom: 1.25rem;
-      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-      font-size: 0.82rem; color: var(--amber);
-    }
-    .apikey-bar input {
-      flex: 1; min-width: 200px;
-      background: var(--bg-3);
-      border: 1px solid rgba(245,158,11,0.3);
-      border-radius: 6px; color: var(--text-1);
-      font-size: 0.8rem; padding: 0.4rem 0.75rem;
-      outline: none; font-family: var(--mono);
-    }
-    .apikey-bar input:focus { border-color: var(--amber); }
-    .apikey-bar.has-key { background: var(--green-dim); border-color: rgba(16,185,129,0.25); color: var(--green); }
-  </style>
 </head>
 <body>
-
 <div class="admin-layout">
-  <main class="main-content" id="main-content" style="display:none">
+<main class="main-content">
+<div class="page-body" id="page-body" style="display:none">
 
-    <!-- ImageBB API Key Bar -->
-    <div class="apikey-bar" id="apikey-bar">
-      <i class="fa fa-key"></i>
-      <span style="white-space:nowrap;font-weight:600">ImageBB Key:</span>
-      <input type="text" id="imgbb-key" placeholder="Paste your ImageBB API key here..."
-        oninput="onKeyInput(this.value)">
-      <a href="https://api.imgbb.com/" target="_blank"
-        style="color:inherit;font-size:0.75rem;white-space:nowrap;text-decoration:underline">
-        Get Free Key ↗
-      </a>
-      <span id="key-status"></span>
+  <!-- ImageBB Key bar -->
+  <div class="key-bar" id="key-bar">
+    <i class="fa fa-key"></i>
+    <span style="font-weight:600;white-space:nowrap">ImageBB Key:</span>
+    <input type="text" id="imgbb-key" placeholder="Paste ImageBB API key here…" oninput="saveKey(this.value)">
+    <a href="https://api.imgbb.com/" target="_blank" style="color:inherit;font-size:.75rem;white-space:nowrap;text-decoration:underline">Get Free Key ↗</a>
+    <span id="key-st"></span>
+  </div>
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+    <div>
+      <h2 style="font-size:1.15rem;font-weight:800">Products</h2>
+      <p id="count-lbl" style="font-size:.76rem;color:var(--t3);margin-top:.1rem">Loading…</p>
     </div>
-
-    <!-- Header Row -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
-      <div>
-        <h2 style="font-size:1.2rem;font-weight:800">Products</h2>
-        <p id="product-count-label" style="font-size:0.78rem;color:var(--text-3);margin-top:0.1rem">Loading...</p>
+    <div style="display:flex;gap:.65rem;align-items:center;flex-wrap:wrap">
+      <div class="search-wrap" style="max-width:240px">
+        <i class="fa fa-search si"></i>
+        <input type="text" id="search" placeholder="Search products…">
       </div>
-      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
-        <div class="search-bar">
-          <i class="fa fa-search icon"></i>
-          <input type="text" id="search-input" placeholder="Search products...">
-        </div>
-        <select id="cat-filter" class="form-control" style="width:auto;font-size:0.82rem">
-          <option value="">All Categories</option>
-          <option>Jackets</option><option>Dresses</option><option>Blazers</option>
-          <option>Tops</option><option>Suits</option><option>Coats</option><option>Accessories</option>
-        </select>
-        <button class="btn btn-primary" id="add-btn">
-          <i class="fa fa-plus"></i> Add Product
-        </button>
-      </div>
+      <select id="cat-filter" class="form-control" style="width:auto;font-size:.8rem">
+        <option value="">All Categories</option>
+        <option>Jackets</option><option>Dresses</option><option>Blazers</option>
+        <option>Tops</option><option>Suits</option><option>Coats</option><option>Accessories</option>
+      </select>
+      <button class="btn btn-primary" id="add-btn"><i class="fa fa-plus"></i> Add Product</button>
     </div>
+  </div>
 
-    <!-- Table -->
-    <div class="card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th style="text-align:right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="products-tbody">
-            <tr><td colspan="7" style="text-align:center;padding:3rem">
-              <div class="spin-anim" style="display:inline-block;width:24px;height:24px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;"></div>
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- Table -->
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price (₹)</th>
+          <th class="hide-mobile">Stock</th>
+          <th class="hide-mobile">Badge</th>
+          <th style="text-align:right">Actions</th>
+        </tr></thead>
+        <tbody id="tbl-body">
+          <tr><td colspan="7" style="text-align:center;padding:3rem">
+            <div style="display:inline-block;width:22px;height:22px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>
+          </td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-  </main>
+</div>
+</main>
 </div>
 
-<!-- ══ ADD/EDIT MODAL ══ -->
-<div class="modal-overlay" id="product-modal">
-  <div class="modal" style="max-width:640px">
-    <div class="modal-header">
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="prod-modal">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-head">
       <h3 id="modal-title">Add Product</h3>
-      <button class="modal-close" onclick="CM('product-modal')">✕</button>
+      <button class="modal-close" onclick="CM('prod-modal')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pid">
 
-      <!-- IMAGES -->
+      <!-- Images -->
       <div class="form-group">
-        <label class="form-label">
-          Product Images &nbsp;
-          <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-3)">(first = main photo)</span>
-        </label>
-
-        <!-- Existing/uploaded images -->
-        <div class="img-multi-row" id="imgs-row"></div>
-
-        <!-- Drop zone -->
-        <div class="img-upload-zone" id="drop-zone">
-          <input type="file" id="file-input" accept="image/*" multiple>
-          <div style="font-size:2rem;opacity:0.4;margin-bottom:0.4rem">📸</div>
-          <div style="font-size:0.82rem;color:var(--text-3)">
-            <strong style="color:var(--blue)">Click or drag</strong> to upload &nbsp;·&nbsp; JPG PNG WEBP
-          </div>
-          <div class="upload-progress" id="upload-prog">
-            <div class="upload-progress-bar" id="upload-bar"></div>
-          </div>
-          <div id="upload-msg" style="font-size:0.72rem;color:var(--blue);margin-top:0.35rem;height:1rem"></div>
+        <label class="form-label">Images <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--t3)">(first = main photo · drag &amp; drop)</span></label>
+        <div class="imgs-row" id="imgs-row"></div>
+        <div class="img-drop" id="img-drop" style="margin-top:.65rem">
+          <input type="file" id="img-file" accept="image/*" multiple>
+          <div class="di">📸</div>
+          <div class="dt"><strong>Click or drag</strong> to upload &nbsp;·&nbsp; JPG PNG WEBP</div>
+          <div class="img-prog" id="img-prog"><div class="img-prog-bar" id="img-bar"></div></div>
+          <div class="img-msg" id="img-msg"></div>
         </div>
-
-        <!-- URL input -->
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem">
-          <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">Or URL:</span>
-          <input type="url" id="url-input" class="form-control"
-            placeholder="https://i.ibb.co/..." style="font-size:0.8rem;padding:0.4rem 0.75rem">
-          <button type="button" class="btn btn-sm btn-outline" onclick="addUrl()" style="white-space:nowrap">
-            <i class="fa fa-plus"></i> Add
-          </button>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem">
+          <span style="font-size:.7rem;color:var(--t3);white-space:nowrap">Or URL:</span>
+          <input type="url" class="form-control" id="url-inp" placeholder="https://i.ibb.co/…" style="font-size:.8rem;padding:.38rem .75rem">
+          <button type="button" class="btn btn-sm btn-outline" onclick="addUrl()" style="white-space:nowrap"><i class="fa fa-plus"></i></button>
         </div>
       </div>
 
-      <hr style="border-color:var(--border);margin:1rem 0">
+      <hr style="border-color:var(--border);margin:.75rem 0">
 
-      <!-- BASIC -->
+      <!-- Basic info -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Name *</label>
-          <input type="text" id="pn" class="form-control" placeholder="Product name" required>
+          <input type="text" class="form-control" id="pn" placeholder="Product name" required>
         </div>
         <div class="form-group">
           <label class="form-label">Category *</label>
-          <select id="pc" class="form-control" required>
-            <option value="">Select...</option>
+          <select class="form-control" id="pc">
+            <option value="">Select…</option>
             <option>Jackets</option><option>Dresses</option><option>Blazers</option>
             <option>Tops</option><option>Suits</option><option>Coats</option><option>Accessories</option>
           </select>
         </div>
       </div>
-
       <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea id="pd" class="form-control" placeholder="Product description..." rows="2"></textarea>
+        <textarea class="form-control" id="pd" placeholder="Product description…" rows="2"></textarea>
       </div>
-
       <div class="form-row form-row-3">
         <div class="form-group">
-          <label class="form-label">Price ($) *</label>
-          <input type="number" id="pp" class="form-control" placeholder="299" min="0" step="0.01" required>
+          <label class="form-label">Price (₹) *</label>
+          <input type="number" class="form-control" id="pp" placeholder="1999" min="0" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Original Price</label>
-          <input type="number" id="pop" class="form-control" placeholder="399" min="0" step="0.01">
+          <label class="form-label">Original Price (₹)</label>
+          <input type="number" class="form-control" id="pop" placeholder="2999 (optional)" min="0">
         </div>
         <div class="form-group">
           <label class="form-label">Stock *</label>
-          <input type="number" id="pst" class="form-control" placeholder="20" min="0" required>
+          <input type="number" class="form-control" id="pst" placeholder="20" min="0" required>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Badge</label>
-          <select id="pb" class="form-control">
+          <select class="form-control" id="pb">
             <option value="">None</option>
             <option value="New">🆕 New</option>
             <option value="Sale">🏷️ Sale</option>
@@ -244,45 +142,40 @@
         </div>
         <div class="form-group">
           <label class="form-label">Emoji (fallback)</label>
-          <input type="text" id="pe" class="form-control" placeholder="🧥" maxlength="4">
+          <input type="text" class="form-control" id="pe" placeholder="🧥" maxlength="4">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Tags (comma separated)</label>
-          <input type="text" id="ptags" class="form-control" placeholder="jacket, luxury">
+          <input type="text" class="form-control" id="ptags" placeholder="jacket, luxury">
         </div>
         <div class="form-group">
           <label class="form-label">Sizes (comma separated)</label>
-          <input type="text" id="psz" class="form-control" placeholder="XS, S, M, L, XL">
+          <input type="text" class="form-control" id="psz" placeholder="XS, S, M, L, XL">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Rating (0–5)</label>
-          <input type="number" id="prat" class="form-control" placeholder="4.8" min="0" max="5" step="0.1">
+          <input type="number" class="form-control" id="prat" placeholder="4.8" min="0" max="5" step="0.1">
         </div>
         <div class="form-group">
           <label class="form-label">Reviews Count</label>
-          <input type="number" id="prev" class="form-control" placeholder="120" min="0">
+          <input type="number" class="form-control" id="prev" placeholder="120" min="0">
         </div>
       </div>
-
-      <div style="display:flex;gap:2rem;padding:0.75rem 0;border-top:1px solid var(--border)">
-        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.83rem">
-          <input type="checkbox" id="pfeat" style="accent-color:var(--blue);width:16px;height:16px">
-          ⭐ Featured
+      <div style="display:flex;gap:2rem;padding:.65rem 0;border-top:1px solid var(--border)">
+        <label style="display:flex;align-items:center;gap:.45rem;cursor:pointer;font-size:.82rem">
+          <input type="checkbox" id="pfeat" style="accent-color:var(--blue);width:15px;height:15px"> ⭐ Featured
         </label>
-        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.83rem">
-          <input type="checkbox" id="pact" checked style="accent-color:var(--green);width:16px;height:16px">
-          ✅ Active
+        <label style="display:flex;align-items:center;gap:.45rem;cursor:pointer;font-size:.82rem">
+          <input type="checkbox" id="pact" checked style="accent-color:var(--green);width:15px;height:15px"> ✅ Active
         </label>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="CM('product-modal')">Cancel</button>
+      <button class="btn btn-outline" onclick="CM('prod-modal')">Cancel</button>
       <button class="btn btn-primary" id="save-btn" onclick="saveProduct()">
         <i class="fa fa-save"></i> Save Product
       </button>
@@ -290,20 +183,20 @@
   </div>
 </div>
 
-<!-- ══ DELETE MODAL ══ -->
+<!-- DELETE MODAL -->
 <div class="modal-overlay" id="del-modal">
   <div class="modal" style="max-width:380px">
-    <div class="modal-header">
+    <div class="modal-head">
       <h3 style="color:var(--red)">🗑️ Delete Product</h3>
       <button class="modal-close" onclick="CM('del-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="color:var(--text-2)">Delete <strong id="del-name" style="color:var(--text-1)"></strong>?</p>
-      <p style="color:var(--red);font-size:0.8rem;margin-top:0.5rem">⚠️ Cannot be undone.</p>
+      <p style="color:var(--t2)">Delete <strong id="del-name" style="color:var(--t1)"></strong>?</p>
+      <p style="color:var(--red);font-size:.78rem;margin-top:.5rem">⚠️ This cannot be undone.</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="CM('del-modal')">Cancel</button>
-      <button class="btn btn-danger" id="del-confirm-btn"><i class="fa fa-trash"></i> Delete</button>
+      <button class="btn btn-danger" id="del-btn"><i class="fa fa-trash"></i> Delete</button>
     </div>
   </div>
 </div>
@@ -320,93 +213,79 @@ import { injectLayout } from './js/admin-layout.js';
 
 injectLayout('Products');
 
-// ── STATE
-let all     = [];
-let delId   = null;
-let editId  = null;
-let imgs    = []; // array of url strings
+let all=[], editId=null, delId=null, imgs=[];
 
-// ── BOOT
-requireAdmin(async (user, prof) => {
-  const name = prof.displayName || user.email;
+requireAdmin(async (user, profile) => {
+  const name = profile.displayName||user.email;
   document.getElementById('sidebar-user-name').textContent = name;
-  document.getElementById('sidebar-avatar').textContent    = name[0].toUpperCase();
+  document.getElementById('sidebar-avatar').textContent    = name.charAt(0).toUpperCase();
   setActiveSidebarLink();
-  document.getElementById('logout-btn')?.addEventListener('click', e => { e.preventDefault(); adminLogout(); });
+  document.getElementById('logout-btn').addEventListener('click', e=>{ e.preventDefault(); adminLogout(); });
 
-  const k = localStorage.getItem('imgbb_key') || '';
-  if (k) { document.getElementById('imgbb-key').value = k; applyKeyUI(k); }
+  const k = localStorage.getItem('imgbb_key')||'';
+  if (k) { document.getElementById('imgbb-key').value=k; applyKeyUI(k); }
 
-  document.getElementById('main-content').style.display = 'block';
-  if (new URLSearchParams(location.search).get('action') === 'add') OM('product-modal');
+  document.getElementById('page-body').style.display = 'block';
+  if (new URLSearchParams(location.search).get('action')==='add') OM('prod-modal');
   await load();
 });
 
-// ── API KEY
-window.onKeyInput = v => { localStorage.setItem('imgbb_key',v.trim()); applyKeyUI(v.trim()); };
+// ── Key ───────────────────────────────────────────────────
+window.saveKey = v => { localStorage.setItem('imgbb_key',v.trim()); applyKeyUI(v.trim()); };
 function applyKeyUI(v) {
-  const bar = document.getElementById('apikey-bar');
-  const st  = document.getElementById('key-status');
-  if (v) { bar.classList.add('has-key'); st.textContent = '✅ Key saved'; }
-  else   { bar.classList.remove('has-key'); st.textContent = ''; }
+  const bar=document.getElementById('key-bar'), st=document.getElementById('key-st');
+  if(v){ bar.classList.add('has-key'); st.textContent='✅ Saved'; }
+  else { bar.classList.remove('has-key'); st.textContent=''; }
 }
 
-// ── LOAD
+// ── Load ──────────────────────────────────────────────────
 async function load() {
   try {
-    all = await getProducts('createdAt','desc');
-    document.getElementById('product-count-label').textContent = `${all.length} products`;
+    all = await getProducts();
+    document.getElementById('count-lbl').textContent = `${all.length} products`;
     render(all);
   } catch(e) {
     showToast('Error','Could not load products: '+e.message,'error');
-    document.getElementById('products-tbody').innerHTML =
-      `<tr><td colspan="7"><div class="empty-state"><div class="empty-state__icon">⚠️</div><h3>Firestore Error</h3><p>${e.message}</p></div></td></tr>`;
   }
 }
 
-// ── RENDER TABLE
 function render(list) {
-  const tb = document.getElementById('products-tbody');
+  const tb = document.getElementById('tbl-body');
   if (!list.length) {
     tb.innerHTML = `<tr><td colspan="7"><div class="empty-state">
-      <div class="empty-state__icon">📦</div>
-      <h3>No products yet</h3><p>Click "Add Product" to start.</p>
+      <div class="empty-state__icon">📦</div><h3>No products yet</h3>
+      <p>Click "Add Product" to get started.</p>
     </div></td></tr>`; return;
   }
-
   tb.innerHTML = list.map(p => {
-    const mainImg = (p.images||[])[0] || p.imageUrl || '';
-    const imgHtml = mainImg
-      ? `<img src="${mainImg}" class="product-img-thumb" alt="${p.name}"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-      : '';
-    const fallback = `<div class="product-emoji-thumb" ${mainImg?'style="display:none"':''}>${p.emoji||'📦'}</div>`;
-    const extraBadge = (p.images||[]).length > 1
-      ? `<span style="position:absolute;bottom:-4px;right:-4px;background:var(--blue);color:#fff;font-size:0.5rem;font-weight:700;padding:0.1rem 0.3rem;border-radius:3px">+${p.images.length-1}</span>` : '';
-
+    const img = (p.images&&p.images[0])||p.imageUrl||'';
     return `<tr class="fade-in">
-      <td><div style="position:relative;width:44px">${imgHtml}${fallback}${extraBadge}</div></td>
+      <td>
+        <div class="prod-thumb">
+          ${img
+            ? `<img src="${img}" alt="${p.name}" onerror="this.parentElement.innerHTML='${p.emoji||'📦'}'">` 
+            : (p.emoji||'📦')}
+        </div>
+      </td>
       <td>
         <strong>${p.name}</strong>
-        ${(p.tags||[]).length ? `<div style="font-size:0.68rem;color:var(--text-3);margin-top:0.1rem">${p.tags.slice(0,3).join(' · ')}</div>` : ''}
+        ${(p.tags||[]).length?`<div style="font-size:.66rem;color:var(--t3);margin-top:.1rem">${p.tags.slice(0,3).join(' · ')}</div>`:''}
       </td>
       <td><span class="badge badge-blue">${p.category||'—'}</span></td>
       <td>
         <strong>${formatCurrency(p.price)}</strong>
-        ${p.originalPrice ? `<div style="font-size:0.7rem;color:var(--text-3);text-decoration:line-through">${formatCurrency(p.originalPrice)}</div>` : ''}
+        ${p.originalPrice?`<div style="font-size:.68rem;color:var(--t3);text-decoration:line-through">${formatCurrency(p.originalPrice)}</div>`:''}
       </td>
-      <td style="font-family:var(--mono);font-size:0.85rem;color:${p.stock>10?'var(--green)':p.stock>0?'var(--amber)':'var(--red)'}">
+      <td class="hide-mobile" style="font-family:var(--mono);color:${p.stock>10?'var(--green)':p.stock>0?'var(--amber)':'var(--red)'}">
         ${p.stock??0}
       </td>
-      <td>
-        ${p.featured?'<span class="badge badge-green">⭐ Featured</span>':''}
-        ${p.badge?`<span class="badge ${p.badge==='New'?'badge-blue':p.badge==='Sale'?'badge-red':'badge-amber'}">${p.badge}</span>`:''}
-        ${!p.featured&&!p.badge?'<span style="color:var(--text-3);font-size:0.75rem">—</span>':''}
+      <td class="hide-mobile">
+        ${p.badge?`<span class="badge ${p.badge==='New'?'badge-blue':p.badge==='Sale'?'badge-red':'badge-amber'}">${p.badge}</span>`:'<span style="color:var(--t3)">—</span>'}
       </td>
       <td>
-        <div style="display:flex;gap:0.4rem;justify-content:flex-end">
+        <div style="display:flex;gap:.35rem;justify-content:flex-end">
           <button class="btn btn-icon" onclick="openEdit('${p.id}')" title="Edit"><i class="fa fa-edit"></i></button>
-          <button class="btn btn-icon" style="color:var(--red);border-color:rgba(239,68,68,0.2)"
+          <button class="btn btn-icon" style="color:var(--red);border-color:rgba(239,68,68,.2)"
             onclick="openDel('${p.id}','${(p.name||'').replace(/'/g,'&#39;')}')" title="Delete">
             <i class="fa fa-trash"></i>
           </button>
@@ -416,263 +295,170 @@ function render(list) {
   }).join('');
 }
 
-// ── SEARCH
-const si = document.getElementById('search-input');
+// ── Search + filter ───────────────────────────────────────
+const si = document.getElementById('search');
 const cf = document.getElementById('cat-filter');
 function filter() {
-  const q = si.value.toLowerCase().trim();
-  const c = cf.value;
-  const f = all.filter(p =>
-    (!q || p.name?.toLowerCase().includes(q) || (p.tags||[]).join(' ').toLowerCase().includes(q)) &&
-    (!c || p.category === c)
-  );
+  const q=si.value.toLowerCase().trim(), c=cf.value;
+  const f=all.filter(p=>(!q||p.name?.toLowerCase().includes(q)||(p.tags||[]).join(' ').toLowerCase().includes(q))&&(!c||p.category===c));
   render(f);
-  document.getElementById('product-count-label').textContent = `${f.length} of ${all.length} products`;
+  document.getElementById('count-lbl').textContent=`${f.length} of ${all.length} products`;
 }
 si?.addEventListener('input', debounce(filter,250));
 cf?.addEventListener('change', filter);
 
-// ══════════════════════════════════════
-// IMGBB UPLOAD
-// ══════════════════════════════════════
-async function uploadFile(file) {
-  const key = (document.getElementById('imgbb-key').value.trim()) || localStorage.getItem('imgbb_key') || '';
-  if (!key) { showToast('Key Missing','Enter your ImageBB API key!','error'); throw new Error('no key'); }
-
-  const prog = document.getElementById('upload-prog');
-  const bar  = document.getElementById('upload-bar');
-  const msg  = document.getElementById('upload-msg');
-
-  prog.style.display = 'block';
-  msg.textContent    = `⏳ Uploading ${file.name}...`;
-
-  let pct = 0;
-  const t = setInterval(() => { pct = Math.min(pct + Math.random()*12, 85); bar.style.width = pct+'%'; }, 200);
-
+// ── Image upload (ImgBB) ──────────────────────────────────
+async function uploadImgBB(file) {
+  const key = document.getElementById('imgbb-key').value.trim()||localStorage.getItem('imgbb_key')||'';
+  if (!key) { showToast('Key Missing','Enter ImageBB API key!','error'); throw new Error('no key'); }
+  const prog=document.getElementById('img-prog'), bar=document.getElementById('img-bar'), msg=document.getElementById('img-msg');
+  prog.style.display='block'; msg.textContent=`⏳ Uploading ${file.name}…`;
+  let pct=0; const t=setInterval(()=>{ pct=Math.min(pct+Math.random()*12,85); bar.style.width=pct+'%'; },200);
   try {
-    const fd = new FormData();
-    fd.append('image', file);
-    fd.append('key', key);
-
-    const res  = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:fd });
-    const json = await res.json();
-
-    clearInterval(t);
-    if (!json.success) throw new Error(json.error?.message || 'Upload failed');
-
-    bar.style.width = '100%';
-    msg.textContent = `✅ Done!`;
-    setTimeout(() => { prog.style.display='none'; bar.style.width='0'; msg.textContent=''; }, 1200);
-
+    const fd=new FormData(); fd.append('image',file); fd.append('key',key);
+    const res=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
+    const json=await res.json();
+    clearInterval(t); if(!json.success) throw new Error(json.error?.message||'Failed');
+    bar.style.width='100%'; msg.textContent='✅ Uploaded!';
+    setTimeout(()=>{ prog.style.display='none'; bar.style.width='0'; msg.textContent=''; },1200);
     return json.data.url;
-  } catch(e) {
-    clearInterval(t);
-    prog.style.display='none'; bar.style.width='0'; msg.textContent='';
-    throw e;
-  }
+  } catch(e) { clearInterval(t); prog.style.display='none'; bar.style.width='0'; msg.textContent=''; throw e; }
 }
 
-document.getElementById('file-input').addEventListener('change', async e => {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  document.getElementById('drop-zone').style.pointerEvents = 'none';
+document.getElementById('img-file').addEventListener('change', async e => {
+  const files=Array.from(e.target.files); if(!files.length) return;
+  document.getElementById('img-drop').style.pointerEvents='none';
   for (const f of files) {
-    if (f.size > 32*1024*1024) { showToast('Too large',f.name+' > 32MB','error'); continue; }
-    try {
-      const url = await uploadFile(f);
-      imgs.push(url);
-      renderImgs();
-      showToast('Uploaded!', f.name, 'success');
-    } catch(e) { showToast('Failed', e.message,'error'); }
+    if(f.size>32*1024*1024){showToast('Too Large',f.name+' > 32MB','error');continue;}
+    try { const url=await uploadImgBB(f); imgs.push(url); renderImgs(); showToast('Uploaded!',f.name,'success'); }
+    catch(e){ showToast('Failed',e.message,'error'); }
   }
-  document.getElementById('drop-zone').style.pointerEvents = '';
-  e.target.value = '';
+  document.getElementById('img-drop').style.pointerEvents='';
+  e.target.value='';
 });
 
-// Drag & drop
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', async e => {
-  e.preventDefault(); dz.classList.remove('drag-over');
-  for (const f of Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'))) {
-    try { const url = await uploadFile(f); imgs.push(url); renderImgs(); } catch {}
+const dz = document.getElementById('img-drop');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',async e=>{
+  e.preventDefault(); dz.classList.remove('over');
+  for(const f of Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'))) {
+    try{ const url=await uploadImgBB(f); imgs.push(url); renderImgs(); }catch{}
   }
 });
 
 window.addUrl = () => {
-  const v = document.getElementById('url-input').value.trim();
-  if (!v || !v.startsWith('http')) { showToast('Invalid','Must be a valid URL','error'); return; }
-  imgs.push(v); renderImgs();
-  document.getElementById('url-input').value = '';
+  const v=document.getElementById('url-inp').value.trim();
+  if(!v||!v.startsWith('http')){showToast('Invalid','Must be a valid URL','error');return;}
+  imgs.push(v); renderImgs(); document.getElementById('url-inp').value='';
 };
 
 function renderImgs() {
   document.getElementById('imgs-row').innerHTML = imgs.map((url,i) => `
-    <div class="img-multi-item ${i===0?'primary':''}">
-      <img src="${url}" alt="img ${i+1}">
-      <button class="del-img-btn" onclick="rmImg(${i})">✕</button>
-    </div>`).join('') +
-    (imgs.length ? `<div style="font-size:0.65rem;color:var(--blue);align-self:flex-end;padding-bottom:0.3rem">🔵 = main</div>` : '');
+    <div class="img-item ${i===0?'primary':''}">
+      <img src="${url}" alt="img" onerror="this.src='https://placehold.co/68x82/1a2332/3b82f6?text=📦'">
+      <button class="img-del" onclick="rmImg(${i})">✕</button>
+    </div>`).join('') + (imgs.length?`<div style="font-size:.62rem;color:var(--blue);align-self:flex-end;padding-bottom:.2rem">🔵 = main</div>`:'');
 }
-
 window.rmImg = i => { imgs.splice(i,1); renderImgs(); };
 
-// ══════════════════════════════════════
-// MODALS
-// ══════════════════════════════════════
+// ── Modals ────────────────────────────────────────────────
 window.OM = id => document.getElementById(id)?.classList.add('open');
 window.CM = id => document.getElementById(id)?.classList.remove('open');
 
 function resetForm() {
-  document.getElementById('pid').value  = '';
-  document.getElementById('pn').value   = '';
-  document.getElementById('pc').value   = '';
-  document.getElementById('pd').value   = '';
-  document.getElementById('pp').value   = '';
-  document.getElementById('pop').value  = '';
-  document.getElementById('pst').value  = '';
-  document.getElementById('pb').value   = '';
-  document.getElementById('pe').value   = '';
-  document.getElementById('ptags').value= '';
-  document.getElementById('psz').value  = '';
-  document.getElementById('prat').value = '';
-  document.getElementById('prev').value = '';
-  document.getElementById('pfeat').checked = false;
-  document.getElementById('pact').checked  = true;
-  imgs = [];
-  renderImgs();
+  ['pid','pn','pd','pp','pop','pst','pe','ptags','psz','prat','prev'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const pb=document.getElementById('pb'); if(pb) pb.value='';
+  const pc=document.getElementById('pc'); if(pc) pc.value='';
+  document.getElementById('pfeat').checked=false;
+  document.getElementById('pact').checked=true;
+  imgs=[]; renderImgs();
 }
 
-// Add
-document.getElementById('add-btn').addEventListener('click', () => {
-  editId = null;
-  document.getElementById('modal-title').textContent = '➕ Add New Product';
-  resetForm();
-  OM('product-modal');
+document.getElementById('add-btn').addEventListener('click',()=>{
+  editId=null;
+  document.getElementById('modal-title').textContent='➕ Add New Product';
+  resetForm(); OM('prod-modal');
 });
 
-// Edit
 window.openEdit = async id => {
-  editId = id;
-  document.getElementById('modal-title').textContent = '✏️ Edit Product';
-  resetForm();
-  OM('product-modal');
-
-  const btn = document.getElementById('save-btn');
-  setLoading(btn, true);
-
+  editId=id;
+  document.getElementById('modal-title').textContent='✏️ Edit Product';
+  resetForm(); OM('prod-modal');
+  const btn=document.getElementById('save-btn');
+  setLoading(btn,true,'<i class="fa fa-save"></i> Save Product');
   try {
-    const p = await getProduct(id);
-    if (!p) { showToast('Error','Not found','error'); CM('product-modal'); return; }
-
-    imgs = [...(p.images||[])];
-    if (!imgs.length && p.imageUrl) imgs = [p.imageUrl];
-    renderImgs();
-
-    document.getElementById('pid').value  = id;
-    document.getElementById('pn').value   = p.name||'';
-    document.getElementById('pc').value   = p.category||'';
-    document.getElementById('pd').value   = p.description||'';
-    document.getElementById('pp').value   = p.price||'';
-    document.getElementById('pop').value  = p.originalPrice||'';
-    document.getElementById('pst').value  = p.stock??'';
-    document.getElementById('pb').value   = p.badge||'';
-    document.getElementById('pe').value   = p.emoji||'';
-    document.getElementById('ptags').value= (p.tags||[]).join(', ');
-    document.getElementById('psz').value  = (p.sizes||[]).join(', ');
-    document.getElementById('prat').value = p.rating||'';
-    document.getElementById('prev').value = p.reviews||'';
-    document.getElementById('pfeat').checked = !!p.featured;
-    document.getElementById('pact').checked  = p.active!==false;
-  } catch(e) {
-    showToast('Error', e.message, 'error');
-  } finally {
-    setLoading(btn, false, '<i class="fa fa-save"></i> Save Product');
-  }
+    const p=await getProduct(id); if(!p){showToast('Error','Not found','error');CM('prod-modal');return;}
+    imgs=[...(p.images||[])]; if(!imgs.length&&p.imageUrl) imgs=[p.imageUrl]; renderImgs();
+    document.getElementById('pid').value=id;
+    document.getElementById('pn').value=p.name||'';
+    document.getElementById('pc').value=p.category||'';
+    document.getElementById('pd').value=p.description||'';
+    document.getElementById('pp').value=p.price||'';
+    document.getElementById('pop').value=p.originalPrice||'';
+    document.getElementById('pst').value=p.stock??'';
+    document.getElementById('pb').value=p.badge||'';
+    document.getElementById('pe').value=p.emoji||'';
+    document.getElementById('ptags').value=(p.tags||[]).join(', ');
+    document.getElementById('psz').value=(p.sizes||[]).join(', ');
+    document.getElementById('prat').value=p.rating||'';
+    document.getElementById('prev').value=p.reviews||'';
+    document.getElementById('pfeat').checked=!!p.featured;
+    document.getElementById('pact').checked=p.active!==false;
+  } catch(e){ showToast('Error',e.message,'error'); }
+  finally { setLoading(btn,false,'<i class="fa fa-save"></i> Save Product'); }
 };
 
-// Save
 window.saveProduct = async () => {
-  const name  = document.getElementById('pn').value.trim();
-  const cat   = document.getElementById('pc').value;
-  const price = parseFloat(document.getElementById('pp').value);
+  const name=document.getElementById('pn').value.trim();
+  const cat =document.getElementById('pc').value;
+  const price=parseFloat(document.getElementById('pp').value);
+  if(!name){showToast('Required','Product name required','error');return;}
+  if(!cat) {showToast('Required','Select a category','error');return;}
+  if(isNaN(price)||price<0){showToast('Required','Enter valid price','error');return;}
 
-  if (!name)     { showToast('Required','Product name is required','error'); return; }
-  if (!cat)      { showToast('Required','Select a category','error'); return; }
-  if (isNaN(price)||price<0) { showToast('Required','Enter valid price','error'); return; }
+  const btn=document.getElementById('save-btn');
+  setLoading(btn,true,'<i class="fa fa-save"></i> Save Product');
 
-  const btn = document.getElementById('save-btn');
-  setLoading(btn, true);
-
-  const op   = parseFloat(document.getElementById('pop').value);
-  const data = {
-    name,
-    category:      cat,
-    description:   document.getElementById('pd').value.trim(),
+  const op=parseFloat(document.getElementById('pop').value);
+  const data={
+    name, category:cat,
+    description:document.getElementById('pd').value.trim(),
     price,
-    stock:         parseInt(document.getElementById('pst').value)||0,
-    badge:         document.getElementById('pb').value||null,
-    emoji:         document.getElementById('pe').value.trim()||'📦',
-    tags:          document.getElementById('ptags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    sizes:         document.getElementById('psz').value.split(',').map(s=>s.trim()).filter(Boolean),
-    rating:        parseFloat(document.getElementById('prat').value)||null,
-    reviews:       parseInt(document.getElementById('prev').value)||0,
-    featured:      document.getElementById('pfeat').checked,
-    active:        document.getElementById('pact').checked,
-    images:        [...imgs],
-    imageUrl:      imgs[0]||null,
+    stock:parseInt(document.getElementById('pst').value)||0,
+    badge:document.getElementById('pb').value||null,
+    emoji:document.getElementById('pe').value.trim()||'📦',
+    tags:document.getElementById('ptags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    sizes:document.getElementById('psz').value.split(',').map(s=>s.trim()).filter(Boolean),
+    rating:parseFloat(document.getElementById('prat').value)||null,
+    reviews:parseInt(document.getElementById('prev').value)||0,
+    featured:document.getElementById('pfeat').checked,
+    active:document.getElementById('pact').checked,
+    images:[...imgs],
+    imageUrl:imgs[0]||null,
   };
-
-  if (!isNaN(op) && op > 0) data.originalPrice = op;
-  Object.keys(data).forEach(k => { if(data[k]===null) delete data[k]; });
+  if(!isNaN(op)&&op>0) data.originalPrice=op;
 
   try {
-    if (editId) {
-      await editProduct(editId, data);
-      showToast('✅ Updated!', `"${data.name}" saved.`, 'success');
-    } else {
-      await createProduct(data);
-      showToast('✅ Created!', `"${data.name}" added.`, 'success');
-    }
-    CM('product-modal');
-    await load();
-  } catch(e) {
-    console.error(e);
-    showToast('Save Error', e.message, 'error');
-  } finally {
-    setLoading(btn, false, '<i class="fa fa-save"></i> Save Product');
-  }
+    if(editId){ await editProduct(editId,data); showToast('✅ Updated!',`"${data.name}" saved.`,'success'); }
+    else       { await createProduct(data);      showToast('✅ Created!',`"${data.name}" added.`,'success'); }
+    CM('prod-modal'); await load();
+  } catch(e){ showToast('Error',e.message,'error'); }
+  finally{ setLoading(btn,false,'<i class="fa fa-save"></i> Save Product'); }
 };
 
-// Delete
-window.openDel = (id, name) => {
-  delId = id;
-  document.getElementById('del-name').textContent = name;
-  OM('del-modal');
-};
-
-document.getElementById('del-confirm-btn').addEventListener('click', async () => {
-  if (!delId) return;
-  const btn = document.getElementById('del-confirm-btn');
-  setLoading(btn, true);
-  try {
-    await removeProduct(delId);
-    showToast('Deleted!','Product removed.','success');
-    CM('del-modal');
-    await load();
-  } catch(e) { showToast('Error',e.message,'error'); }
-  finally { setLoading(btn,false,'<i class="fa fa-trash"></i> Delete'); delId=null; }
+window.openDel=(id,name)=>{ delId=id; document.getElementById('del-name').textContent=name; OM('del-modal'); };
+document.getElementById('del-btn').addEventListener('click',async()=>{
+  if(!delId)return;
+  const btn=document.getElementById('del-btn');
+  setLoading(btn,true,'<i class="fa fa-trash"></i> Delete');
+  try{ await removeProduct(delId); showToast('Deleted!','Product removed.','success'); CM('del-modal'); await load(); }
+  catch(e){ showToast('Error',e.message,'error'); }
+  finally{ setLoading(btn,false,'<i class="fa fa-trash"></i> Delete'); delId=null; }
 });
 
-// Click outside close
-['product-modal','del-modal'].forEach(id => {
-  document.getElementById(id)?.addEventListener('click', e => {
-    if (e.target===e.currentTarget) CM(id);
-  });
-});
-document.addEventListener('keydown', e => { if(e.key==='Escape'){CM('product-modal');CM('del-modal');} });
-
+['prod-modal','del-modal'].forEach(id=>{ document.getElementById(id)?.addEventListener('click',e=>{ if(e.target===e.currentTarget) CM(id); }); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){CM('prod-modal');CM('del-modal');} });
 </script>
 </body>
 </html>

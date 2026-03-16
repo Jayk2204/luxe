@@ -6,152 +6,131 @@
   <title>Admin Login — LUXE</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    /* Grid background */
-    .login-page {
-      background-image:
-        linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    .divider { height:1px; background:var(--border); margin:1.5rem 0; position:relative; }
-    .divider span {
-      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-      background:var(--bg-2); padding:0 0.75rem;
-      font-size:0.72rem; color:var(--text-3);
-    }
-    .input-wrap { position:relative; }
-    .input-wrap .fa {
-      position:absolute; left:0.85rem; top:50%; transform:translateY(-50%);
-      color:var(--text-3); font-size:0.8rem; pointer-events:none;
-    }
-    .input-wrap .form-control { padding-left:2.4rem; }
-    .eye-btn {
-      position:absolute; right:0.85rem; top:50%; transform:translateY(-50%);
-      background:none; border:none; color:var(--text-3); cursor:pointer;
-      font-size:0.85rem; transition:color 0.2s;
-    }
-    .eye-btn:hover { color:var(--text-1); }
-    .feature-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; margin-top:1.5rem; }
-    .feature-list li { display:flex; align-items:center; gap:0.6rem; font-size:0.8rem; color:var(--text-2); }
-    .feature-list li .fa { color:var(--blue); font-size:0.75rem; }
-  </style>
 </head>
 <body>
 
 <div class="login-page">
   <div class="login-card">
 
-    <!-- Logo -->
     <div class="login-logo">
-      <div class="icon">🛡️</div>
+      <div class="ico">🛡️</div>
       <h1>LUXE <span style="color:var(--blue)">ADMIN</span></h1>
-      <p>Command Center — Authorized Access Only</p>
+      <p>Authorized access only</p>
     </div>
 
-    <!-- Alert box -->
-    <div id="alert-box" style="display:none;background:var(--red-dim);border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.82rem;color:var(--red);margin-bottom:1.25rem;display:none"></div>
+    <div class="login-alert err" id="alert-err"><i class="fa fa-exclamation-circle"></i><span id="err-msg"></span></div>
+    <div class="login-alert ok"  id="alert-ok"><i class="fa fa-check-circle"></i><span id="ok-msg"></span></div>
 
-    <!-- Login Form -->
-    <form id="login-form">
+    <form id="login-form" onsubmit="doLogin(event)">
       <div class="form-group">
-        <label class="form-label">Admin Email</label>
-        <div class="input-wrap">
-          <i class="fa fa-envelope"></i>
-          <input type="email" id="email" class="form-control"
+        <label class="form-label">Email Address</label>
+        <div class="fi-wrap">
+          <input type="email" class="form-control fi-inp" id="email"
             placeholder="admin@example.com" required autocomplete="email">
+          <i class="fi fa fa-envelope"></i>
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Password</label>
-        <div class="input-wrap">
-          <i class="fa fa-lock"></i>
-          <input type="password" id="password" class="form-control"
+        <div class="fi-wrap">
+          <input type="password" class="form-control fi-inp" id="pass"
             placeholder="••••••••" required autocomplete="current-password">
-          <button type="button" class="eye-btn" id="eye-btn">
-            <i class="fa fa-eye"></i>
+          <i class="fi fa fa-lock"></i>
+          <button type="button" class="fi-eye" onclick="toggleEye()">
+            <i class="fa fa-eye" id="eye-ico"></i>
           </button>
         </div>
       </div>
 
-      <div style="display:flex;justify-content:flex-end;margin-bottom:1.25rem">
-        <a href="#" style="font-size:0.75rem;color:var(--blue)">Forgot password?</a>
-      </div>
-
-      <button type="submit" class="btn btn-primary" id="login-btn"
-        style="width:100%;justify-content:center;padding:0.85rem">
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-btn" style="margin-top:.5rem">
         <i class="fa fa-sign-in-alt"></i> Sign In to Admin
       </button>
     </form>
 
-    <div class="divider"><span>Features</span></div>
-
-    <ul class="feature-list">
-      <li><i class="fa fa-chart-line"></i> Real-time revenue & analytics dashboard</li>
-      <li><i class="fa fa-box"></i> Full product CRUD management</li>
-      <li><i class="fa fa-users"></i> User management & role control</li>
-      <li><i class="fa fa-shopping-cart"></i> Order tracking & status updates</li>
-    </ul>
-
     <div style="text-align:center;margin-top:1.5rem">
-      <a href="../index.html" style="font-size:0.75rem;color:var(--text-3)">
+      <a href="../index.html" style="font-size:.76rem;color:var(--t3)">
         <i class="fa fa-arrow-left"></i> Back to Store
       </a>
     </div>
+
   </div>
 </div>
 
-<div class="toast-container"></div>
-
 <script type="module">
-  import { auth, adminLogin, showToast, setLoading }
-    from './js/admin-firebase.js';
-  import { onAuthStateChanged }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { auth, adminLogin, showToast, setLoading }
+  from './js/admin-firebase.js';
+import { onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // Already logged in? Redirect
-  onAuthStateChanged(auth, user => {
-    if (user) window.location.href = 'dashboard.html';
-  });
+const db = getFirestore();
 
-  // Form submit
-  document.getElementById('login-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn   = document.getElementById('login-btn');
-    const email = document.getElementById('email').value.trim();
-    const pass  = document.getElementById('password').value;
-    const alert = document.getElementById('alert-box');
-
-    setLoading(btn, true);
-    alert.style.display = 'none';
-
-    try {
-      await adminLogin(email, pass);
-      showToast('Success', 'Redirecting to dashboard...', 'success');
-      setTimeout(() => window.location.href = 'dashboard.html', 800);
-    } catch (err) {
-      const msgs = {
-        'auth/user-not-found':     'No admin account with this email.',
-        'auth/wrong-password':     'Incorrect password.',
-        'auth/invalid-email':      'Invalid email address.',
-        'auth/too-many-requests':  'Too many attempts. Try later.',
-        'auth/invalid-credential': 'Invalid email or password.',
-      };
-      const msg = msgs[err.code] || err.message;
-      alert.textContent = '⚠ ' + msg;
-      alert.style.display = 'block';
-      setLoading(btn, false, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+// If already logged in as admin → go to dashboard
+onAuthStateChanged(auth, async user => {
+  if (!user) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.data()?.role === 'admin') {
+      window.location.href = 'dashboard.html';
     }
-  });
+  } catch { /* not admin, stay */ }
+});
 
-  // Eye toggle
-  document.getElementById('eye-btn').addEventListener('click', () => {
-    const input = document.getElementById('password');
-    const icon  = document.querySelector('#eye-btn .fa');
-    input.type  = input.type === 'password' ? 'text' : 'password';
-    icon.className = `fa fa-eye${input.type === 'password' ? '' : '-slash'}`;
+window.doLogin = async (e) => {
+  e.preventDefault();
+  const btn   = document.getElementById('login-btn');
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('pass').value;
+  hideAlerts();
+  setLoading(btn, true, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+
+  try {
+    const cred = await adminLogin(email, pass);
+    // Verify admin role
+    const snap = await getDoc(doc(db, 'users', cred.user.uid));
+    const data = snap.data();
+    if (!data || data.role !== 'admin') {
+      const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      await signOut(auth);
+      showAlert('err', 'This account does not have admin access.');
+      setLoading(btn, false, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+      return;
+    }
+    showAlert('ok', 'Login successful! Redirecting to dashboard…');
+    setTimeout(() => window.location.href = 'dashboard.html', 800);
+  } catch (err) {
+    const map = {
+      'auth/user-not-found':     'No account found with this email.',
+      'auth/wrong-password':     'Incorrect password.',
+      'auth/invalid-credential': 'Invalid email or password.',
+      'auth/too-many-requests':  'Too many attempts. Try again later.',
+      'auth/invalid-email':      'Enter a valid email address.',
+    };
+    showAlert('err', map[err.code] || err.message);
+    setLoading(btn, false, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+  }
+};
+
+window.toggleEye = () => {
+  const inp = document.getElementById('pass');
+  const ico = document.getElementById('eye-ico');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ico.className = `fa fa-eye${inp.type === 'password' ? '' : '-slash'}`;
+};
+
+function showAlert(type, msg) {
+  hideAlerts();
+  const el = document.getElementById(`alert-${type}`);
+  document.getElementById(`${type}-msg`).textContent = msg;
+  el.style.display = 'flex';
+}
+function hideAlerts() {
+  ['alert-err','alert-ok'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
   });
+}
 </script>
 </body>
 </html>
