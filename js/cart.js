@@ -29,8 +29,8 @@ export function initCartPage() {
       itemsEl.innerHTML = `
         <div class="empty-state">
           <div class="empty-state__icon">🛒</div>
-          <h3>Aapka cart khaali hai</h3>
-          <p>Kuch products add karo aur wapas aao!</p>
+          <h3>Your cart is empty</h3>
+          <p>Add some products and come back!</p>
           <a href="products.html" class="btn btn-primary" style="margin-top:1rem">Shopping Shuru Karo</a>
         </div>`;
     } else {
@@ -44,10 +44,10 @@ export function initCartPage() {
       summaryEl.innerHTML = `
         ${freeShippingLeft > 0
           ? `<div style="background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.2);border-radius:6px;padding:0.6rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;color:var(--gold)">
-              🚚 Free delivery ke liye <strong>${formatPrice(freeShippingLeft)}</strong> aur add karo!
+              🚚 Add <strong>${formatPrice(freeShippingLeft)}</strong> more for free delivery!
              </div>`
           : `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:0.6rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;color:#27ae60">
-              ✅ Aapko Free Delivery mil rahi hai!
+              ✅ You have unlocked Free Delivery!
              </div>`
         }
 
@@ -58,7 +58,7 @@ export function initCartPage() {
 
         ${totals.savings > 0 ? `
         <div class="summary-line" style="color:var(--green)">
-          <span>Aapki Bachat (Discount)</span>
+          <span>Your Savings (Discount)</span>
           <span>− ${formatPrice(totals.savings)}</span>
         </div>` : ''}
 
@@ -111,9 +111,9 @@ export function initCartPage() {
       showToast({ msg:`Min order ${formatPrice(promo.min)} chahiye is code ke liye`, type:'warning' });
       return;
     }
-    if (promo.type === 'pct')  showToast({ title:'🎉 Promo Lagaya!', msg:`${Math.round(promo.val*100)}% discount mila!`, type:'success' });
-    if (promo.type === 'flat') showToast({ title:'🎉 Promo Lagaya!', msg:`${formatPrice(promo.val)} ka flat discount!`, type:'success' });
-    if (promo.type === 'ship') showToast({ title:'🎉 Promo Lagaya!', msg:'Is order pe free delivery!', type:'success' });
+    if (promo.type === 'pct')  showToast({ title:'🎉 Promo Applied!', msg:`${Math.round(promo.val*100)}% discount applied!`, type:'success' });
+    if (promo.type === 'flat') showToast({ title:'🎉 Promo Applied!', msg:`${formatPrice(promo.val)} flat discount applied!`, type:'success' });
+    if (promo.type === 'ship') showToast({ title:'🎉 Promo Applied!', msg:'Free delivery on this order!', type:'success' });
   });
 
   // Checkout
@@ -196,7 +196,7 @@ export async function placeOrder({ shippingAddress, paymentMethod = 'upi' }) {
   const items  = LocalCart.get();
   const totals = LocalCart.totals(paymentMethod);
 
-  if (!items.length) throw new Error('Cart khaali hai!');
+  if (!items.length) throw new Error('Your cart is empty!');
 
   const order = {
     userId:          user?.uid   || 'guest',
@@ -304,7 +304,7 @@ export function initCheckoutPage() {
     e.preventDefault();
     const btn = form.querySelector('#place-order-btn');
     btn.disabled    = true;
-    btn.textContent = '⏳ Order place ho raha hai...';
+    btn.textContent = '⏳ Placing your order...';
 
     const data = Object.fromEntries(new FormData(form));
     const shippingAddress = {
@@ -320,7 +320,7 @@ export function initCheckoutPage() {
 
     try {
       const orderId = await placeOrder({ shippingAddress, paymentMethod: selectedPayment });
-      showToast({ title:'🎉 Order Ho Gaya!', msg:`Order #${orderId.slice(-8).toUpperCase()} confirm ho gaya!`, type:'success', duration:6000 });
+      showToast({ title:'🎉 Order Placed!', msg:`Order #${orderId.slice(-8).toUpperCase()} confirmed!`, type:'success', duration:6000 });
       setTimeout(() => window.location.href = `order-success.html?id=${orderId}`, 1800);
     } catch (err) {
       showToast({ title:'Error', msg: err.message, type:'error' });

@@ -129,7 +129,7 @@ export const LocalCart = {
     if (idx>-1) items[idx].qty += qty;
     else items.push({ key, product, qty, variant, addedAt: Date.now() });
     this.save(items);
-    showToast({ title:'Cart mein add ho gaya! 🛍️', msg:product.name, type:'success' });
+    showToast({ title:'Added to Cart! 🛍️', msg:product.name, type:'success' });
     return items;
   },
 
@@ -189,8 +189,8 @@ export const Wishlist = {
   has(id)      { return this.get().includes(id); },
   toggle(id)   {
     const list = this.get(); const idx = list.indexOf(id);
-    if (idx>-1) { list.splice(idx,1); showToast({ msg:'Wishlist se hataya', type:'info' }); }
-    else         { list.push(id);     showToast({ msg:'Wishlist mein save kiya ♡', type:'success' }); }
+    if (idx>-1) { list.splice(idx,1); showToast({ msg:'Removed from wishlist', type:'info' }); }
+    else         { list.push(id);     showToast({ msg:'Saved to wishlist ♡', type:'success' }); }
     localStorage.setItem(WL_KEY, JSON.stringify(list));
     return list.includes(id);
   }

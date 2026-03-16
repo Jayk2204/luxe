@@ -1,5 +1,5 @@
 // admin-shortcut.js (inside admin/)
-// Ctrl + Shift + A  →  admin/login.html pe redirect (already here, so dashboard)
+// Ctrl + Shift + A  →  already on admin, go to login
 document.addEventListener('keydown', function (e) {
   if (e.ctrlKey && e.shiftKey && e.key === 'A') {
     e.preventDefault();

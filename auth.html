@@ -144,8 +144,8 @@
     <p class="left-sub">India's most curated fashion destination.<br>Free delivery above ₹999 · Easy 7-day returns.</p>
     <div class="feats">
       <div class="feat"><div class="feat-ico">✨</div><span>Handpicked luxury pieces, new every week</span></div>
-      <div class="feat"><div class="feat-ico">🚚</div><span>Free delivery pan-India above ₹999</span></div>
-      <div class="feat"><div class="feat-ico">📱</div><span>UPI, Cards, NetBanking, COD — sab accepted</span></div>
+      <div class="feat"><div class="feat-ico">🚚</div><span>Free pan-India delivery above ₹999</span></div>
+      <div class="feat"><div class="feat-ico">📱</div><span>UPI, Cards, Net Banking, COD — all accepted</span></div>
       <div class="feat"><div class="feat-ico">🔒</div><span>100% secure · Email verified accounts only</span></div>
     </div>
   </div>
@@ -188,7 +188,7 @@
         <div class="fg">
           <label class="lbl">Email Address</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="l-email" placeholder="aap@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="l-email" placeholder="you@example.com" required autocomplete="email">
             <i class="fi fa fa-envelope"></i>
           </div>
         </div>
@@ -213,14 +213,14 @@
         <div class="fg">
           <label class="lbl">Full Name</label>
           <div class="fw">
-            <input type="text" class="fi-inp" id="r-name" placeholder="Aapka poora naam" required autocomplete="name">
+            <input type="text" class="fi-inp" id="r-name" placeholder="Your full name" required autocomplete="name">
             <i class="fi fa fa-user"></i>
           </div>
         </div>
         <div class="fg">
           <label class="lbl">Email Address</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="r-email" placeholder="aap@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="r-email" placeholder="you@example.com" required autocomplete="email">
             <i class="fi fa fa-envelope"></i>
           </div>
         </div>
@@ -236,7 +236,7 @@
         <div class="fg">
           <label class="lbl">Confirm Password</label>
           <div class="fw">
-            <input type="password" class="fi-inp" id="r-confirm" placeholder="Dobara likhein" required>
+            <input type="password" class="fi-inp" id="r-confirm" placeholder="Re-enter password" required>
             <i class="fi fa fa-lock"></i>
           </div>
         </div>
@@ -252,40 +252,40 @@
       </form>
 
       <p class="sw-txt" id="sw-txt">
-        Pehli baar aa rahe ho?
-        <button class="f-lnk" onclick="switchTab('register')">Account banao</button>
+        New here?
+        <button class="f-lnk" onclick="switchTab('register')">Create account</button>
       </p>
     </div><!-- /main-screen -->
 
     <!-- EMAIL VERIFICATION SCREEN -->
     <div id="verify-screen" class="hidden">
       <div class="verify-icon">📧</div>
-      <h2 class="verify-title">Email Verify Karo!</h2>
+      <h2 class="verify-title">Verify Your Email</h2>
       <p class="verify-sub">
-        Humne ek verification email bheja hai:<br>
+        We sent a verification email to:<br>
         <span class="verify-email-shown" id="verify-email-shown">—</span>
       </p>
       <div class="verify-steps">
-        <div class="vstep"><div class="num">1</div><span>Apna email inbox kholo</span></div>
-        <div class="vstep"><div class="num">2</div><span>LUXE ka email dhundo (spam bhi check karo)</span></div>
-        <div class="vstep"><div class="num">3</div><span>"Verify Email Address" link pe click karo</span></div>
-        <div class="vstep"><div class="num">4</div><span>Neeche "Done! Check Karo" button dabao</span></div>
+        <div class="vstep"><div class="num">1</div><span>Open your email inbox</span></div>
+        <div class="vstep"><div class="num">2</div><span>Find the LUXE email (check spam too)</span></div>
+        <div class="vstep"><div class="num">3</div><span>Click the "Verify Email Address" link</span></div>
+        <div class="vstep"><div class="num">4</div><span>Return here and click "Done! I Verified" below</span></div>
       </div>
       <div class="alert info" id="v-info" style="display:flex;margin-bottom:1rem">
         <i class="fa fa-info-circle"></i>
-        <span>Email verify karne ke baad hi aap login kar sakte hain.</span>
+        <span>You must verify your email before you can sign in.</span>
       </div>
       <div class="alert ok"  id="v-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="v-ok-msg"></span></div>
       <div class="alert err" id="v-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="v-err-msg"></span></div>
       <button class="sub-btn" id="verified-btn" style="margin-bottom:.75rem">
-        ✅ Done! Check Karo
+        ✅ Done! I Verified
       </button>
       <button class="sub-btn ghost" id="resend-btn">
         <i class="fa fa-paper-plane"></i> Resend Verification Email
       </button>
       <div style="text-align:center;margin-top:1.25rem">
         <button class="f-lnk" id="back-to-login-btn" style="font-size:.75rem;color:var(--t3)">
-          <i class="fa fa-arrow-left"></i> Wapas Sign In pe jao
+          <i class="fa fa-arrow-left"></i> Back to Sign In
         </button>
       </div>
     </div><!-- /verify-screen -->
@@ -297,7 +297,7 @@
       </button>
       <div class="form-head">
         <h2>Password Reset</h2>
-        <p>Apna email daalo — reset link bhej denge</p>
+        <p>Enter your email — we will send a reset link</p>
       </div>
       <div class="alert ok"  id="fp-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="fp-ok-msg"></span></div>
       <div class="alert err" id="fp-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="fp-err-msg"></span></div>
@@ -305,7 +305,7 @@
         <div class="fg">
           <label class="lbl">Registered Email</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="fp-email" placeholder="aap@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="fp-email" placeholder="you@example.com" required autocomplete="email">
             <i class="fi fa fa-envelope"></i>
           </div>
         </div>
@@ -315,16 +315,16 @@
       </form>
       <div id="fp-sent" class="hidden" style="margin-top:1.25rem">
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1.25rem">
-          <div style="font-size:.88rem;font-weight:600;margin-bottom:.75rem;color:var(--t1)">📬 Email Bhej Diya!</div>
+          <div style="font-size:.88rem;font-weight:600;margin-bottom:.75rem;color:var(--t1)">📬 Email Sent!</div>
           <div class="verify-steps" style="margin-bottom:0">
-            <div class="vstep"><div class="num">1</div><span>Inbox mein LUXE ka email dhundo</span></div>
-            <div class="vstep"><div class="num">2</div><span>"Reset Password" link pe click karo</span></div>
-            <div class="vstep"><div class="num">3</div><span>Naya password set karo</span></div>
-            <div class="vstep"><div class="num">4</div><span>Wapas aao aur sign in karo</span></div>
+            <div class="vstep"><div class="num">1</div><span>Find the LUXE email in your inbox</span></div>
+            <div class="vstep"><div class="num">2</div><span>Click the "Reset Password" link</span></div>
+            <div class="vstep"><div class="num">3</div><span>Set your new password</span></div>
+            <div class="vstep"><div class="num">4</div><span>Come back and sign in</span></div>
           </div>
         </div>
         <div style="text-align:center;margin-top:1rem">
-          <button class="f-lnk" onclick="showMainScreen()">Sign In pe wapas jao →</button>
+          <button class="f-lnk" onclick="showMainScreen()">Back to Sign In → →</button>
         </div>
       </div>
     </div><!-- /forgot-screen -->
@@ -418,8 +418,8 @@ window.switchTab = (tab) => {
   document.getElementById('fh-title').textContent = isL ? 'Welcome Back' : 'Create Account';
   document.getElementById('fh-sub').textContent   = isL ? 'Sign in to continue shopping' : "Join LUXE — it's free!";
   document.getElementById('sw-txt').innerHTML = isL
-    ? 'Pehli baar aa rahe ho? <button class="f-lnk" onclick="switchTab(\'register\')">Account banao</button>'
-    : 'Already account hai? <button class="f-lnk" onclick="switchTab(\'login\')">Sign in karo</button>';
+    ? 'New here? <button class="f-lnk" onclick="switchTab(\'register\')">Create account</button>'
+    : 'Already have an account? <button class="f-lnk" onclick="switchTab(\'login\')">Sign in</button>';
   clearAlerts();
 };
 
@@ -448,10 +448,10 @@ window.doLogin = async (e) => {
 
     await saveProfile(user);
 
-    // ── Admin check — agar role === 'admin' hai to seedha admin dashboard ──
+    // ── Admin role check — redirect to dashboard if admin ──
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.exists() && snap.data()?.role === 'admin') {
-      showOk('Admin login! Dashboard pe ja rahe hain…');
+      showOk('Admin verified! Redirecting to dashboard…');
       setTimeout(() => window.location.replace('admin/dashboard.html'), 700);
       return;
     }
@@ -474,8 +474,8 @@ window.doRegister = async (e) => {
   const conf  = ge('r-confirm').value;
   clearAlerts();
 
-  if (pass !== conf)   { showErr('Passwords match nahi kar rahe!'); return; }
-  if (pass.length < 6) { showErr('Password kam se kam 6 characters ka hona chahiye.'); return; }
+  if (pass !== conf)   { showErr('Passwords do not match!'); return; }
+  if (pass.length < 6) { showErr('Password must be at least 6 characters.'); return; }
 
   setLoad(btn, true, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
   try {
@@ -510,7 +510,7 @@ ge('btn-google').addEventListener('click', async () => {
   try {
     const res = await signInWithPopup(auth, new GoogleAuthProvider());
     await saveProfile(res.user);
-    showOk('Google se login ho gaya! Redirecting…');
+    showOk('Signed in with Google! Redirecting…');
     setTimeout(() => window.location.replace(nextUrl), 700);
   } catch (err) {
     if (err.code !== 'auth/popup-closed-by-user') showErr(friendlyMsg(err.code));
@@ -529,14 +529,14 @@ window.doForgot = async (e) => {
     await sendPasswordResetEmail(auth, email, {
       url: `${location.origin}/auth.html`,
     });
-    showFpOk(`Reset link bhej diya gaya ${email} pe!`);
+    showFpOk(`Password reset link sent to ${email} pe!`);
     ge('fp-sent').classList.remove('hidden');
     btn.style.display = 'none';
   } catch (err) {
     const map = {
-      'auth/user-not-found':    'Is email pe koi account nahi mila.',
-      'auth/invalid-email':     'Valid email address daalo.',
-      'auth/too-many-requests': 'Bahut requests ho gayi. Thodi der baad try karo.',
+      'auth/user-not-found':    'No account found with this email.',
+      'auth/invalid-email':     'Please enter a valid email address.',
+      'auth/too-many-requests': 'Too many requests. Please try again later.',
     };
     showFpErr(map[err.code] || err.message);
     setLoad(btn, false, '<i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo');
@@ -547,12 +547,12 @@ window.doForgot = async (e) => {
 // FIX: re-sign-in with stored creds to call reload() properly
 ge('verified-btn').addEventListener('click', async () => {
   const btn = ge('verified-btn');
-  setLoad(btn, true, '✅ Done! Check Karo');
+  setLoad(btn, true, '✅ Done! I Verified');
   clearVAlerts();
 
   if (!_savedEmail || !_savedPass) {
-    showVErr('Session expire ho gaya. Wapas sign in karo.');
-    setLoad(btn, false, '✅ Done! Check Karo');
+    showVErr('Session expired. Please sign in again.');
+    setLoad(btn, false, '✅ Done! I Verified');
     return;
   }
 
@@ -563,16 +563,16 @@ ge('verified-btn').addEventListener('click', async () => {
     if (user.emailVerified) {
       await saveProfile(user);
       _savedEmail = ''; _savedPass = '';
-      showVOk('✅ Email verify ho gaya! Store pe ja rahe hain…');
+      showVOk('✅ Email verified! Taking you to the store…');
       setTimeout(() => window.location.replace(nextUrl), 900);
     } else {
       await signOut(auth);
-      showVErr('Abhi bhi verify nahi hua. Email open karo aur link pe click karo.');
-      setLoad(btn, false, '✅ Done! Check Karo');
+      showVErr('Email not yet verified. Open your email and click the verification link.');
+      setLoad(btn, false, '✅ Done! I Verified');
     }
   } catch (err) {
     showVErr(friendlyMsg(err.code));
-    setLoad(btn, false, '✅ Done! Check Karo');
+    setLoad(btn, false, '✅ Done! I Verified');
   }
 });
 
@@ -583,7 +583,7 @@ ge('resend-btn').addEventListener('click', async () => {
   clearVAlerts();
 
   if (!_savedEmail || !_savedPass) {
-    showVErr('Kuch gadbad ho gayi. Wapas register karo.');
+    showVErr('Something went wrong. Please register again.');
     setLoad(btn, false, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
     return;
   }
@@ -594,10 +594,10 @@ ge('resend-btn').addEventListener('click', async () => {
       url: `${location.origin}/auth.html?next=${encodeURIComponent(nextUrl)}`,
     });
     await signOut(auth);
-    showVOk('Verification email dobara bhej diya! Inbox check karo.');
+    showVOk('Verification email resent! Check your inbox.');
   } catch (err) {
     const m = err.code === 'auth/too-many-requests'
-      ? 'Bahut baar bheja. 1 minute baad try karo.'
+      ? 'Sent too many times. Please wait a minute.'
       : friendlyMsg(err.code);
     showVErr(m);
   }
@@ -638,7 +638,7 @@ window.showMainScreen = () => {
 
 // Show success banner if landing after email link click
 if (params.get('verified') === '1') {
-  showOk('✅ Email verify ho gaya! Ab sign in karo.');
+  showOk('✅ Email verified! You can now sign in.');
 }
 
 // ── Password strength meter ───────────────────────────────
@@ -689,16 +689,16 @@ function clearFpAlerts(){ ['fp-ok','fp-err'].forEach(id => ge(id).style.display=
 
 function friendlyMsg(code) {
   return ({
-    'auth/user-not-found':         'Is email pe koi account nahi mila.',
-    'auth/wrong-password':         'Password galat hai.',
-    'auth/invalid-credential':     'Email ya password galat hai.',
-    'auth/email-already-in-use':   'Yeh email already registered hai. Sign in karo.',
-    'auth/invalid-email':          'Valid email address daalo.',
-    'auth/weak-password':          'Password zyada strong banao (6+ characters).',
-    'auth/too-many-requests':      'Bahut attempts ho gaye. Thodi der baad try karo.',
-    'auth/network-request-failed': 'Network error. Internet check karo.',
-    'auth/popup-closed-by-user':   'Google sign-in cancel ho gaya.',
-  })[code] || 'Kuch gadbad ho gayi. Dobara try karo.';
+    'auth/user-not-found':         'No account found with this email.',
+    'auth/wrong-password':         'Incorrect password.',
+    'auth/invalid-credential':     'Invalid email or password.',
+    'auth/email-already-in-use':   'This email is already registered. Please sign in.',
+    'auth/invalid-email':          'Please enter a valid email address.',
+    'auth/weak-password':          'Please choose a stronger password (6+ characters).',
+    'auth/too-many-requests':      'Too many attempts. Please try again later.',
+    'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/popup-closed-by-user':   'Google sign-in was cancelled.',
+  })[code] || 'Something went wrong. Please try again.';
 }
 </script>
 

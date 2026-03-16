@@ -51,7 +51,7 @@ export function requireAdmin(cb) {
       const data = snap.data();
 
       if (!data || data.role !== 'admin') {
-        showToast('Access Denied', 'Admin access required.', 'error');
+        showToast('Access Denied', 'You do not have admin access.', 'error');
         setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         splash.remove();
         return;

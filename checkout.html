@@ -146,7 +146,7 @@
     </div>
 
     <a href="cart.html" class="btn btn-ghost btn-sm">
-      <i class="fa fa-arrow-left"></i> Cart pe wapas
+      <i class="fa fa-arrow-left"></i> Back to Cart
     </a>
   </div>
 </nav>
@@ -172,7 +172,7 @@
             <div class="form-group">
               <label class="form-label">Full Name *</label>
               <input class="form-input" type="text" name="full-name"
-                placeholder="Aapka poora naam" required style="width:100%">
+                placeholder="Your full name" required style="width:100%">
             </div>
             <div class="form-group">
               <label class="form-label">Mobile Number *</label>
@@ -395,7 +395,7 @@
           </div>
 
           <div style="text-align:center;margin-top:1rem;font-size:0.7rem;color:var(--gray-3)">
-            Order place karke aap hamare <a href="#" style="color:var(--gold)">Terms & Conditions</a>
+            By placing your order you agree to our <a href="#" style="color:var(--gold)">Terms & Conditions</a>
             se agree karte hain
           </div>
 
@@ -457,7 +457,7 @@
     const st = document.getElementById('pincode-status');
     if (val.length === 6) {
       st.className = 'pincode-status ok';
-      st.textContent = '✓ PIN code valid — "Verify" dabao to city auto-fill karo';
+      st.textContent = '✓ PIN code valid — click "Verify" to auto-fill city';
     } else if (val.length > 0) {
       st.className = 'pincode-status err';
       st.textContent = 'PIN code 6 digits ka hona chahiye';
