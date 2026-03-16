@@ -93,11 +93,6 @@
 <body>
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> abd48409ae1432aae6cc7a7728426fb2bf6a61d2
-
 <!-- NAV -->
 <nav class="nav" id="main-nav">
   <div class="nav__inner">
@@ -185,11 +180,10 @@
       <div class="sidebar__section">
         <div class="sidebar__title">Price Range</div>
         <div class="price-range">
-          <input type="range" id="price-range" min="0" max="1000" value="1000" step="10"
-            oninput="document.getElementById('price-max-label').textContent = '$'+this.value">
+          <input type="range" id="price-range" min="0" max="50000" value="50000" step="500">
           <div class="price-labels">
-            <span>$0</span>
-            <span id="price-max-label">$1000</span>
+            <span>₹0</span>
+            <span id="price-max-label">₹50,000</span>
           </div>
         </div>
       </div>
@@ -198,13 +192,13 @@
         <div class="sidebar__title">Availability</div>
         <div style="display:flex;flex-direction:column;gap:0.5rem">
           <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:pointer">
-            <input type="checkbox" checked style="accent-color:var(--gold)"> In Stock
+            <input type="checkbox" id="cb-stock" class="avail-checkbox" checked style="accent-color:var(--gold)"> In Stock
           </label>
           <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:pointer">
-            <input type="checkbox" style="accent-color:var(--gold)"> Sale Items
+            <input type="checkbox" id="cb-sale" class="avail-checkbox" style="accent-color:var(--gold)"> Sale Items
           </label>
           <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--gray-2);cursor:pointer">
-            <input type="checkbox" style="accent-color:var(--gold)"> New Arrivals
+            <input type="checkbox" id="cb-new" class="avail-checkbox" style="accent-color:var(--gold)"> New Arrivals
           </label>
         </div>
       </div>
@@ -267,73 +261,139 @@
 
 <script type="module" src="./js/auth-guard.js"></script>
 <script type="module">
-  import { initApp }          from './js/app.js';
-  import { initProductsPage, renderProductGrid, renderSkeletons, DEMO_PRODUCTS } from './js/products.js';
+  import { initApp } from './js/app.js';
+  import { fetchProducts, renderProductGrid, renderSkeletons, DEMO_PRODUCTS } from './js/products.js';
 
   initApp();
 
-  // Handle URL params
-  const params  = new URLSearchParams(window.location.search);
-  const catParam= params.get('cat');
-  const qParam  = params.get('q');
+  // ── State ──────────────────────────────────────────────
+  let allProducts  = [];
+  let currentCat   = null;
+  let currentSort  = 'createdAt';
+  let currentMaxPr = 50000;
+  let currentSale  = false;
+  let currentNew   = false;
 
-  if (catParam && catParam !== 'all') {
-    document.getElementById('page-title').textContent = catParam;
-    // Activate relevant filter
-    document.querySelectorAll('.filter-chip, [data-cat]').forEach(el => {
-      el.classList.toggle('active', el.dataset.cat === catParam);
-    });
+  const grid        = document.getElementById('products-grid');
+  const countEl     = document.getElementById('product-count');
+  const loadMoreBtn = document.getElementById('load-more-btn');
+  const priceSlider = document.getElementById('price-range');
+  const priceLabel  = document.getElementById('price-max-label');
+
+  // ── Fetch all products once ────────────────────────────
+  async function loadAll() {
+    renderSkeletons(grid);
+    try {
+      const res = await fetchProducts({ pageSize: 200 });
+      allProducts = res.products;
+    } catch {
+      allProducts = DEMO_PRODUCTS;
+    }
+    applyFilters();
   }
 
+  // ── Core filter + render ───────────────────────────────
+  function applyFilters() {
+    let list = [...allProducts];
+
+    if (currentCat) list = list.filter(p => p.category === currentCat);
+
+    list = list.filter(p => (p.price || 0) <= currentMaxPr);
+
+    if (currentSale) list = list.filter(p => p.badge === 'Sale' || (p.originalPrice && p.originalPrice > p.price));
+    if (currentNew)  list = list.filter(p => p.badge === 'New' || p.badge === 'Hot');
+
+    list.sort((a, b) => {
+      if (currentSort === 'price')  return (a.price || 0) - (b.price || 0);
+      if (currentSort === 'rating') return (b.rating || 0) - (a.rating || 0);
+      if (currentSort === 'sales')  return (b.sales || 0) - (a.sales || 0);
+      const aT = a.createdAt?.toMillis?.() ?? 0;
+      const bT = b.createdAt?.toMillis?.() ?? 0;
+      return bT - aT;
+    });
+
+    renderProductGrid(grid, list);
+    if (countEl) countEl.textContent = `${list.length} product${list.length !== 1 ? 's' : ''}`;
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+  }
+
+  // ── Set category — syncs chips + sidebar ──────────────
+  function setCategory(cat) {
+    currentCat = (cat === 'all' || !cat) ? null : cat;
+    document.querySelectorAll('.filter-chip').forEach(c =>
+      c.classList.toggle('active', c.dataset.cat === (cat || 'all'))
+    );
+    document.querySelectorAll('#category-links a').forEach(l =>
+      l.classList.toggle('active', l.dataset.cat === (cat || 'all'))
+    );
+    applyFilters();
+  }
+
+  // ── Filter chips ───────────────────────────────────────
+  document.querySelectorAll('.filter-chip').forEach(btn =>
+    btn.addEventListener('click', () => setCategory(btn.dataset.cat))
+  );
+
+  // ── Sidebar category links ─────────────────────────────
+  document.querySelectorAll('#category-links a').forEach(link =>
+    link.addEventListener('click', e => { e.preventDefault(); setCategory(link.dataset.cat); })
+  );
+
+  // ── Sort ───────────────────────────────────────────────
+  document.getElementById('sort-select')?.addEventListener('change', function() {
+    currentSort = this.value;
+    applyFilters();
+  });
+
+  // ── Price range slider ─────────────────────────────────
+  priceSlider?.addEventListener('input', () => {
+    currentMaxPr = parseInt(priceSlider.value);
+    priceLabel.textContent = '₹' + currentMaxPr.toLocaleString('en-IN');
+    applyFilters();
+  });
+
+  // ── Availability checkboxes ────────────────────────────
+  document.querySelectorAll('.avail-checkbox').forEach(cb =>
+    cb.addEventListener('change', () => {
+      currentSale = document.getElementById('cb-sale')?.checked || false;
+      currentNew  = document.getElementById('cb-new')?.checked  || false;
+      applyFilters();
+    })
+  );
+
+  // ── Clear all filters ──────────────────────────────────
+  window.clearFilters = () => {
+    currentCat = null; currentSort = 'createdAt';
+    currentMaxPr = 50000; currentSale = false; currentNew = false;
+    priceSlider.value = 50000;
+    priceLabel.textContent = '₹50,000';
+    document.getElementById('sort-select').value = 'createdAt';
+    if (document.getElementById('cb-sale')) document.getElementById('cb-sale').checked = false;
+    if (document.getElementById('cb-new'))  document.getElementById('cb-new').checked  = false;
+    setCategory('all');
+  };
+
+  // ── Mobile sidebar ─────────────────────────────────────
+  const sidebar      = document.getElementById('sidebar');
+  const filterToggle = document.getElementById('filter-toggle');
+  const sidebarClose = document.getElementById('sidebar-close');
+  filterToggle?.addEventListener('click', () => { sidebar.classList.add('open'); sidebarClose.style.display = 'block'; });
+  sidebarClose?.addEventListener('click', () => sidebar.classList.remove('open'));
+
+  // ── URL params ─────────────────────────────────────────
+  const params   = new URLSearchParams(window.location.search);
+  const catParam = params.get('cat');
+  const qParam   = params.get('q');
+  if (catParam && catParam !== 'all') document.getElementById('page-title').textContent = catParam;
   if (qParam) {
     document.getElementById('page-title').textContent = `"${qParam}"`;
     document.getElementById('page-subtitle').textContent = 'Search results';
   }
 
-  // Try Firebase; show demo if not configured
-  try {
-    await initProductsPage();
-  } catch {
-    // Demo fallback
-    const grid = document.getElementById('products-grid');
-    renderProductGrid(grid, DEMO_PRODUCTS);
-    document.getElementById('product-count').textContent = `${DEMO_PRODUCTS.length} products`;
-  }
-
-  // Sidebar mobile toggle
-  const sidebar      = document.getElementById('sidebar');
-  const filterToggle = document.getElementById('filter-toggle');
-  const sidebarClose = document.getElementById('sidebar-close');
-
-  filterToggle?.addEventListener('click', () => {
-    sidebar.classList.add('open');
-    sidebarClose.style.display = 'block';
-  });
-  sidebarClose?.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-  });
-
-  // Sidebar category links (no page reload)
-  document.querySelectorAll('#category-links a').forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('#category-links a').forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-      // Sync with filter chips
-      const cat = link.dataset.cat;
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
-    });
-  });
-
-  // Clear filters
-  window.clearFilters = () => {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
-    document.querySelectorAll('#category-links a').forEach(l => l.classList.toggle('active', l.dataset.cat === 'all'));
-    document.getElementById('price-range').value = 1000;
-    document.getElementById('price-max-label').textContent = '$1000';
-  };
+  // ── Boot ───────────────────────────────────────────────
+  await loadAll();
+  if (catParam && catParam !== 'all') setCategory(catParam);
 </script>
-
 <script type="module" src="./js/admin-shortcut.js"></script>
 </body>
 </html>
