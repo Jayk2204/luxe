@@ -6,6 +6,11 @@
   <title>Dashboard — LUXE Admin</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+@media(min-width:900px){
+  .dash-main-grid { grid-template-columns: 1fr 320px !important; }
+}
+</style>
 </head>
 <body>
 
@@ -60,7 +65,7 @@
     </div>
 
     <!-- Charts + Quick Actions Row -->
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:1.25rem;margin-bottom:1.25rem">
+    <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;margin-bottom:1.25rem" class="dash-main-grid">
 
       <!-- Revenue Chart -->
       <div class="card fade-in">
@@ -110,7 +115,7 @@
     </div>
 
     <!-- Recent Orders + Top Products -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem">
 
       <!-- Recent Orders -->
       <div class="card fade-in">

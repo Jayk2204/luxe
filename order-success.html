@@ -68,7 +68,14 @@
       justify-content: center;
       gap: 0.5rem;
       margin: 2rem 0;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    @media(max-width:480px){
+      .success-card { padding: 2.5rem 1.25rem; }
+      .step-line { max-width: 30px; }
+      .step-dot { width: 28px; height: 28px; font-size: 0.7rem; }
+      .step-label { font-size: 0.58rem; }
     }
 
     .step-item {

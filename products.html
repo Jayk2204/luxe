@@ -13,6 +13,11 @@
       gap: 3rem;
       align-items: start;
     }
+    @media (max-width: 900px) {
+      .products-page-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* Sidebar */
     .sidebar {
@@ -59,6 +64,15 @@
     .price-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray-2); }
 
     .toggle-sidebar { display: none; }
+    @media (max-width: 900px) {
+      .toggle-sidebar { display: flex; }
+      .sidebar {
+        position: fixed; top: 0; left: -300px; width: 280px;
+        height: 100vh; overflow-y: auto; z-index: 3000;
+        border-radius: 0; transition: left 0.4s cubic-bezier(0.77,0,0.175,1);
+      }
+      .sidebar.open { left: 0; }
+    }
 
     @media (max-width: 900px) {
       .products-page-grid { grid-template-columns: 1fr; }
