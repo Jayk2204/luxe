@@ -273,6 +273,7 @@
   let currentMaxPr = 50000;
   let currentSale  = false;
   let currentNew   = false;
+  let currentBadge = null;  // 'New' | 'Sale' | null
 
   const grid        = document.getElementById('products-grid');
   const countEl     = document.getElementById('product-count');
@@ -300,6 +301,8 @@
 
     list = list.filter(p => (p.price || 0) <= currentMaxPr);
 
+    if (currentBadge === 'Sale') list = list.filter(p => p.badge === 'Sale' || (p.originalPrice && p.originalPrice > p.price));
+    else if (currentBadge === 'New') list = list.filter(p => p.badge === 'New' || p.badge === 'Hot');
     if (currentSale) list = list.filter(p => p.badge === 'Sale' || (p.originalPrice && p.originalPrice > p.price));
     if (currentNew)  list = list.filter(p => p.badge === 'New' || p.badge === 'Hot');
 
@@ -364,7 +367,7 @@
   // ── Clear all filters ──────────────────────────────────
   window.clearFilters = () => {
     currentCat = null; currentSort = 'createdAt';
-    currentMaxPr = 50000; currentSale = false; currentNew = false;
+    currentMaxPr = 50000; currentSale = false; currentNew = false; currentBadge = null;
     priceSlider.value = 50000;
     priceLabel.textContent = '₹50,000';
     document.getElementById('sort-select').value = 'createdAt';
@@ -384,7 +387,9 @@
   const params   = new URLSearchParams(window.location.search);
   const catParam = params.get('cat');
   const qParam   = params.get('q');
-  if (catParam && catParam !== 'all') document.getElementById('page-title').textContent = catParam;
+  if (catParam === 'New')  { document.getElementById('page-title').textContent = 'New In';  document.getElementById('page-subtitle').textContent = 'Fresh arrivals, just landed'; }
+  else if (catParam === 'Sale') { document.getElementById('page-title').textContent = 'Sale'; document.getElementById('page-subtitle').textContent = 'Big savings on premium pieces'; }
+  else if (catParam && catParam !== 'all') document.getElementById('page-title').textContent = catParam;
   if (qParam) {
     document.getElementById('page-title').textContent = `"${qParam}"`;
     document.getElementById('page-subtitle').textContent = 'Search results';
@@ -392,7 +397,27 @@
 
   // ── Boot ───────────────────────────────────────────────
   await loadAll();
-  if (catParam && catParam !== 'all') setCategory(catParam);
+  if (catParam === 'New') {
+    currentBadge = 'New';
+    document.getElementById('page-title').textContent    = 'New In';
+    document.getElementById('page-subtitle').textContent = 'Fresh arrivals, just landed';
+    // tick the New Arrivals checkbox
+    const cbNew = document.getElementById('cb-new');
+    if (cbNew) cbNew.checked = true;
+    currentNew = true;
+    applyFilters();
+  } else if (catParam === 'Sale') {
+    currentBadge = 'Sale';
+    document.getElementById('page-title').textContent    = 'Sale';
+    document.getElementById('page-subtitle').textContent = 'Big savings on premium pieces';
+    // tick the Sale Items checkbox
+    const cbSale = document.getElementById('cb-sale');
+    if (cbSale) cbSale.checked = true;
+    currentSale = true;
+    applyFilters();
+  } else if (catParam && catParam !== 'all') {
+    setCategory(catParam);
+  }
 </script>
 <script type="module" src="./js/admin-shortcut.js"></script>
 </body>
