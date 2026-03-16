@@ -1,14 +1,13 @@
 // ============================================================
-// auth-guard.js
-// Kisi bhi page pe import karo — agar logged out hai
-// toh seedha auth.html pe bhej deta hai.
+// auth-guard.js  —  FIXED
+// Import on any protected page. Blocks unverified users too.
 // ============================================================
 
 import { auth } from './firebase-config.js';
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ── Loading splash (LUXE logo + spinner) ─────────────────
+// ── Loading splash ────────────────────────────────────────
 const splash = document.createElement('div');
 splash.id = '__auth_splash';
 splash.innerHTML = `
@@ -47,30 +46,39 @@ function hideSplash() {
 
 // ── Auth check ────────────────────────────────────────────
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // ✅ Logged in — let the page show
-    hideSplash();
-    // Update nav user icon / logout
-    _updateNav(user);
-  } else {
-    // ❌ Not logged in — go to auth page
-    // Pass current URL so auth.html can come back after login
+  if (!user) {
+    // Not logged in → redirect to auth
     const returnUrl = encodeURIComponent(window.location.href);
     window.location.replace(`auth.html?next=${returnUrl}`);
+    return;
   }
+
+  // FIX: also block users who registered but never verified their email
+  if (!user.emailVerified) {
+    const returnUrl = encodeURIComponent(window.location.href);
+    window.location.replace(`auth.html?next=${returnUrl}`);
+    return;
+  }
+
+  // ✅ Logged in and verified — show the page
+  hideSplash();
+  _updateNav(user);
 });
 
-// ── Update nav: show avatar + logout, hide login link ─────
+// ── Update nav ────────────────────────────────────────────
 function _updateNav(user) {
-  // Hide "login" links
+  // Hide login links
   document.querySelectorAll('#nav-login-link').forEach(el => {
     el.style.display = 'none';
   });
 
-  // Show logout btn if present
+  // Show logout button
   document.querySelectorAll('#nav-logout-btn').forEach(btn => {
     btn.style.display = 'flex';
-    btn.addEventListener('click', async (e) => {
+    // Remove any previous listener to avoid stacking
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const { signOut } = await import(
         "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"
@@ -80,7 +88,7 @@ function _updateNav(user) {
     });
   });
 
-  // Update user icon → show first letter
+  // Update user icon with initials
   const userBtn = document.getElementById('nav-user-btn');
   if (userBtn) {
     const initials = (user.displayName || user.email || 'U').charAt(0).toUpperCase();

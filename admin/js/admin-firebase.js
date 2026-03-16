@@ -1,14 +1,14 @@
 // ============================================================
 // admin-firebase.js — LUXE Admin Shared Firebase (INR Edition)
 // ============================================================
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp, getApps }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, doc,
   getDocs, getDoc, addDoc, updateDoc, deleteDoc,
   query, orderBy, limit, where,
-  serverTimestamp, getCountFromServer
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── Firebase Config ───────────────────────────────────────
@@ -21,16 +21,15 @@ const FC = {
   appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
 };
 
-let _app;
-try       { _app = initializeApp(FC); }
-catch (e) { _app = initializeApp(FC, 'admin'); }
+// FIX 1: Prevent duplicate app init crash when firebase-config.js already ran
+const _app = getApps().find(a => a.name === 'admin') || initializeApp(FC, 'admin');
 
 export const auth = getAuth(_app);
 export const db   = getFirestore(_app);
 
 // ── Auth Guard ────────────────────────────────────────────
+// FIX 2: Single source of truth — requireAdmin sets sidebar user info here only
 export function requireAdmin(cb) {
-  // Show loading splash
   const splash = document.createElement('div');
   splash.id = '_adm_splash';
   splash.style.cssText = 'position:fixed;inset:0;background:#070b12;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:1rem';
@@ -44,30 +43,50 @@ export function requireAdmin(cb) {
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = 'login.html'; return; }
+
     try {
       const snap = await getDoc(doc(db, 'users', user.uid));
       const data = snap.data();
+
       if (!data || data.role !== 'admin') {
         showToast('Access Denied', 'Admin access required.', 'error');
         setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         splash.remove();
         return;
       }
-      // Set user info in sidebar
-      const nameEl   = document.getElementById('sidebar-user-name');
-      const avatarEl = document.getElementById('sidebar-avatar');
+
+      // FIX 3: Set sidebar user info exactly once here — pages must NOT repeat this
       const name = data.displayName || user.email || 'Admin';
-      if (nameEl)   nameEl.textContent   = name;
-      if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
+      _setSidebarUser(name);
+      setActiveSidebarLink();
+
+      // Wire up logout button
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', e => { e.preventDefault(); adminLogout(); });
+      }
 
       splash.remove();
       cb(user, data);
-    } catch {
-      // First time — no users doc, allow
+
+    } catch (err) {
+      // Edge case: user doc doesn't exist yet — grant access, treat as admin
+      const name = user.email || 'Admin';
+      _setSidebarUser(name);
+      setActiveSidebarLink();
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) logoutBtn.addEventListener('click', e => { e.preventDefault(); adminLogout(); });
       splash.remove();
-      cb(user, { role:'admin', displayName: user.email });
+      cb(user, { role: 'admin', displayName: user.email });
     }
   });
+}
+
+function _setSidebarUser(name) {
+  const nameEl   = document.getElementById('sidebar-user-name');
+  const avatarEl = document.getElementById('sidebar-avatar');
+  if (nameEl)   nameEl.textContent   = name;
+  if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase();
 }
 
 export async function adminLogin(email, password) {
@@ -80,15 +99,19 @@ export async function adminLogout() {
 }
 
 // ── Products ──────────────────────────────────────────────
+// FIX 4: Graceful fallback when Firestore index is missing
 export async function getProducts() {
   try {
     const q    = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch {
-    // If no index, fallback without sort
-    const snap = await getDocs(collection(db, 'products'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    if (e.code === 'failed-precondition' || e.message?.includes('index')) {
+      console.warn('[LUXE] Firestore index missing for products — falling back to unsorted. Deploy indexes to fix.');
+      const snap = await getDocs(collection(db, 'products'));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+    throw e;
   }
 }
 
@@ -98,14 +121,12 @@ export async function getProduct(id) {
 }
 
 export async function createProduct(data) {
-  const clean = {};
-  Object.keys(data).forEach(k => { if (data[k] !== null && data[k] !== undefined && data[k] !== '') clean[k] = data[k]; });
+  const clean = _cleanObj(data);
   return await addDoc(collection(db, 'products'), { ...clean, createdAt: serverTimestamp(), sales: 0, views: 0 });
 }
 
 export async function editProduct(id, data) {
-  const clean = {};
-  Object.keys(data).forEach(k => { if (data[k] !== null && data[k] !== undefined && data[k] !== '') clean[k] = data[k]; });
+  const clean = _cleanObj(data);
   return await updateDoc(doc(db, 'products', id), { ...clean, updatedAt: serverTimestamp() });
 }
 
@@ -119,9 +140,13 @@ export async function getUsers() {
     const q    = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch {
-    const snap = await getDocs(collection(db, 'users'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    if (e.code === 'failed-precondition' || e.message?.includes('index')) {
+      console.warn('[LUXE] Firestore index missing for users — falling back to unsorted.');
+      const snap = await getDocs(collection(db, 'users'));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+    throw e;
   }
 }
 
@@ -136,9 +161,13 @@ export async function getOrders() {
     const q    = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch {
-    const snap = await getDocs(collection(db, 'orders'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    if (e.code === 'failed-precondition' || e.message?.includes('index')) {
+      console.warn('[LUXE] Firestore index missing for orders — falling back to unsorted.');
+      const snap = await getDocs(collection(db, 'orders'));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+    throw e;
   }
 }
 
@@ -177,7 +206,7 @@ export function timeAgo(ts) {
   const d    = ts.toDate ? ts.toDate() : new Date(ts);
   const diff = Date.now() - d.getTime();
   const m    = Math.floor(diff / 60000);
-  if (m < 1)    return 'Abhi';
+  if (m < 1)    return 'Just now';
   if (m < 60)   return `${m}m ago`;
   if (m < 1440) return `${Math.floor(m/60)}h ago`;
   return `${Math.floor(m/1440)}d ago`;
@@ -231,4 +260,13 @@ export function setActiveSidebarLink() {
   document.querySelectorAll('.sidebar__link').forEach(a => {
     a.classList.toggle('active', a.getAttribute('href') === page);
   });
+}
+
+// FIX 5: Centralised object cleaner — removes null/undefined/empty string
+function _cleanObj(data) {
+  const clean = {};
+  Object.keys(data).forEach(k => {
+    if (data[k] !== null && data[k] !== undefined && data[k] !== '') clean[k] = data[k];
+  });
+  return clean;
 }

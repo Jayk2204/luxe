@@ -20,18 +20,15 @@
     html, body { height: 100%; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t1); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-    /* ── LEFT ─────────────────────────────── */
+    /* ── LEFT panel ── */
     .left { flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; background:var(--bg2); }
     @media(max-width:860px){ .left { display:none; } }
-
     .left-grid { position:absolute; inset:0; background-image: linear-gradient(rgba(201,169,110,.04) 1px,transparent 1px), linear-gradient(90deg,rgba(201,169,110,.04) 1px,transparent 1px); background-size:56px 56px; animation:gridMove 18s linear infinite; }
     @keyframes gridMove { from{background-position:0 0} to{background-position:56px 56px} }
-
     .orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.1; animation:orbP 7s ease-in-out infinite; }
     .orb1 { width:500px; height:500px; background:#c9a96e; top:-15%; left:-15%; }
     .orb2 { width:350px; height:350px; background:#7c5c2a; bottom:5%; right:-10%; animation-delay:-3.5s; }
     @keyframes orbP { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08) translateY(-20px)} }
-
     .fc-wrap { position:absolute; inset:0; pointer-events:none; }
     .fc { position:absolute; background:rgba(255,255,255,.03); border:1px solid rgba(201,169,110,.12); border-radius:12px; padding:.85rem 1rem; animation:fcF 6s ease-in-out infinite; backdrop-filter:blur(4px); }
     .fc:nth-child(1){ top:18%; left:8%;  animation-delay:0s;  }
@@ -41,7 +38,6 @@
     .fc .em { font-size:1.8rem; }
     .fc .nm { font-size:.68rem; color:var(--gold); margin-top:.3rem; }
     .fc .pr { font-size:.72rem; color:var(--t3); }
-
     .left-inner { position:relative; z-index:1; text-align:center; padding:3rem; max-width:460px; }
     .left-logo { font-family:'Bebas Neue',sans-serif; font-size:4rem; letter-spacing:.2em; color:var(--t1); display:block; margin-bottom:.3rem; }
     .left-logo span { color:var(--gold); }
@@ -51,13 +47,11 @@
     .feat { display:flex; align-items:center; gap:.75rem; font-size:.8rem; color:var(--t2); }
     .feat-ico { width:30px; height:30px; flex-shrink:0; background:var(--gold-g); border:1px solid rgba(201,169,110,.18); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:.85rem; }
 
-    /* ── RIGHT ────────────────────────────── */
+    /* ── RIGHT panel ── */
     .right { width:460px; flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:2rem 2.5rem; overflow-y:auto; }
     @media(max-width:860px){ .right { width:100%; border-left:none; min-height:100vh; } }
-
     .wrap { width:100%; max-width:360px; animation:slideUp .45s cubic-bezier(.16,1,.3,1) both; }
     @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
     .form-head { margin-bottom:1.75rem; }
     .form-head h2 { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:400; color:var(--t1); }
     .form-head p  { font-size:.8rem; color:var(--t3); margin-top:.35rem; }
@@ -77,7 +71,6 @@
     /* Google */
     .g-btn { width:100%; padding:.75rem; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:#ccc; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; cursor:pointer; transition:all .22s; display:flex; align-items:center; justify-content:center; gap:.6rem; }
     .g-btn:hover { background:var(--bg4); border-color:var(--border2); color:#fff; }
-
     .div-or { text-align:center; font-size:.7rem; color:var(--t3); margin:1.1rem 0; position:relative; }
     .div-or::before, .div-or::after { content:''; position:absolute; top:50%; width:calc(50% - 1.4rem); height:1px; background:var(--bg4); }
     .div-or::before{ left:0; } .div-or::after{ right:0; }
@@ -88,12 +81,11 @@
     label.lbl, .fl label { font-size:.67rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--t3); }
     .f-lnk { font-size:.72rem; color:var(--gold); background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
     .f-lnk:hover { text-decoration:underline; }
-
     .fw { position:relative; }
     .fi { position:absolute; left:.9rem; top:50%; transform:translateY(-50%); color:var(--t4); font-size:.8rem; pointer-events:none; transition:color .2s; }
     .fi-inp { width:100%; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:var(--t1); font-family:'DM Sans',sans-serif; font-size:.87rem; padding:.72rem 1rem .72rem 2.5rem; outline:none; transition:all .22s; }
     .fi-inp:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,169,110,.08); }
-    .fi-inp:focus + .fi { color:var(--gold); }
+    .fi-inp:focus ~ .fi { color:var(--gold); }
     .fi-inp::placeholder { color:var(--t4); }
     .eye { position:absolute; right:.9rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--t4); cursor:pointer; font-size:.82rem; transition:color .2s; }
     .eye:hover { color:var(--gold); }
@@ -101,52 +93,42 @@
     /* Password strength */
     .pwd-bars { display:flex; gap:3px; margin-top:6px; }
     .pwd-bar  { flex:1; height:3px; background:var(--bg4); border-radius:2px; transition:background .3s; }
-    .bar-w { background:#ef4444; }
-    .bar-m { background:#f59e0b; }
-    .bar-s { background:#22c55e; }
+    .bar-w { background:#ef4444; } .bar-m { background:#f59e0b; } .bar-s { background:#22c55e; }
 
     /* Submit */
     .sub-btn { width:100%; padding:.82rem; background:var(--gold); color:#080808; border:none; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:700; cursor:pointer; transition:all .25s; display:flex; align-items:center; justify-content:center; gap:.5rem; }
     .sub-btn:hover:not(:disabled) { background:var(--gold-l); transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,169,110,.28); }
     .sub-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+    .sub-btn.ghost { background:transparent; border:1.5px solid var(--border2); color:var(--t2); box-shadow:none; }
+    .sub-btn.ghost:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); background:var(--gold-g); transform:none; box-shadow:none; }
 
     /* Spinner */
     .spin { display:inline-block; width:16px; height:16px; border:2px solid rgba(8,8,8,.3); border-top-color:#080808; border-radius:50%; animation:sp .7s linear infinite; }
     @keyframes sp { to{transform:rotate(360deg)} }
+    .sub-btn.ghost .spin { border-color:rgba(255,255,255,.2); border-top-color:var(--t2); }
 
     .sw-txt { text-align:center; margin-top:1.25rem; font-size:.78rem; color:var(--t3); }
     .hidden { display:none !important; }
 
-    /* ── Verification screen ──────────────── */
-    #verify-screen {
-      text-align:center; padding:1rem 0;
-    }
-    .verify-icon {
-      width:70px; height:70px; border-radius:50%;
-      background:var(--gold-g); border:2px solid rgba(201,169,110,.25);
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.8rem; margin:0 auto 1.5rem;
-      animation:pulse 2s ease-in-out infinite;
-    }
+    /* Verify screen */
+    #verify-screen { text-align:center; padding:1rem 0; }
+    .verify-icon { width:70px; height:70px; border-radius:50%; background:var(--gold-g); border:2px solid rgba(201,169,110,.25); display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 1.5rem; animation:pulse 2s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.3)} 50%{box-shadow:0 0 0 12px rgba(201,169,110,0)} }
-
     .verify-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:400; margin-bottom:.75rem; }
     .verify-sub   { font-size:.84rem; color:var(--t3); line-height:1.8; margin-bottom:1.5rem; }
-    .verify-email { color:var(--gold); font-weight:600; }
-
+    .verify-email-shown { color:var(--gold); font-weight:600; }
     .verify-steps { display:flex; flex-direction:column; gap:.6rem; margin-bottom:2rem; text-align:left; }
     .vstep { display:flex; align-items:flex-start; gap:.65rem; font-size:.8rem; color:var(--t2); }
     .vstep .num { width:22px; height:22px; border-radius:50%; background:var(--bg4); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:700; flex-shrink:0; margin-top:.05rem; }
 
-    /* ── Forgot password screen ───────────── */
-    #forgot-screen { display:none; }
+    /* Forgot screen */
     .back-btn { display:flex; align-items:center; gap:.4rem; font-size:.75rem; color:var(--t3); background:none; border:none; cursor:pointer; margin-bottom:1.5rem; font-family:'DM Sans',sans-serif; }
     .back-btn:hover { color:var(--gold); }
   </style>
 </head>
 <body>
 
-<!-- ════ LEFT ════════════════════════════════════════════ -->
+<!-- LEFT -->
 <div class="left">
   <div class="left-grid"></div>
   <div class="orb orb1"></div>
@@ -169,31 +151,27 @@
   </div>
 </div>
 
-<!-- ════ RIGHT ═══════════════════════════════════════════ -->
+<!-- RIGHT -->
 <div class="right">
   <div class="wrap">
 
-    <!-- ══ MAIN AUTH (Login / Register) ══ -->
+    <!-- MAIN AUTH SCREEN -->
     <div id="main-screen">
-
       <div class="form-head">
         <h2 id="fh-title">Welcome Back</h2>
         <p  id="fh-sub">Sign in to continue shopping</p>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs">
-        <button class="tab on" id="tab-login"    onclick="go('login')">Sign In</button>
-        <button class="tab"    id="tab-register" onclick="go('register')">Create Account</button>
+        <button class="tab on" id="tab-login"    onclick="switchTab('login')">Sign In</button>
+        <button class="tab"    id="tab-register" onclick="switchTab('register')">Create Account</button>
       </div>
 
-      <!-- Alerts -->
       <div class="alert err"  id="a-err" ><i class="fa fa-exclamation-circle"></i><span id="a-err-msg"></span></div>
       <div class="alert ok"   id="a-ok"  ><i class="fa fa-check-circle"></i><span id="a-ok-msg"></span></div>
       <div class="alert warn" id="a-warn"><i class="fa fa-exclamation-triangle"></i><span id="a-warn-msg"></span></div>
 
-      <!-- Google -->
-      <button class="g-btn" onclick="doGoogle()">
+      <button class="g-btn" id="btn-google">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6A7.8 7.8 0 0 0 16.87 9.1c0-.57-.05-.8-.15-1.1z" fill="#4285F4"/>
           <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z" fill="#34A853"/>
@@ -275,82 +253,66 @@
 
       <p class="sw-txt" id="sw-txt">
         Pehli baar aa rahe ho?
-        <button class="f-lnk" onclick="go('register')">Account banao</button>
+        <button class="f-lnk" onclick="switchTab('register')">Account banao</button>
       </p>
     </div><!-- /main-screen -->
 
-    <!-- ══ EMAIL VERIFICATION SCREEN ══ -->
+    <!-- EMAIL VERIFICATION SCREEN -->
     <div id="verify-screen" class="hidden">
       <div class="verify-icon">📧</div>
       <h2 class="verify-title">Email Verify Karo!</h2>
       <p class="verify-sub">
         Humne ek verification email bheja hai:<br>
-        <span class="verify-email" id="verify-email-shown">—</span>
+        <span class="verify-email-shown" id="verify-email-shown">—</span>
       </p>
-
       <div class="verify-steps">
         <div class="vstep"><div class="num">1</div><span>Apna email inbox kholo</span></div>
         <div class="vstep"><div class="num">2</div><span>LUXE ka email dhundo (spam bhi check karo)</span></div>
         <div class="vstep"><div class="num">3</div><span>"Verify Email Address" link pe click karo</span></div>
         <div class="vstep"><div class="num">4</div><span>Neeche "Done! Check Karo" button dabao</span></div>
       </div>
-
-      <div class="alert info" id="v-info" style="margin-bottom:1rem">
+      <div class="alert info" id="v-info" style="display:flex;margin-bottom:1rem">
         <i class="fa fa-info-circle"></i>
         <span>Email verify karne ke baad hi aap login kar sakte hain.</span>
       </div>
-      <div class="alert ok"   id="v-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="v-ok-msg"></span></div>
-      <div class="alert err"  id="v-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="v-err-msg"></span></div>
-
-      <!-- Done button — reload user and check verification -->
-      <button class="sub-btn" id="verified-btn" onclick="checkVerified()" style="margin-bottom:.75rem">
+      <div class="alert ok"  id="v-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="v-ok-msg"></span></div>
+      <div class="alert err" id="v-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="v-err-msg"></span></div>
+      <button class="sub-btn" id="verified-btn" style="margin-bottom:.75rem">
         ✅ Done! Check Karo
       </button>
-
-      <!-- Resend -->
-      <button class="sub-btn" id="resend-btn" onclick="resendVerification()"
-        style="background:transparent;border:1.5px solid var(--border2);color:var(--t2);box-shadow:none">
+      <button class="sub-btn ghost" id="resend-btn">
         <i class="fa fa-paper-plane"></i> Resend Verification Email
       </button>
-
       <div style="text-align:center;margin-top:1.25rem">
-        <button class="f-lnk" onclick="backToLogin()" style="font-size:.75rem;color:var(--t3)">
+        <button class="f-lnk" id="back-to-login-btn" style="font-size:.75rem;color:var(--t3)">
           <i class="fa fa-arrow-left"></i> Wapas Sign In pe jao
         </button>
       </div>
     </div><!-- /verify-screen -->
 
-    <!-- ══ FORGOT PASSWORD SCREEN ══ -->
+    <!-- FORGOT PASSWORD SCREEN -->
     <div id="forgot-screen" class="hidden">
-
-      <button class="back-btn" onclick="showLogin()">
+      <button class="back-btn" onclick="showMainScreen()">
         <i class="fa fa-arrow-left"></i> Back to Sign In
       </button>
-
       <div class="form-head">
         <h2>Password Reset</h2>
         <p>Apna email daalo — reset link bhej denge</p>
       </div>
-
-      <div class="alert ok"   id="fp-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="fp-ok-msg"></span></div>
-      <div class="alert err"  id="fp-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="fp-err-msg"></span></div>
-
+      <div class="alert ok"  id="fp-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="fp-ok-msg"></span></div>
+      <div class="alert err" id="fp-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="fp-err-msg"></span></div>
       <form id="f-forgot" onsubmit="doForgot(event)">
         <div class="fg">
           <label class="lbl">Registered Email</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="fp-email"
-              placeholder="aap@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="fp-email" placeholder="aap@example.com" required autocomplete="email">
             <i class="fi fa fa-envelope"></i>
           </div>
         </div>
-
         <button class="sub-btn" id="btn-forgot" type="submit">
           <i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo
         </button>
       </form>
-
-      <!-- After email sent — show next steps -->
       <div id="fp-sent" class="hidden" style="margin-top:1.25rem">
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1.25rem">
           <div style="font-size:.88rem;font-weight:600;margin-bottom:.75rem;color:var(--t1)">📬 Email Bhej Diya!</div>
@@ -362,16 +324,18 @@
           </div>
         </div>
         <div style="text-align:center;margin-top:1rem">
-          <button class="f-lnk" onclick="showLogin()">Sign In pe wapas jao →</button>
+          <button class="f-lnk" onclick="showMainScreen()">Sign In pe wapas jao →</button>
         </div>
       </div>
-
     </div><!-- /forgot-screen -->
 
   </div>
 </div>
 
-<!-- ════ SCRIPT ══════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     SINGLE <script type="module"> — fixes the duplicate-app crash
+     All Firebase logic lives here. No more multiple module blocks.
+════════════════════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -387,7 +351,7 @@ import {
   getFirestore, doc, setDoc, getDoc, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── Firebase ──────────────────────────────────────────────
+// ── Firebase init (single instance) ──────────────────────
 const FC = {
   apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
   authDomain:        "shopzz-ca17e.firebaseapp.com",
@@ -396,42 +360,56 @@ const FC = {
   messagingSenderId: "158388352339",
   appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
 };
-let _app;
-try { _app = initializeApp(FC); } catch { _app = initializeApp(FC,'auth_pg'); }
-const auth = getAuth(_app);
-const db   = getFirestore(_app);
 
-// ── Redirect destination ──────────────────────────────────
+// Guard against HMR / accidental double-import
+let app;
+try { app = initializeApp(FC); }
+catch (e) {
+  if (e.code === 'app/duplicate-app') {
+    const { getApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    app = getApp();
+  } else throw e;
+}
+
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── Redirect target ───────────────────────────────────────
 const params  = new URLSearchParams(location.search);
 const nextUrl = params.get('next') || 'index.html';
 
-// ── Auth state — if already verified, redirect ────────────
+// ── Temp credential store for verify screen ───────────────
+// FIX: store creds BEFORE signOut so resend/check can re-auth
+let _savedEmail = '';
+let _savedPass  = '';
+
+// ── Auth state observer ───────────────────────────────────
+// If already fully verified, skip straight to the store
 onAuthStateChanged(auth, user => {
-  // Google users are auto-verified
   if (user && user.emailVerified) {
     window.location.replace(nextUrl);
   }
-  // If signed in but NOT verified, stay on verify screen
-  // (handled after register)
 });
 
-// ── Save profile to Firestore ─────────────────────────────
+// ── Firestore profile ─────────────────────────────────────
 async function saveProfile(user, extra = {}) {
   const ref  = doc(db, 'users', user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     await setDoc(ref, {
-      uid: user.uid, email: user.email,
+      uid:         user.uid,
+      email:       user.email,
       displayName: user.displayName || extra.name || '',
-      photoURL: user.photoURL || '',
-      role: 'customer',
-      createdAt: serverTimestamp(),
+      photoURL:    user.photoURL || '',
+      role:        'customer',
+      createdAt:   serverTimestamp(),
+      wishlist:    [],
     });
   }
 }
 
 // ── Tab switch ────────────────────────────────────────────
-window.go = (tab) => {
+window.switchTab = (tab) => {
   const isL = tab === 'login';
   document.getElementById('tab-login').classList.toggle('on', isL);
   document.getElementById('tab-register').classList.toggle('on', !isL);
@@ -440,29 +418,30 @@ window.go = (tab) => {
   document.getElementById('fh-title').textContent = isL ? 'Welcome Back' : 'Create Account';
   document.getElementById('fh-sub').textContent   = isL ? 'Sign in to continue shopping' : "Join LUXE — it's free!";
   document.getElementById('sw-txt').innerHTML = isL
-    ? 'Pehli baar aa rahe ho? <button class="f-lnk" onclick="go(\'register\')">Account banao</button>'
-    : 'Already account hai? <button class="f-lnk" onclick="go(\'login\')">Sign in karo</button>';
+    ? 'Pehli baar aa rahe ho? <button class="f-lnk" onclick="switchTab(\'register\')">Account banao</button>'
+    : 'Already account hai? <button class="f-lnk" onclick="switchTab(\'login\')">Sign in karo</button>';
   clearAlerts();
 };
 
-// ── LOGIN (with email verification check) ────────────────
+// ── LOGIN ─────────────────────────────────────────────────
 window.doLogin = async (e) => {
   e.preventDefault();
-  const btn   = document.getElementById('btn-login');
-  const email = document.getElementById('l-email').value.trim();
-  const pass  = document.getElementById('l-pass').value;
+  const btn   = ge('btn-login');
+  const email = ge('l-email').value.trim();
+  const pass  = ge('l-pass').value;
   clearAlerts();
-  setLoad(btn, true);
+  setLoad(btn, true, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
 
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    const user = cred.user;
+    const { user } = await signInWithEmailAndPassword(auth, email, pass);
 
-    // ✅ CHECK EMAIL VERIFIED
+    // FIX: check email verification before allowing entry
     if (!user.emailVerified) {
-      // Sign them out immediately — can't use site without verification
       await signOut(auth);
-      showWarn(`Pehle email verify karo! <button class="f-lnk" onclick="doResendFromLogin('${email}','${pass}')" style="margin-left:.3rem">Resend email ↗</button>`);
+      // Store creds so user can resend / check from verify screen
+      _savedEmail = email;
+      _savedPass  = pass;
+      showVerifyScreen(email);
       setLoad(btn, false, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
       return;
     }
@@ -471,93 +450,79 @@ window.doLogin = async (e) => {
     await saveProfile(user);
     setTimeout(() => window.location.replace(nextUrl), 700);
   } catch (err) {
-    showErr(msg(err.code));
+    showErr(friendlyMsg(err.code));
     setLoad(btn, false, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
   }
-};
-
-// Resend from login page (when user tries to login unverified)
-window.doResendFromLogin = async (email, pass) => {
-  try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    await sendEmailVerification(cred.user);
-    await signOut(auth);
-    clearAlerts();
-    showOk(`Verification email bhej diya ${email} pe! Check karo.`);
-  } catch {}
 };
 
 // ── REGISTER ──────────────────────────────────────────────
 window.doRegister = async (e) => {
   e.preventDefault();
-  const btn    = document.getElementById('btn-reg');
-  const name   = document.getElementById('r-name').value.trim();
-  const email  = document.getElementById('r-email').value.trim();
-  const pass   = document.getElementById('r-pass').value;
-  const conf   = document.getElementById('r-confirm').value;
+  const btn   = ge('btn-reg');
+  const name  = ge('r-name').value.trim();
+  const email = ge('r-email').value.trim();
+  const pass  = ge('r-pass').value;
+  const conf  = ge('r-confirm').value;
   clearAlerts();
 
   if (pass !== conf)   { showErr('Passwords match nahi kar rahe!'); return; }
   if (pass.length < 6) { showErr('Password kam se kam 6 characters ka hona chahiye.'); return; }
 
-  setLoad(btn, true);
+  setLoad(btn, true, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
   try {
-    // Create account
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    await saveProfile(cred.user, { name });
+    // FIX: save creds BEFORE signOut so verify screen can use them
+    _savedEmail = email;
+    _savedPass  = pass;
 
-    // Send verification email
-    await sendEmailVerification(cred.user, {
-      url: window.location.origin + '/auth.html?verified=1&next=' + encodeURIComponent(nextUrl),
+    const { user } = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(user, { displayName: name });
+    await saveProfile(user, { name });
+
+    await sendEmailVerification(user, {
+      url: `${location.origin}/auth.html?verified=1&next=${encodeURIComponent(nextUrl)}`,
       handleCodeInApp: false,
     });
 
-    // Sign out — they must verify first
+    // Sign out — must verify before entering the store
     await signOut(auth);
 
-    // Show verification screen
     showVerifyScreen(email);
-
     setLoad(btn, false, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
   } catch (err) {
-    showErr(msg(err.code));
+    _savedEmail = ''; _savedPass = '';
+    showErr(friendlyMsg(err.code));
     setLoad(btn, false, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
   }
 };
 
-// ── GOOGLE (auto verified) ────────────────────────────────
-window.doGoogle = async () => {
+// ── GOOGLE ────────────────────────────────────────────────
+ge('btn-google').addEventListener('click', async () => {
   clearAlerts();
   try {
     const res = await signInWithPopup(auth, new GoogleAuthProvider());
     await saveProfile(res.user);
-    // Google accounts are always verified
     showOk('Google se login ho gaya! Redirecting…');
     setTimeout(() => window.location.replace(nextUrl), 700);
   } catch (err) {
-    if (err.code !== 'auth/popup-closed-by-user') showErr(msg(err.code));
+    if (err.code !== 'auth/popup-closed-by-user') showErr(friendlyMsg(err.code));
   }
-};
+});
 
 // ── FORGOT PASSWORD ───────────────────────────────────────
 window.doForgot = async (e) => {
   e.preventDefault();
-  const btn   = document.getElementById('btn-forgot');
-  const email = document.getElementById('fp-email').value.trim();
+  const btn   = ge('btn-forgot');
+  const email = ge('fp-email').value.trim();
   clearFpAlerts();
-  setLoad(btn, true);
+  setLoad(btn, true, '<i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo');
 
   try {
     await sendPasswordResetEmail(auth, email, {
-      url: window.location.origin + '/auth.html',
+      url: `${location.origin}/auth.html`,
     });
-
-    // Show sent confirmation
     showFpOk(`Reset link bhej diya gaya ${email} pe!`);
-    document.getElementById('fp-sent').classList.remove('hidden');
+    ge('fp-sent').classList.remove('hidden');
     btn.style.display = 'none';
-
   } catch (err) {
     const map = {
       'auth/user-not-found':    'Is email pe koi account nahi mila.',
@@ -569,93 +534,107 @@ window.doForgot = async (e) => {
   }
 };
 
-// ── VERIFY SCREEN — Check if verified ────────────────────
-let _verifyUser = null; // temp hold of unverified user's creds
-
-window.checkVerified = async () => {
-  const btn = document.getElementById('verified-btn');
-  setLoad(btn, true);
+// ── VERIFY SCREEN: Check if verified ─────────────────────
+// FIX: re-sign-in with stored creds to call reload() properly
+ge('verified-btn').addEventListener('click', async () => {
+  const btn = ge('verified-btn');
+  setLoad(btn, true, '✅ Done! Check Karo');
   clearVAlerts();
 
-  try {
-    // Try signing in with stored creds to reload
-    if (_verifyUser) {
-      await reload(_verifyUser);
-      if (_verifyUser.emailVerified) {
-        showVOk('Email verified! Login ho raha hai…');
-        await saveProfile(_verifyUser);
-        setTimeout(() => window.location.replace(nextUrl), 800);
-        return;
-      }
-    }
-    showVErr('Email abhi verify nahi hua. Email check karo aur link pe click karo.');
-  } catch (e) {
-    showVErr('Check karne mein error. Dobara try karo.');
+  if (!_savedEmail || !_savedPass) {
+    showVErr('Session expire ho gaya. Wapas sign in karo.');
+    setLoad(btn, false, '✅ Done! Check Karo');
+    return;
   }
-  setLoad(btn, false, '✅ Done! Check Karo');
-};
 
-window.resendVerification = async () => {
-  const btn = document.getElementById('resend-btn');
-  setLoad(btn, true);
-  clearVAlerts();
   try {
-    if (_verifyUser) {
-      await sendEmailVerification(_verifyUser, {
-        url: window.location.origin + '/auth.html?next=' + encodeURIComponent(nextUrl),
-      });
-      showVOk('Verification email dobara bhej diya! Inbox check karo.');
+    const { user } = await signInWithEmailAndPassword(auth, _savedEmail, _savedPass);
+    await reload(user); // force fresh token from Firebase
+
+    if (user.emailVerified) {
+      await saveProfile(user);
+      _savedEmail = ''; _savedPass = '';
+      showVOk('✅ Email verify ho gaya! Store pe ja rahe hain…');
+      setTimeout(() => window.location.replace(nextUrl), 900);
     } else {
-      showVErr('Kuch gadbad ho gayi. Wapas register karo.');
+      await signOut(auth);
+      showVErr('Abhi bhi verify nahi hua. Email open karo aur link pe click karo.');
+      setLoad(btn, false, '✅ Done! Check Karo');
     }
-  } catch (e) {
-    const map = { 'auth/too-many-requests': 'Bahut baar send kiya. 1 minute baad try karo.' };
-    showVErr(map[e.code] || e.message);
+  } catch (err) {
+    showVErr(friendlyMsg(err.code));
+    setLoad(btn, false, '✅ Done! Check Karo');
+  }
+});
+
+// ── VERIFY SCREEN: Resend ─────────────────────────────────
+ge('resend-btn').addEventListener('click', async () => {
+  const btn = ge('resend-btn');
+  setLoad(btn, true, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
+  clearVAlerts();
+
+  if (!_savedEmail || !_savedPass) {
+    showVErr('Kuch gadbad ho gayi. Wapas register karo.');
+    setLoad(btn, false, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
+    return;
+  }
+
+  try {
+    const { user } = await signInWithEmailAndPassword(auth, _savedEmail, _savedPass);
+    await sendEmailVerification(user, {
+      url: `${location.origin}/auth.html?next=${encodeURIComponent(nextUrl)}`,
+    });
+    await signOut(auth);
+    showVOk('Verification email dobara bhej diya! Inbox check karo.');
+  } catch (err) {
+    const m = err.code === 'auth/too-many-requests'
+      ? 'Bahut baar bheja. 1 minute baad try karo.'
+      : friendlyMsg(err.code);
+    showVErr(m);
   }
   setLoad(btn, false, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
-};
+});
 
-// ── SCREEN SWITCHES ───────────────────────────────────────
+// ── Back to login from verify screen ─────────────────────
+ge('back-to-login-btn').addEventListener('click', async () => {
+  try { await signOut(auth); } catch {}
+  _savedEmail = ''; _savedPass = '';
+  showMainScreen();
+  switchTab('login');
+});
+
+// ── Screen navigation ─────────────────────────────────────
 function showVerifyScreen(email) {
-  document.getElementById('main-screen').classList.add('hidden');
-  document.getElementById('forgot-screen').classList.add('hidden');
-  document.getElementById('verify-screen').classList.remove('hidden');
-  document.getElementById('verify-email-shown').textContent = email;
-  document.getElementById('v-info').style.display = 'flex';
+  ge('main-screen').classList.add('hidden');
+  ge('forgot-screen').classList.add('hidden');
+  ge('verify-screen').classList.remove('hidden');
+  ge('verify-email-shown').textContent = email;
 }
 
 window.showForgot = () => {
-  document.getElementById('main-screen').classList.add('hidden');
-  document.getElementById('verify-screen').classList.add('hidden');
-  document.getElementById('forgot-screen').classList.remove('hidden');
-  document.getElementById('f-forgot').reset();
-  document.getElementById('fp-sent').classList.add('hidden');
-  document.getElementById('btn-forgot').style.display = 'flex';
+  ge('main-screen').classList.add('hidden');
+  ge('verify-screen').classList.add('hidden');
+  ge('forgot-screen').classList.remove('hidden');
+  ge('f-forgot').reset();
+  ge('fp-sent').classList.add('hidden');
+  ge('btn-forgot').style.display = '';
   clearFpAlerts();
 };
 
-window.showLogin = () => {
-  document.getElementById('forgot-screen').classList.add('hidden');
-  document.getElementById('verify-screen').classList.add('hidden');
-  document.getElementById('main-screen').classList.remove('hidden');
-  go('login');
+window.showMainScreen = () => {
+  ge('forgot-screen').classList.add('hidden');
+  ge('verify-screen').classList.add('hidden');
+  ge('main-screen').classList.remove('hidden');
 };
 
-window.backToLogin = async () => {
-  // Sign out any partial session
-  try { await signOut(auth); } catch {}
-  _verifyUser = null;
-  showLogin();
-};
-
-// ── Check if landed here after email verification ─────────
+// Show success banner if landing after email link click
 if (params.get('verified') === '1') {
   showOk('✅ Email verify ho gaya! Ab sign in karo.');
 }
 
-// ── Password strength ─────────────────────────────────────
+// ── Password strength meter ───────────────────────────────
 window.pwdStr = (v) => {
-  const bars = ['pb1','pb2','pb3','pb4'].map(id => document.getElementById(id));
+  const bars = ['pb1','pb2','pb3','pb4'].map(id => ge(id));
   bars.forEach(b => b.className = 'pwd-bar');
   let s = 0;
   if (v.length >= 6) s++;
@@ -666,176 +645,52 @@ window.pwdStr = (v) => {
   for (let i = 0; i < s; i++) bars[i].className = `pwd-bar ${cls}`;
 };
 
-// ── Eye toggle ────────────────────────────────────────────
+// ── Password eye toggle ───────────────────────────────────
 window.toggleEye = (id, btn) => {
-  const inp = document.getElementById(id);
+  const inp = ge(id);
   inp.type  = inp.type === 'password' ? 'text' : 'password';
   btn.querySelector('i').className = `fa fa-eye${inp.type === 'password' ? '' : '-slash'}`;
 };
 
-// ── Alert helpers ─────────────────────────────────────────
-function showErr(html)  { const e=document.getElementById('a-err');  document.getElementById('a-err-msg').innerHTML=html;  e.style.display='flex'; }
-function showOk(html)   { const e=document.getElementById('a-ok');   document.getElementById('a-ok-msg').innerHTML=html;   e.style.display='flex'; }
-function showWarn(html) { const e=document.getElementById('a-warn'); document.getElementById('a-warn-msg').innerHTML=html; e.style.display='flex'; }
-function clearAlerts()  { ['a-err','a-ok','a-warn'].forEach(id=>document.getElementById(id).style.display='none'); }
+// ── Helpers ───────────────────────────────────────────────
+function ge(id) { return document.getElementById(id); }
 
-function showVOk(t)  { const e=document.getElementById('v-ok');  document.getElementById('v-ok-msg').textContent=t;  e.style.display='flex'; document.getElementById('v-err').style.display='none'; }
-function showVErr(t) { const e=document.getElementById('v-err'); document.getElementById('v-err-msg').textContent=t; e.style.display='flex'; document.getElementById('v-ok').style.display='none'; }
-function clearVAlerts() { ['v-ok','v-err'].forEach(id=>document.getElementById(id).style.display='none'); }
-
-function showFpOk(t)  { const e=document.getElementById('fp-ok');  document.getElementById('fp-ok-msg').textContent=t;  e.style.display='flex'; document.getElementById('fp-err').style.display='none'; }
-function showFpErr(t) { const e=document.getElementById('fp-err'); document.getElementById('fp-err-msg').textContent=t; e.style.display='flex'; document.getElementById('fp-ok').style.display='none'; }
-function clearFpAlerts() { ['fp-ok','fp-err'].forEach(id=>document.getElementById(id).style.display='none'); }
-
-// ── Loading state ─────────────────────────────────────────
 function setLoad(btn, on, html = '') {
-  btn.disabled  = on;
-  if (html && !on) btn.dataset.orig = btn.dataset.orig || html;
-  btn.innerHTML = on ? '<div class="spin"></div>' : (btn.dataset.orig || html || btn.innerHTML);
+  btn.disabled = on;
+  if (html) btn.dataset.orig = html;
+  btn.innerHTML = on
+    ? (btn.classList.contains('ghost')
+        ? '<div class="spin"></div>'
+        : '<div class="spin"></div>')
+    : (btn.dataset.orig || html);
 }
 
-// ── Error messages (Hindi) ────────────────────────────────
-function msg(code) {
+function showErr(html)  { const e=ge('a-err');  ge('a-err-msg').innerHTML=html;   e.style.display='flex'; }
+function showOk(html)   { const e=ge('a-ok');   ge('a-ok-msg').innerHTML=html;    e.style.display='flex'; }
+function showWarn(html) { const e=ge('a-warn'); ge('a-warn-msg').innerHTML=html;  e.style.display='flex'; }
+function clearAlerts()  { ['a-err','a-ok','a-warn'].forEach(id => ge(id).style.display='none'); }
+
+function showVOk(t)     { ge('v-ok-msg').textContent=t;  ge('v-ok').style.display='flex';  ge('v-err').style.display='none'; }
+function showVErr(t)    { ge('v-err-msg').textContent=t; ge('v-err').style.display='flex'; ge('v-ok').style.display='none';  }
+function clearVAlerts() { ['v-ok','v-err'].forEach(id => ge(id).style.display='none'); }
+
+function showFpOk(t)    { ge('fp-ok-msg').textContent=t;  ge('fp-ok').style.display='flex';  ge('fp-err').style.display='none'; }
+function showFpErr(t)   { ge('fp-err-msg').textContent=t; ge('fp-err').style.display='flex'; ge('fp-ok').style.display='none';  }
+function clearFpAlerts(){ ['fp-ok','fp-err'].forEach(id => ge(id).style.display='none'); }
+
+function friendlyMsg(code) {
   return ({
-    'auth/user-not-found':      'Is email pe koi account nahi mila.',
-    'auth/wrong-password':      'Password galat hai.',
-    'auth/invalid-credential':  'Email ya password galat hai.',
-    'auth/email-already-in-use':'Yeh email already registered hai. Sign in karo.',
-    'auth/invalid-email':       'Valid email address daalo.',
-    'auth/weak-password':       'Password zyada strong banao (6+ characters).',
-    'auth/too-many-requests':   'Bahut attempts ho gaye. Thodi der baad try karo.',
+    'auth/user-not-found':         'Is email pe koi account nahi mila.',
+    'auth/wrong-password':         'Password galat hai.',
+    'auth/invalid-credential':     'Email ya password galat hai.',
+    'auth/email-already-in-use':   'Yeh email already registered hai. Sign in karo.',
+    'auth/invalid-email':          'Valid email address daalo.',
+    'auth/weak-password':          'Password zyada strong banao (6+ characters).',
+    'auth/too-many-requests':      'Bahut attempts ho gaye. Thodi der baad try karo.',
     'auth/network-request-failed': 'Network error. Internet check karo.',
-    'auth/popup-closed-by-user':'Google sign-in cancel ho gaya.',
+    'auth/popup-closed-by-user':   'Google sign-in cancel ho gaya.',
   })[code] || 'Kuch gadbad ho gayi. Dobara try karo.';
 }
-
-// ── Store unverified user ref (for resend) ────────────────
-// We intercept the createUser flow above — but we need to
-// capture the user object before signOut for resend to work.
-// Patch: override showVerifyScreen to capture user first.
-const _orig_createUser = window._origCreate;
-
-// Expose _verifyUser setter for the register flow
-window._setVerifyUser = u => { _verifyUser = u; };
-
-</script>
-
-<!-- Patch: capture user before signout in register -->
-<script type="module">
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-// The register function above signs out immediately after sending verification.
-// We need to keep the user object alive for resend.
-// This is handled via _verifyUser in the module scope above.
-// The register flow is: create → updateProfile → saveProfile → sendVerification → signOut → showVerifyScreen
-// At that point, _verifyUser is NOT set because we signed out.
-// Fix: sign out AFTER storing the user ref.
-// Solution: We'll re-sign-in silently for resend using stored credentials.
-// Actually the cleanest solution: store email+pass temporarily for resend.
-</script>
-
-<script type="module">
-// Cleaner approach: store email temporarily for resend
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, sendEmailVerification, signOut }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const FC = {
-  apiKey:"AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
-  authDomain:"shopzz-ca17e.firebaseapp.com",
-  projectId:"shopzz-ca17e",
-  storageBucket:"shopzz-ca17e.firebasestorage.app",
-  messagingSenderId:"158388352339",
-  appId:"1:158388352339:web:2c1016ed5c782ed6e6dda6",
-};
-let _app2; try { _app2=initializeApp(FC); } catch { _app2=initializeApp(FC,'auth_pg2'); }
-const auth2 = getAuth(_app2);
-
-// Expose resend that uses stored creds
-let _storedEmail='', _storedPass='';
-
-window._storeCredentials = (email, pass) => {
-  _storedEmail = email; _storedPass = pass;
-};
-
-// Override resend to use stored creds
-window.resendVerification = async () => {
-  const btn = document.getElementById('resend-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spin" style="border-top-color:#080808"></div>';
-  document.getElementById('v-ok').style.display='none';
-  document.getElementById('v-err').style.display='none';
-
-  if (!_storedEmail || !_storedPass) {
-    document.getElementById('v-err-msg').textContent = 'Kuch gadbad ho gayi. Wapas register karo.';
-    document.getElementById('v-err').style.display='flex';
-    btn.disabled=false;
-    btn.innerHTML='<i class="fa fa-paper-plane"></i> Resend Verification Email';
-    return;
-  }
-
-  try {
-    const cred = await signInWithEmailAndPassword(auth2, _storedEmail, _storedPass);
-    await sendEmailVerification(cred.user, { url: window.location.origin + '/auth.html' });
-    await signOut(auth2);
-    document.getElementById('v-ok-msg').textContent='Verification email dobara bhej diya! Inbox check karo.';
-    document.getElementById('v-ok').style.display='flex';
-  } catch(e) {
-    const m = e.code==='auth/too-many-requests' ? 'Bahut baar bheja. 1 minute baad try karo.' : e.message;
-    document.getElementById('v-err-msg').textContent = m;
-    document.getElementById('v-err').style.display='flex';
-  }
-  btn.disabled=false;
-  btn.innerHTML='<i class="fa fa-paper-plane"></i> Resend Verification Email';
-};
-
-// Override checkVerified to use stored creds
-window.checkVerified = async () => {
-  const btn = document.getElementById('verified-btn');
-  btn.disabled=true;
-  btn.innerHTML='<div class="spin" style="border-top-color:#080808"></div>';
-  document.getElementById('v-ok').style.display='none';
-  document.getElementById('v-err').style.display='none';
-
-  if (!_storedEmail || !_storedPass) {
-    // Maybe they already verified and are trying to check
-    document.getElementById('v-err-msg').textContent='Session expire ho gaya. Wapas sign in karo.';
-    document.getElementById('v-err').style.display='flex';
-    btn.disabled=false; btn.innerHTML='✅ Done! Check Karo';
-    return;
-  }
-
-  try {
-    const cred = await signInWithEmailAndPassword(auth2, _storedEmail, _storedPass);
-    await cred.user.reload();
-
-    if (cred.user.emailVerified) {
-      document.getElementById('v-ok-msg').textContent='✅ Email verify ho gaya! Store pe ja rahe hain…';
-      document.getElementById('v-ok').style.display='flex';
-      _storedEmail=''; _storedPass='';
-      const nextUrl = new URLSearchParams(location.search).get('next') || 'index.html';
-      setTimeout(() => window.location.replace(nextUrl), 1000);
-    } else {
-      await signOut(auth2);
-      document.getElementById('v-err-msg').textContent='Abhi bhi verify nahi hua. Email open karo aur link pe click karo.';
-      document.getElementById('v-err').style.display='flex';
-      btn.disabled=false; btn.innerHTML='✅ Done! Check Karo';
-    }
-  } catch(e) {
-    document.getElementById('v-err-msg').textContent = e.message;
-    document.getElementById('v-err').style.display='flex';
-    btn.disabled=false; btn.innerHTML='✅ Done! Check Karo';
-  }
-};
-
-// Intercept register form to store creds + patch showVerifyScreen
-const origDoRegister = window.doRegister;
-window.doRegister = async (e) => {
-  // Store credentials BEFORE calling original
-  const email = document.getElementById('r-email').value.trim();
-  const pass  = document.getElementById('r-pass').value;
-  window._storeCredentials(email, pass);
-  await origDoRegister(e);
-};
 </script>
 
 </body>

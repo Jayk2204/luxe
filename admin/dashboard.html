@@ -148,12 +148,6 @@ import { injectLayout } from './js/admin-layout.js';
 injectLayout('Dashboard');
 
 requireAdmin(async (user, profile) => {
-  const name = profile.displayName || user.email;
-  document.getElementById('sidebar-user-name').textContent = name;
-  document.getElementById('sidebar-avatar').textContent    = name.charAt(0).toUpperCase();
-  setActiveSidebarLink();
-
-  document.getElementById('logout-btn').addEventListener('click', e => { e.preventDefault(); adminLogout(); });
   document.getElementById('page-body').style.display = 'block';
 
   // Sidebar counts + stats
