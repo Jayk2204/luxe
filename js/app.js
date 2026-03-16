@@ -2,14 +2,13 @@
 // app.js  —  Global Utilities (India Edition — ₹ INR)
 // ============================================================
 
-<<<<<<< HEAD
+
 // ── Custom Cursor ──────────────────────────────────────────
 // initCursor disabled — using default OS cursor
 export function initCursor() { /* no-op */ }
-=======
 // ── Custom Cursor (disabled — using normal system cursor) ──
-export function initCursor() { /* disabled */ }
->>>>>>> abd48409ae1432aae6cc7a7728426fb2bf6a61d2
+
+
 
 // ── Nav scroll ────────────────────────────────────────────
 export function initNav() {
