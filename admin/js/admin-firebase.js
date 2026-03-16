@@ -22,7 +22,9 @@ const FC = {
 };
 
 // FIX 1: Prevent duplicate app init crash when firebase-config.js already ran
-const _app = getApps().find(a => a.name === 'admin') || initializeApp(FC, 'admin');
+// Use DEFAULT app — named apps ('admin') cause 'No Firebase App [DEFAULT]' errors
+// because Firebase Auth/Firestore internals always look up '[DEFAULT]' first.
+const _app = getApps().length === 0 ? initializeApp(FC) : getApps()[0];
 
 export const auth = getAuth(_app);
 export const db   = getFirestore(_app);

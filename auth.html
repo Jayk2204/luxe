@@ -446,8 +446,17 @@ window.doLogin = async (e) => {
       return;
     }
 
-    showOk('Login successful! Redirecting…');
     await saveProfile(user);
+
+    // ── Admin check — agar role === 'admin' hai to seedha admin dashboard ──
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists() && snap.data()?.role === 'admin') {
+      showOk('Admin login! Dashboard pe ja rahe hain…');
+      setTimeout(() => window.location.replace('admin/dashboard.html'), 700);
+      return;
+    }
+
+    showOk('Login successful! Redirecting…');
     setTimeout(() => window.location.replace(nextUrl), 700);
   } catch (err) {
     showErr(friendlyMsg(err.code));

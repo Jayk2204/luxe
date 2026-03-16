@@ -18,8 +18,12 @@
       <p>Authorized access only</p>
     </div>
 
-    <div class="login-alert err" id="alert-err"><i class="fa fa-exclamation-circle"></i><span id="err-msg"></span></div>
-    <div class="login-alert ok"  id="alert-ok"><i class="fa fa-check-circle"></i><span id="ok-msg"></span></div>
+    <div class="login-alert err" id="alert-err" style="display:none">
+      <i class="fa fa-exclamation-circle"></i><span id="err-msg"></span>
+    </div>
+    <div class="login-alert ok" id="alert-ok" style="display:none">
+      <i class="fa fa-check-circle"></i><span id="ok-msg"></span>
+    </div>
 
     <form id="login-form" onsubmit="doLogin(event)">
       <div class="form-group">
@@ -58,24 +62,39 @@
 </div>
 
 <script type="module">
-import { auth, adminLogin, showToast, setLoading }
-  from './js/admin-firebase.js';
-import { onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp, getApps }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const db = getFirestore();
+const FC = {
+  apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+  authDomain:        "shopzz-ca17e.firebaseapp.com",
+  projectId:         "shopzz-ca17e",
+  storageBucket:     "shopzz-ca17e.firebasestorage.app",
+  messagingSenderId: "158388352339",
+  appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
+};
 
-// If already logged in as admin → go to dashboard
+// Use DEFAULT app — login.html is standalone, no other scripts run here.
+// Named apps ('admin') cause 'No Firebase App [DEFAULT]' errors because
+// Firebase Auth/Firestore internally still look up '[DEFAULT]' in some paths.
+const app  = getApps().length === 0 ? initializeApp(FC) : getApps()[0];
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// If already logged in as admin → skip login, go straight to dashboard
 onAuthStateChanged(auth, async user => {
   if (!user) return;
   try {
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.data()?.role === 'admin') {
-      window.location.href = 'dashboard.html';
+      window.location.replace('dashboard.html');
     }
-  } catch { /* not admin, stay */ }
+  } catch { /* not admin, stay on login */ }
 });
 
 window.doLogin = async (e) => {
@@ -84,22 +103,25 @@ window.doLogin = async (e) => {
   const email = document.getElementById('email').value.trim();
   const pass  = document.getElementById('pass').value;
   hideAlerts();
-  setLoading(btn, true, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+  setLoad(btn, true);
 
   try {
-    const cred = await adminLogin(email, pass);
-    // Verify admin role
-    const snap = await getDoc(doc(db, 'users', cred.user.uid));
+    const { user } = await signInWithEmailAndPassword(auth, email, pass);
+
+    // Verify admin role in Firestore
+    const snap = await getDoc(doc(db, 'users', user.uid));
     const data = snap.data();
+
     if (!data || data.role !== 'admin') {
-      const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
       await signOut(auth);
       showAlert('err', 'This account does not have admin access.');
-      setLoading(btn, false, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+      setLoad(btn, false);
       return;
     }
+
     showAlert('ok', 'Login successful! Redirecting to dashboard…');
-    setTimeout(() => window.location.href = 'dashboard.html', 800);
+    setTimeout(() => window.location.replace('dashboard.html'), 700);
+
   } catch (err) {
     const map = {
       'auth/user-not-found':     'No account found with this email.',
@@ -109,7 +131,7 @@ window.doLogin = async (e) => {
       'auth/invalid-email':      'Enter a valid email address.',
     };
     showAlert('err', map[err.code] || err.message);
-    setLoading(btn, false, '<i class="fa fa-sign-in-alt"></i> Sign In to Admin');
+    setLoad(btn, false);
   }
 };
 
@@ -122,15 +144,20 @@ window.toggleEye = () => {
 
 function showAlert(type, msg) {
   hideAlerts();
-  const el = document.getElementById(`alert-${type}`);
   document.getElementById(`${type}-msg`).textContent = msg;
-  el.style.display = 'flex';
+  document.getElementById(`alert-${type}`).style.display = 'flex';
 }
 function hideAlerts() {
-  ['alert-err','alert-ok'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
+  document.getElementById('alert-err').style.display = 'none';
+  document.getElementById('alert-ok').style.display  = 'none';
+}
+function setLoad(btn, on) {
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:_sp_ .7s linear infinite"></span><style>@keyframes _sp_{to{transform:rotate(360deg)}}</style>'
+    : '<i class="fa fa-sign-in-alt"></i> Sign In to Admin';
 }
 </script>
+
 </body>
 </html>
