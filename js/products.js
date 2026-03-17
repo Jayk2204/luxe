@@ -383,6 +383,9 @@ export async function initProductDetailPage() {
 
     trackProductView(id);
     renderProductDetailPage(container, product);
+    // Expose product data for reviews, share, recently viewed
+    container.dataset.productId   = product.id;
+    container.dataset.productName = product.name;
     loadRelated(product);
   } catch (err) {
     container.innerHTML = `
@@ -632,4 +635,23 @@ async function loadRelated(product) {
   } catch {
     /* fail silently */
   }
+}
+// ── Fetch products by array of IDs ────────────────────────
+export async function fetchProductsByIds(ids) {
+  if (!ids || !ids.length) return [];
+  // Use demo products if IDs match demos
+  const demos = DEMO_PRODUCTS.filter(p => ids.includes(p.id));
+  if (demos.length) return demos;
+  // Otherwise fetch from Firestore
+  const { getDocs, collection, query, where } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  const { db } = await import('./firebase-config.js');
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += 10) chunks.push(ids.slice(i, i+10));
+  const results = [];
+  for (const chunk of chunks) {
+    const q = query(collection(db,'products'), where('__name__','in',chunk));
+    const snap = await getDocs(q);
+    snap.forEach(d => results.push({ id:d.id, ...d.data() }));
+  }
+  return results;
 }

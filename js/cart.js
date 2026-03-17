@@ -94,26 +94,48 @@ export function initCartPage() {
 
   render();
 
-  // Promo code
-  document.getElementById('apply-promo')?.addEventListener('click', () => {
-    const code   = document.getElementById('promo-input')?.value?.trim().toUpperCase();
-    const promos = {
-      'LUXE10':   { type:'pct',  val:0.10, min:999  },
-      'WELCOME':  { type:'pct',  val:0.15, min:1499 },
-      'VIP20':    { type:'pct',  val:0.20, min:2999 },
-      'INDIA50':  { type:'flat', val:50,   min:499  },
-      'FREESHIP': { type:'ship', val:0,    min:0    },
-    };
-    const promo = promos[code];
-    if (!promo) { showToast({ msg:'Invalid promo code', type:'error' }); return; }
-    const totals = LocalCart.totals();
-    if (totals.subtotal < promo.min) {
-      showToast({ msg:`Min order ${formatPrice(promo.min)} chahiye is code ke liye`, type:'warning' });
-      return;
+  // ── Promo code — validates against Firestore coupons ──────
+  let appliedCoupon = null;
+
+  document.getElementById('apply-promo')?.addEventListener('click', async () => {
+    const code = document.getElementById('promo-input')?.value?.trim().toUpperCase();
+    const btn  = document.getElementById('apply-promo');
+    const msgEl= document.getElementById('promo-msg');
+    if (!code) { showToast({ msg: 'Enter a coupon code first.', type: 'warning' }); return; }
+
+    btn.disabled = true;
+    btn.textContent = '…';
+    if (msgEl) { msgEl.textContent = ''; msgEl.style.color = ''; }
+
+    try {
+      const { validateCoupon, incrementCouponUse } = await import('./firebase-config.js').then(() =>
+        import('../admin/js/admin-firebase.js')
+      );
+      const totals = LocalCart.totals();
+      const coupon = await validateCoupon(code, totals.subtotal);
+      appliedCoupon = coupon;
+
+      // Store for checkout to use
+      sessionStorage.setItem('luxe_coupon', JSON.stringify({ id: coupon.id, code: coupon.code, type: coupon.type, value: coupon.value }));
+
+      let discountText = '';
+      if (coupon.type === 'pct')  discountText = `${coupon.value}% discount applied!`;
+      if (coupon.type === 'flat') discountText = `${formatPrice(coupon.value)} off applied!`;
+      if (coupon.type === 'ship') discountText = 'Free shipping applied!';
+
+      showToast({ title: '🎉 Coupon Applied!', msg: discountText, type: 'success' });
+      if (msgEl) { msgEl.textContent = '✓ ' + discountText; msgEl.style.color = '#27ae60'; }
+
+      // Re-render to show discount line
+      render();
+    } catch(err) {
+      appliedCoupon = null;
+      sessionStorage.removeItem('luxe_coupon');
+      showToast({ msg: err.message, type: 'error' });
+      if (msgEl) { msgEl.textContent = err.message; msgEl.style.color = '#c0392b'; }
     }
-    if (promo.type === 'pct')  showToast({ title:'🎉 Promo Applied!', msg:`${Math.round(promo.val*100)}% discount applied!`, type:'success' });
-    if (promo.type === 'flat') showToast({ title:'🎉 Promo Applied!', msg:`${formatPrice(promo.val)} flat discount applied!`, type:'success' });
-    if (promo.type === 'ship') showToast({ title:'🎉 Promo Applied!', msg:'Free delivery on this order!', type:'success' });
+    btn.disabled = false;
+    btn.textContent = 'Apply';
   });
 
   // Checkout
@@ -198,6 +220,24 @@ export async function placeOrder({ shippingAddress, paymentMethod = 'upi' }) {
 
   if (!items.length) throw new Error('Your cart is empty!');
 
+  // ── Apply coupon discount if one was validated ────────
+  let couponDiscount = 0;
+  let couponCode     = null;
+  let couponId       = null;
+  try {
+    const raw = sessionStorage.getItem('luxe_coupon');
+    if (raw) {
+      const c = JSON.parse(raw);
+      couponCode = c.code;
+      couponId   = c.id;
+      if (c.type === 'pct')  couponDiscount = Math.round(totals.subtotal * (c.value / 100));
+      if (c.type === 'flat') couponDiscount = Math.min(c.value, totals.subtotal);
+      if (c.type === 'ship') couponDiscount = totals.shipping; // free shipping
+    }
+  } catch {}
+
+  const finalTotal = Math.max(0, totals.total - couponDiscount);
+
   const order = {
     userId:          user?.uid   || 'guest',
     userEmail:       user?.email || shippingAddress.email,
@@ -217,13 +257,25 @@ export async function placeOrder({ shippingAddress, paymentMethod = 'upi' }) {
     codCharge:       totals.codCharge,
     gstIncluded:     totals.gstIncluded,
     savings:         totals.savings,
-    total:           totals.total,
+    couponCode:      couponCode || null,
+    couponDiscount:  couponDiscount,
+    total:           finalTotal,
     status:          'pending',
     createdAt:       serverTimestamp(),
   };
 
   const ref = await addDoc(collection(db, 'orders'), order);
+
+  // Increment coupon usage count in Firestore
+  if (couponId) {
+    try {
+      const { incrementCouponUse } = await import('../admin/js/admin-firebase.js');
+      await incrementCouponUse(couponId);
+    } catch {}
+  }
+
   LocalCart.clear();
+  sessionStorage.removeItem('luxe_coupon');
   return ref.id;
 }
 
@@ -274,6 +326,26 @@ export function initCheckoutPage() {
       <div id="cod-line" style="display:none" class="summary-line" style="color:var(--amber)">
         <span>COD Fee</span><span>${formatPrice(STORE.codCharge)}</span>
       </div>
+      ${(() => {
+        try {
+          const raw = sessionStorage.getItem('luxe_coupon');
+          if (raw) {
+            const c = JSON.parse(raw);
+            let disc = 0;
+            if (c.type === 'pct')  disc = Math.round(totals.subtotal * (c.value/100));
+            if (c.type === 'flat') disc = Math.min(c.value, totals.subtotal);
+            if (c.type === 'ship') disc = totals.shipping;
+            const newTotal = Math.max(0, totals.total - disc);
+            // update total display
+            setTimeout(() => {
+              const el = document.getElementById('order-total');
+              if (el) el.querySelector('span:last-child').textContent = formatPrice(newTotal);
+            }, 0);
+            return disc > 0 ? `<div class="summary-line" style="color:#27ae60"><span>Coupon (${c.code})</span><span>− ${formatPrice(disc)}</span></div>` : '';
+          }
+        } catch {}
+        return '';
+      })()}
       <div class="summary-line total" id="order-total">
         <span>Total</span><span>${formatPrice(totals.total)}</span>
       </div>

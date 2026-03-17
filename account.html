@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#c9a96e">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — LUXE</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .account-layout { display:grid; grid-template-columns:260px 1fr; gap:2rem; padding-top:calc(var(--nav-h)+3rem); padding-bottom:4rem; min-height:100vh; }
+    @media(max-width:900px){ .account-layout{grid-template-columns:1fr;gap:1.5rem;} }
+    .account-sidebar { position:sticky; top:calc(var(--nav-h)+1rem); height:fit-content; }
+    .account-card { background:var(--black-2); border:1px solid var(--black-4); border-radius:var(--radius-lg); overflow:hidden; }
+    .account-profile-header { padding:2rem; text-align:center; border-bottom:1px solid var(--black-4); background:linear-gradient(135deg,rgba(201,169,110,.06),transparent); }
+    .account-avatar { width:80px;height:80px;border-radius:50%;background:var(--gold);color:var(--black);font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem; }
+    .account-name { font-family:var(--font-display);font-size:1.3rem;color:var(--cream);margin-bottom:.25rem; }
+    .account-email { font-size:.78rem;color:var(--gray-3); }
+    .account-nav { padding:.5rem 0; }
+    .account-nav-item { display:flex;align-items:center;gap:.75rem;padding:.85rem 1.5rem;font-size:.82rem;font-weight:500;color:var(--gray-2);cursor:pointer;transition:all .2s;border-left:2px solid transparent; }
+    .account-nav-item:hover { color:var(--cream);background:rgba(201,169,110,.04); }
+    .account-nav-item.active { color:var(--gold);border-left-color:var(--gold);background:rgba(201,169,110,.06); }
+    .account-nav-item i { width:18px;text-align:center;opacity:.7; }
+    .tab-pane { display:none; } .tab-pane.active { display:block; }
+    .page-title { font-family:var(--font-display);font-size:1.6rem;color:var(--cream);margin-bottom:.5rem; }
+    .page-sub { font-size:.82rem;color:var(--gray-3);margin-bottom:2rem; }
+    .form-section { background:var(--black-2);border:1px solid var(--black-4);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem; }
+    .form-section-title { font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem; }
+    .form-row2 { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
+    @media(max-width:600px){ .form-row2{grid-template-columns:1fr;} }
+    .form-group { display:flex;flex-direction:column;gap:.4rem; }
+    .form-label { font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3); }
+    .form-input { background:var(--black-3);border:1.5px solid var(--black-4);border-radius:var(--radius);color:var(--cream);font-family:var(--font-body);font-size:.87rem;padding:.75rem 1rem;outline:none;transition:border-color .2s;width:100%; }
+    .form-input:focus { border-color:var(--gold); }
+    .form-input::placeholder { color:var(--gray-3); }
+    /* Orders */
+    .order-card { background:var(--black-2);border:1px solid var(--black-4);border-radius:var(--radius-lg);margin-bottom:1rem;overflow:hidden;transition:border-color .2s; }
+    .order-card:hover { border-color:var(--black-4); }
+    .order-header { display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid var(--black-4);flex-wrap:wrap;gap:.75rem; }
+    .order-id { font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold); }
+    .order-date { font-size:.76rem;color:var(--gray-3); }
+    .order-status { font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .75rem;border-radius:20px; }
+    .status-pending   { background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25); }
+    .status-processing{ background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25); }
+    .status-shipped   { background:rgba(139,92,246,.12);color:#8b5cf6;border:1px solid rgba(139,92,246,.25); }
+    .status-delivered { background:rgba(39,174,96,.12);color:#27ae60;border:1px solid rgba(39,174,96,.25); }
+    .status-cancelled { background:rgba(192,57,43,.12);color:#c0392b;border:1px solid rgba(192,57,43,.25); }
+    .order-body { padding:1.25rem 1.5rem; }
+    .order-items-row { display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem; }
+    .order-item-thumb { width:52px;height:52px;border-radius:var(--radius);background:var(--black-3);border:1px solid var(--black-4);display:flex;align-items:center;justify-content:center;font-size:1.4rem; }
+    .order-footer { display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--black-4);flex-wrap:wrap;gap:.5rem; }
+    .order-total { font-size:.85rem;font-weight:700;color:var(--cream); }
+    /* Tracking timeline */
+    .tracking-timeline { padding:1.25rem 1.5rem;background:rgba(201,169,110,.03);border-top:1px solid var(--black-4); }
+    .timeline { display:flex;align-items:flex-start;gap:0;position:relative;padding:.5rem 0; }
+    .tl-step { flex:1;text-align:center;position:relative; }
+    .tl-step::before { content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--black-4);z-index:0; }
+    .tl-step:last-child::before { display:none; }
+    .tl-dot { width:28px;height:28px;border-radius:50%;border:2px solid var(--black-4);background:var(--black-3);display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;position:relative;z-index:1;font-size:.65rem;transition:all .3s; }
+    .tl-step.done .tl-dot { background:var(--gold);border-color:var(--gold);color:var(--black); }
+    .tl-step.done::before { background:var(--gold); }
+    .tl-step.active .tl-dot { background:var(--black-3);border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(201,169,110,.3); }
+    .tl-label { font-size:.62rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-3); }
+    .tl-step.done .tl-label, .tl-step.active .tl-label { color:var(--gold); }
+    /* Address */
+    .address-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.25rem; }
+    .address-card { background:var(--black-2);border:1.5px solid var(--black-4);border-radius:var(--radius-lg);padding:1.25rem;position:relative;transition:border-color .2s; }
+    .address-card.default { border-color:var(--gold); }
+    .address-card-name { font-size:.9rem;font-weight:600;color:var(--cream);margin-bottom:.35rem; }
+    .address-card-text { font-size:.8rem;color:var(--gray-2);line-height:1.7; }
+    .address-card-actions { display:flex;gap:.5rem;margin-top:1rem; }
+    .address-default-badge { position:absolute;top:.75rem;right:.75rem;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:rgba(201,169,110,.15);color:var(--gold);border:1px solid rgba(201,169,110,.3);padding:.18rem .5rem;border-radius:20px; }
+    /* Wishlist */
+    .wishlist-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem; }
+    .empty-state { text-align:center;padding:4rem 2rem;color:var(--gray-3); }
+    .empty-state .icon { font-size:3rem;margin-bottom:1rem;opacity:.4; }
+    .btn-sm-outline { background:transparent;border:1px solid var(--black-4);color:var(--gray-2);padding:.4rem .85rem;border-radius:var(--radius);font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;cursor:pointer; }
+    .btn-sm-outline:hover { border-color:var(--gold);color:var(--gold); }
+    .btn-sm-danger { background:transparent;border:1px solid rgba(192,57,43,.3);color:#c0392b;padding:.4rem .85rem;border-radius:var(--radius);font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s; }
+    .btn-sm-danger:hover { background:rgba(192,57,43,.1); }
+    .alert-success { background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.2);color:#27ae60;padding:.75rem 1rem;border-radius:var(--radius);font-size:.82rem;margin-bottom:1rem;display:none; }
+    .alert-error { background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);color:#c0392b;padding:.75rem 1rem;border-radius:var(--radius);font-size:.82rem;margin-bottom:1rem;display:none; }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
+    <ul class="nav__links">
+      <li><a href="index.html" class="home-link">Home</a></li>
+      <li><a href="products.html" class="shop-link">Shop</a></li>
+      <li><a href="wishlist.html" class="wishlist-link">Wishlist</a></li>
+      <li><a href="account.html" class="account-nav-link">Account</a></li>
+    </ul>
+    <div class="nav__actions">
+      <button class="nav__icon-btn" id="search-btn" title="Search (Ctrl+K)">
+        <i class="fa fa-search"></i>
+      </button>
+      <a href="wishlist.html" class="nav__icon-btn" title="Wishlist" id="nav-wishlist-btn">
+        <i class="fa fa-heart"></i>
+      </a>
+      <a href="account.html" class="nav__icon-btn" id="nav-user-btn" title="My Account"
+        style="font-size:.75rem;font-weight:700;color:var(--gold)">
+        <i class="fa fa-user"></i>
+      </a>
+      <button class="nav__icon-btn" id="nav-logout-btn" title="Sign Out"
+        style="display:none;font-size:.9rem">
+        <i class="fa fa-sign-out-alt"></i>
+      </button>
+      <a href="cart.html" class="nav__icon-btn" title="Cart">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu__overlay"></div>
+<div class="mobile-menu">
+  <button class="mobile-menu__close">✕</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Shop</a>
+    <a href="wishlist.html">♡ Wishlist</a>
+    <a href="account.html">My Account</a>
+    <a href="cart.html">Cart</a>
+    <a href="auth.html">Sign In / Register</a>
+  </nav>
+</div>
+<div class="container account-layout">
+  <!-- Sidebar -->
+  <aside class="account-sidebar">
+    <div class="account-card">
+      <div class="account-profile-header">
+        <div class="account-avatar" id="acc-avatar">U</div>
+        <div class="account-name" id="acc-name">Loading…</div>
+        <div class="account-email" id="acc-email"></div>
+      </div>
+      <nav class="account-nav">
+        <div class="account-nav-item active" data-tab="profile"><i class="fa fa-user"></i> Profile</div>
+        <div class="account-nav-item" data-tab="orders"><i class="fa fa-box"></i> My Orders</div>
+        <div class="account-nav-item" data-tab="addresses"><i class="fa fa-map-marker-alt"></i> Addresses</div>
+        <div class="account-nav-item" data-tab="wishlist"><i class="fa fa-heart"></i> Wishlist</div>
+        <div class="account-nav-item" data-tab="security"><i class="fa fa-lock"></i> Password</div>
+        <div class="account-nav-item" id="acc-logout-btn" style="color:#c0392b;margin-top:1rem"><i class="fa fa-sign-out-alt"></i> Sign Out</div>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+
+    <!-- PROFILE TAB -->
+    <div class="tab-pane active" id="tab-profile">
+      <div class="page-title">My Profile</div>
+      <div class="page-sub">Manage your personal information</div>
+      <div id="profile-alert-ok"  class="alert-success"><i class="fa fa-check-circle"></i> Profile updated successfully!</div>
+      <div id="profile-alert-err" class="alert-error"><i class="fa fa-exclamation-circle"></i> <span id="profile-err-msg">Error</span></div>
+      <form id="profile-form">
+        <div class="form-section">
+          <div class="form-section-title">Personal Information</div>
+          <div class="form-row2" style="margin-bottom:1rem">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" id="p-name" type="text" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input class="form-input" id="p-phone" type="tel" placeholder="+91 98765 43210">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" id="p-email" type="email" disabled style="opacity:.5;cursor:not-allowed">
+            <span style="font-size:.7rem;color:var(--gray-3);margin-top:.3rem">Email cannot be changed. Contact support if needed.</span>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Profile Photo</div>
+          <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+            <div class="account-avatar" id="photo-preview" style="width:64px;height:64px;font-size:1.5rem">U</div>
+            <div>
+              <input type="url" class="form-input" id="p-photo" placeholder="Paste image URL (e.g. https://...)" style="max-width:400px">
+              <p style="font-size:.72rem;color:var(--gray-3);margin-top:.4rem">Paste a direct image URL for your avatar</p>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="tab-pane" id="tab-orders">
+      <div class="page-title">My Orders</div>
+      <div class="page-sub">Track and manage your purchases</div>
+      <div id="orders-list"><div style="text-align:center;padding:3rem"><div style="display:inline-block;width:28px;height:28px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div></div></div>
+    </div>
+
+    <!-- ADDRESSES TAB -->
+    <div class="tab-pane" id="tab-addresses">
+      <div class="page-title">Saved Addresses</div>
+      <div class="page-sub">Manage your delivery addresses</div>
+      <div id="addr-alert-ok"  class="alert-success"><i class="fa fa-check-circle"></i> Address saved!</div>
+      <div id="addr-alert-err" class="alert-error"><i class="fa fa-exclamation-circle"></i> <span id="addr-err-msg">Error</span></div>
+      <div class="address-grid" id="address-grid"></div>
+      <!-- Add/Edit Form -->
+      <div class="form-section" id="addr-form-wrap">
+        <div class="form-section-title" id="addr-form-title">Add New Address</div>
+        <form id="address-form">
+          <input type="hidden" id="addr-id">
+          <div class="form-row2" style="margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="a-name" placeholder="Recipient name" required></div>
+            <div class="form-group"><label class="form-label">Mobile</label><input class="form-input" id="a-phone" placeholder="+91 98765 43210" required></div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem"><label class="form-label">Address Line 1</label><input class="form-input" id="a-line1" placeholder="House/Flat/Block No., Street" required></div>
+          <div class="form-group" style="margin-bottom:1rem"><label class="form-label">Address Line 2 (optional)</label><input class="form-input" id="a-line2" placeholder="Area, Colony, Landmark"></div>
+          <div class="form-row2" style="margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" id="a-city" placeholder="Mumbai" required></div>
+            <div class="form-group"><label class="form-label">State</label><input class="form-input" id="a-state" placeholder="Maharashtra" required></div>
+          </div>
+          <div class="form-row2" style="margin-bottom:1rem">
+            <div class="form-group"><label class="form-label">PIN Code</label><input class="form-input" id="a-pin" placeholder="400001" maxlength="6" required></div>
+            <div class="form-group"><label class="form-label">Country</label><input class="form-input" id="a-country" value="India"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem">
+            <input type="checkbox" id="a-default" accent-color="var(--gold)" style="accent-color:var(--gold)">
+            <label for="a-default" style="font-size:.82rem;color:var(--gray-2);cursor:pointer">Set as default address</label>
+          </div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button type="submit" class="btn btn-primary btn-sm">Save Address</button>
+            <button type="button" class="btn btn-outline btn-sm" id="addr-cancel-btn" style="display:none">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- WISHLIST TAB -->
+    <div class="tab-pane" id="tab-wishlist">
+      <div class="page-title">My Wishlist</div>
+      <div class="page-sub">Products you've saved for later</div>
+      <div class="wishlist-grid" id="wishlist-grid"></div>
+    </div>
+
+    <!-- SECURITY TAB -->
+    <div class="tab-pane" id="tab-security">
+      <div class="page-title">Change Password</div>
+      <div class="page-sub">Keep your account secure</div>
+      <div id="sec-alert-ok"  class="alert-success"><i class="fa fa-check-circle"></i> Password updated!</div>
+      <div id="sec-alert-err" class="alert-error"><i class="fa fa-exclamation-circle"></i> <span id="sec-err-msg">Error</span></div>
+      <div class="form-section" style="max-width:480px">
+        <div class="form-section-title">Update Password</div>
+        <form id="security-form">
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label">Current Password</label>
+            <div style="position:relative"><input class="form-input" id="s-current" type="password" placeholder="Your current password"><button type="button" style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-3);font-size:.85rem" onclick="togglePwd('s-current',this)"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label">New Password</label>
+            <div style="position:relative"><input class="form-input" id="s-new" type="password" placeholder="8+ chars, uppercase, number, symbol"><button type="button" style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-3);font-size:.85rem" onclick="togglePwd('s-new',this)"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="form-group" style="margin-bottom:1.5rem">
+            <label class="form-label">Confirm New Password</label>
+            <div style="position:relative"><input class="form-input" id="s-confirm" type="password" placeholder="Re-enter new password"><button type="button" style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-3);font-size:.85rem" onclick="togglePwd('s-confirm',this)"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container"></div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script type="module" src="./js/auth-guard.js"></script>
+<script type="module">
+import { initApp, showToast, LocalCart, Wishlist, formatPrice } from './js/app.js';
+import { auth, db } from './js/firebase-config.js';
+import {
+  updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  doc, getDoc, updateDoc, setDoc, collection,
+  query, where, orderBy, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { observeAuth } from './js/auth.js';
+
+initApp();
+
+const ge = id => document.getElementById(id);
+let currentUser = null;
+let userDoc = {};
+
+// ── Tab switching ─────────────────────────────────────────
+document.querySelectorAll('.account-nav-item[data-tab]').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.account-nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    ge('tab-' + item.dataset.tab).classList.add('active');
+    if (item.dataset.tab === 'orders') loadOrders();
+    if (item.dataset.tab === 'wishlist') loadWishlist();
+    if (item.dataset.tab === 'addresses') loadAddresses();
+  });
+});
+
+// ── Auth & load profile ───────────────────────────────────
+observeAuth(async user => {
+  if (!user) return;
+  currentUser = user;
+  ge('acc-name').textContent  = user.displayName || 'User';
+  ge('acc-email').textContent = user.email;
+  ge('acc-avatar').textContent = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+  ge('photo-preview').textContent = ge('acc-avatar').textContent;
+  ge('p-email').value = user.email;
+  ge('p-name').value  = user.displayName || '';
+  if (user.photoURL) {
+    ge('photo-preview').innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  }
+  // Load Firestore user doc
+  const snap = await getDoc(doc(db, 'users', user.uid));
+  if (snap.exists()) {
+    userDoc = snap.data();
+    ge('p-phone').value = userDoc.phone || '';
+    ge('p-photo').value = user.photoURL || '';
+  }
+});
+
+ge('acc-logout-btn').addEventListener('click', async () => {
+  const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  await signOut(auth);
+  window.location.href = 'auth.html';
+});
+
+// ── PROFILE SAVE ─────────────────────────────────────────
+ge('profile-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name  = ge('p-name').value.trim();
+  const phone = ge('p-phone').value.trim();
+  const photo = ge('p-photo').value.trim();
+  ge('profile-alert-ok').style.display  = 'none';
+  ge('profile-alert-err').style.display = 'none';
+  try {
+    await updateProfile(currentUser, { displayName: name, photoURL: photo || null });
+    await updateDoc(doc(db, 'users', currentUser.uid), { displayName: name, phone, photoURL: photo || '', updatedAt: serverTimestamp() });
+    ge('acc-name').textContent = name;
+    ge('acc-avatar').textContent = name.charAt(0).toUpperCase();
+    if (photo) ge('photo-preview').innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    ge('profile-alert-ok').style.display = 'flex';
+  } catch(err) {
+    ge('profile-err-msg').textContent = err.message;
+    ge('profile-alert-err').style.display = 'flex';
+  }
+});
+
+// ── ORDERS ────────────────────────────────────────────────
+async function loadOrders() {
+  ge('orders-list').innerHTML = '<div style="text-align:center;padding:3rem"><div style="display:inline-block;width:28px;height:28px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div></div>';
+  try {
+    const q = query(collection(db,'orders'), where('userId','==',currentUser.uid), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      ge('orders-list').innerHTML = `<div class="empty-state"><div class="icon">📦</div><h3 style="font-family:var(--font-display);color:var(--cream);margin-bottom:.5rem">No orders yet</h3><p>Start shopping to see your orders here</p><a href="products.html" class="btn btn-primary btn-sm" style="margin-top:1.25rem">Browse Products</a></div>`;
+      return;
+    }
+    const statuses = ['pending','processing','shipped','delivered','cancelled'];
+    const steps    = [['fa-clock','Placed'],['fa-cog','Processing'],['fa-truck','Shipped'],['fa-check-circle','Delivered']];
+    ge('orders-list').innerHTML = snap.docs.map(d => {
+      const o = d.data(); const oid = d.id;
+      const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'N/A';
+      const stepIdx = Math.min(['pending','processing','shipped','delivered'].indexOf(o.status ?? 'pending'), 3);
+      const tlHtml = steps.map((s,i) => {
+        const cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
+        return `<div class="tl-step ${cls}"><div class="tl-dot"><i class="fa ${s[0]}" style="font-size:.55rem"></i></div><div class="tl-label">${s[1]}</div></div>`;
+      }).join('');
+      const thumbs = (o.items||[]).slice(0,4).map(it => `<div class="order-item-thumb">${it.product?.emoji||'📦'}</div>`).join('');
+      return `<div class="order-card">
+        <div class="order-header">
+          <div><div class="order-id">Order #${oid.slice(-8).toUpperCase()}</div><div class="order-date">${date}</div></div>
+          <span class="order-status status-${o.status||'pending'}">${(o.status||'pending').toUpperCase()}</span>
+        </div>
+        <div class="order-body">
+          <div class="order-items-row">${thumbs}${(o.items||[]).length > 4 ? `<div class="order-item-thumb" style="font-size:.75rem;color:var(--gray-3)">+${(o.items||[]).length-4}</div>` : ''}</div>
+          <div class="order-footer">
+            <span class="order-total">${formatPrice(o.total)} · ${(o.items||[]).length} item${(o.items||[]).length!==1?'s':''}</span>
+            <span style="font-size:.75rem;color:var(--gray-3)">${o.paymentMethod?.toUpperCase()||'COD'}</span>
+          </div>
+        </div>
+        ${o.status !== 'cancelled' ? `<div class="tracking-timeline"><div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.85rem">Tracking</div><div class="timeline">${tlHtml}</div></div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(err) {
+    ge('orders-list').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${err.message}</p></div>`;
+  }
+}
+
+// ── ADDRESSES ─────────────────────────────────────────────
+let editingAddrId = null;
+async function loadAddresses() {
+  if (!currentUser) return;
+  const snap = await getDoc(doc(db,'users',currentUser.uid));
+  const addresses = snap.exists() ? (snap.data().addresses || []) : [];
+  if (!addresses.length) {
+    ge('address-grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📍</div><p>No saved addresses. Add one below.</p></div>`;
+    return;
+  }
+  ge('address-grid').innerHTML = addresses.map((a,i) => `
+    <div class="address-card ${a.isDefault?'default':''}">
+      ${a.isDefault ? '<span class="address-default-badge">Default</span>' : ''}
+      <div class="address-card-name">${a.name}</div>
+      <div class="address-card-text">${a.line1}${a.line2?', '+a.line2:''}<br>${a.city}, ${a.state} — ${a.pin}<br>${a.country}</div>
+      <div style="font-size:.78rem;color:var(--gray-3);margin-top:.35rem">📞 ${a.phone}</div>
+      <div class="address-card-actions">
+        <button class="btn-sm-outline" onclick="editAddr(${i})">Edit</button>
+        ${!a.isDefault ? `<button class="btn-sm-outline" onclick="setDefaultAddr(${i})">Set Default</button>` : ''}
+        <button class="btn-sm-danger" onclick="deleteAddr(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+ge('address-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  ge('addr-alert-ok').style.display  = 'none';
+  ge('addr-alert-err').style.display = 'none';
+  const snap  = await getDoc(doc(db,'users',currentUser.uid));
+  let addresses = snap.exists() ? (snap.data().addresses || []) : [];
+  const newAddr = {
+    name: ge('a-name').value.trim(), phone: ge('a-phone').value.trim(),
+    line1: ge('a-line1').value.trim(), line2: ge('a-line2').value.trim(),
+    city: ge('a-city').value.trim(), state: ge('a-state').value.trim(),
+    pin: ge('a-pin').value.trim(), country: ge('a-country').value.trim(),
+    isDefault: ge('a-default').checked
+  };
+  if (newAddr.isDefault) addresses.forEach(a => a.isDefault = false);
+  if (editingAddrId !== null) addresses[editingAddrId] = newAddr;
+  else addresses.push(newAddr);
+  await updateDoc(doc(db,'users',currentUser.uid), { addresses });
+  ge('address-form').reset(); editingAddrId = null;
+  ge('addr-form-title').textContent = 'Add New Address';
+  ge('addr-cancel-btn').style.display = 'none';
+  ge('addr-alert-ok').style.display = 'flex';
+  loadAddresses();
+});
+
+ge('addr-cancel-btn').addEventListener('click', () => {
+  ge('address-form').reset(); editingAddrId = null;
+  ge('addr-form-title').textContent = 'Add New Address';
+  ge('addr-cancel-btn').style.display = 'none';
+});
+
+window.editAddr = async (i) => {
+  const snap = await getDoc(doc(db,'users',currentUser.uid));
+  const a = (snap.data().addresses||[])[i];
+  ge('a-name').value=a.name; ge('a-phone').value=a.phone; ge('a-line1').value=a.line1;
+  ge('a-line2').value=a.line2||''; ge('a-city').value=a.city; ge('a-state').value=a.state;
+  ge('a-pin').value=a.pin; ge('a-country').value=a.country; ge('a-default').checked=a.isDefault;
+  editingAddrId = i;
+  ge('addr-form-title').textContent = 'Edit Address';
+  ge('addr-cancel-btn').style.display = 'inline-flex';
+  ge('addr-form-wrap').scrollIntoView({ behavior:'smooth' });
+};
+
+window.deleteAddr = async (i) => {
+  if (!confirm('Remove this address?')) return;
+  const snap = await getDoc(doc(db,'users',currentUser.uid));
+  const addresses = snap.data().addresses || [];
+  addresses.splice(i, 1);
+  await updateDoc(doc(db,'users',currentUser.uid), { addresses });
+  loadAddresses();
+};
+
+window.setDefaultAddr = async (i) => {
+  const snap = await getDoc(doc(db,'users',currentUser.uid));
+  const addresses = snap.data().addresses || [];
+  addresses.forEach((a,idx) => a.isDefault = idx === i);
+  await updateDoc(doc(db,'users',currentUser.uid), { addresses });
+  loadAddresses();
+};
+
+// ── WISHLIST ──────────────────────────────────────────────
+async function loadWishlist() {
+  const { fetchProductsByIds, renderProductGrid } = await import('./js/products.js');
+  const ids = Wishlist.get();
+  if (!ids.length) {
+    ge('wishlist-grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">♡</div><h3 style="font-family:var(--font-display);color:var(--cream);margin-bottom:.5rem">Wishlist is empty</h3><p>Save products you love for later</p><a href="products.html" class="btn btn-primary btn-sm" style="margin-top:1.25rem">Browse Products</a></div>`;
+    return;
+  }
+  ge('wishlist-grid').innerHTML = '<div style="text-align:center;padding:2rem;grid-column:1/-1"><div style="display:inline-block;width:24px;height:24px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div></div>';
+  try {
+    const products = await fetchProductsByIds(ids);
+    renderProductGrid(ge('wishlist-grid'), products);
+  } catch { ge('wishlist-grid').innerHTML = '<p style="color:var(--gray-3);padding:2rem">Could not load wishlist items.</p>'; }
+}
+
+// ── SECURITY ──────────────────────────────────────────────
+ge('security-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const cur  = ge('s-current').value;
+  const nw   = ge('s-new').value;
+  const conf = ge('s-confirm').value;
+  ge('sec-alert-ok').style.display  = 'none';
+  ge('sec-alert-err').style.display = 'none';
+  if (nw !== conf) { ge('sec-err-msg').textContent = 'Passwords do not match.'; ge('sec-alert-err').style.display='flex'; return; }
+  if (nw.length < 8 || !/[A-Z]/.test(nw) || !/[0-9]/.test(nw) || !/[^A-Za-z0-9]/.test(nw)) {
+    ge('sec-err-msg').textContent = 'Password must be 8+ chars with uppercase, number, and symbol.';
+    ge('sec-alert-err').style.display = 'flex'; return;
+  }
+  try {
+    const cred = EmailAuthProvider.credential(currentUser.email, cur);
+    await reauthenticateWithCredential(currentUser, cred);
+    await updatePassword(currentUser, nw);
+    ge('sec-alert-ok').style.display = 'flex';
+    ge('security-form').reset();
+  } catch(err) {
+    const msgs = { 'auth/wrong-password':'Current password is incorrect.', 'auth/too-many-requests':'Too many attempts. Try later.' };
+    ge('sec-err-msg').textContent = msgs[err.code] || err.message;
+    ge('sec-alert-err').style.display = 'flex';
+  }
+});
+
+window.togglePwd = (id, btn) => {
+  const inp = ge(id); inp.type = inp.type==='password'?'text':'password';
+  btn.querySelector('i').className = `fa fa-eye${inp.type==='password'?'':'-slash'}`;
+};
+
+// Photo URL preview
+ge('p-photo').addEventListener('input', e => {
+  const url = e.target.value.trim();
+  ge('photo-preview').innerHTML = url ? `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentElement.textContent='?'">` : ge('acc-avatar').textContent;
+});
+</script>
+<script type="module" src="./js/admin-shortcut.js"></script>
+<script type="module" src="./js/global-widgets.js"></script>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__col footer__col--brand">
+        <div class="footer__logo">LU<span>X</span>E</div>
+        <p>India's most curated fashion destination.<br>Free delivery above ₹999 · Easy 7-day returns.</p>
+        <div class="footer__social">
+          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" title="Pinterest"><i class="fab fa-pinterest"></i></a>
+          <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h5>Shop</h5>
+        <ul class="footer__links">
+          <li><a href="products.html">All Products</a></li>
+          <li><a href="products.html?cat=New">New Arrivals</a></li>
+          <li><a href="products.html?cat=Sale">Sale</a></li>
+          <li><a href="products.html?cat=Jackets">Jackets</a></li>
+          <li><a href="products.html?cat=Dresses">Dresses</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Account</h5>
+        <ul class="footer__links">
+          <li><a href="account.html">My Profile</a></li>
+          <li><a href="account.html">My Orders</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="auth.html">Sign In</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Help</h5>
+        <ul class="footer__links">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2025 LUXE. All rights reserved. Made with ♥ in India</div>
+      <div style="display:flex;gap:1.5rem">
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Privacy Policy</a>
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

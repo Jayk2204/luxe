@@ -52,6 +52,19 @@
     </div>
   </div>
 
+  <!-- Charts -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem" id="charts-grid">
+    <div class="card">
+      <div class="card-head"><span class="card-title"><i class="fa fa-chart-bar" style="color:var(--blue)"></i> Revenue (Last 7 Days)</span></div>
+      <div style="padding:1rem;height:220px;position:relative"><canvas id="revenue-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title"><i class="fa fa-chart-pie" style="color:var(--purple)"></i> Orders by Status</span></div>
+      <div style="padding:1rem;height:220px;position:relative;display:flex;align-items:center;justify-content:center"><canvas id="status-chart" style="max-height:190px"></canvas></div>
+    </div>
+  </div>
+  <style>@media(max-width:900px){#charts-grid{grid-template-columns:1fr!important}}</style>
+
   <!-- Quick Actions + Recent Orders -->
   <div style="display:grid;grid-template-columns:1fr 300px;gap:1.25rem;margin-bottom:1.25rem" id="mid-grid">
 
@@ -243,6 +256,47 @@ function animateVal(id, target, fmt) {
     if (p < 1) requestAnimationFrame(step);
   })(start);
 }
+
+// ── Charts ────────────────────────────────────────────────
+async function loadCharts() {
+  try {
+    const { getDailyRevenue, getOrders } = await import('./js/admin-firebase.js');
+    // Revenue bar chart
+    const revMap = await getDailyRevenue(7);
+    const labels = Object.keys(revMap);
+    const values = Object.values(revMap);
+    const rCtx = document.getElementById('revenue-chart')?.getContext('2d');
+    if (rCtx && typeof Chart !== 'undefined') {
+      new Chart(rCtx, {
+        type: 'bar',
+        data: { labels, datasets:[{ label:'Revenue (₹)', data:values, backgroundColor:'rgba(59,130,246,.55)', borderColor:'#3b82f6', borderWidth:1.5, borderRadius:4 }] },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+          scales:{ x:{ grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#475569',font:{size:10}} }, y:{ grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#475569',font:{size:10}, callback:v=>'₹'+v} } } }
+      });
+    }
+    // Status doughnut
+    const orders = await getOrders();
+    const counts = {}; orders.forEach(o=>{ counts[o.status||'pending']=(counts[o.status||'pending']||0)+1; });
+    const statusLabels = Object.keys(counts);
+    const statusVals   = Object.values(counts);
+    const colors = { pending:'#f59e0b', processing:'#3b82f6', shipped:'#8b5cf6', delivered:'#10b981', cancelled:'#ef4444' };
+    const sCtx = document.getElementById('status-chart')?.getContext('2d');
+    if (sCtx && typeof Chart !== 'undefined' && statusLabels.length) {
+      new Chart(sCtx, {
+        type: 'doughnut',
+        data: { labels: statusLabels, datasets:[{ data:statusVals, backgroundColor:statusLabels.map(s=>colors[s]||'#475569'), borderWidth:0, hoverOffset:6 }] },
+        options: { responsive:true, maintainAspectRatio:false, cutout:'68%',
+          plugins:{ legend:{ position:'bottom', labels:{ color:'#94a3b8', font:{size:10}, padding:10, boxWidth:10 } } } }
+      });
+    }
+  } catch(e) { console.warn('Charts failed:', e); }
+}
+
+// Load Chart.js then charts
+const sc = document.createElement('script');
+sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+sc.onload = loadCharts;
+document.head.appendChild(sc);
 </script>
 </body>
 </html>

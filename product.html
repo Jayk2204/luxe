@@ -2,98 +2,405 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#c9a96e">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product — LUXE</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Reviews */
+    .reviews-section { padding:5rem 0; background:var(--black-2); border-top:1px solid var(--black-4); }
+    .review-summary { display:grid; grid-template-columns:220px 1fr; gap:2.5rem; margin-bottom:3rem; align-items:center; }
+    @media(max-width:640px){ .review-summary{grid-template-columns:1fr;} }
+    .review-avg { text-align:center; }
+    .review-big-score { font-family:var(--font-display); font-size:5rem; color:var(--cream); line-height:1; }
+    .review-stars-big { font-size:1.4rem; color:var(--gold); margin:.4rem 0; letter-spacing:3px; }
+    .review-bars { display:flex; flex-direction:column; gap:.5rem; }
+    .rbar-row { display:flex; align-items:center; gap:.75rem; font-size:.8rem; }
+    .rbar-label { width:40px; color:var(--gray-3); text-align:right; white-space:nowrap; }
+    .rbar-track { flex:1; height:6px; background:var(--black-4); border-radius:3px; overflow:hidden; }
+    .rbar-fill  { height:100%; background:var(--gold); border-radius:3px; transition:width .6s ease; }
+    .rbar-count { width:28px; color:var(--gray-3); font-size:.75rem; }
+    .review-cards { display:grid; gap:1.25rem; }
+    .review-card { background:var(--black-3); border:1px solid var(--black-4); border-radius:var(--radius-lg); padding:1.5rem; }
+    .review-card-head { display:flex; align-items:center; gap:.85rem; margin-bottom:.85rem; }
+    .reviewer-avatar { width:38px; height:38px; border-radius:50%; background:var(--gold); color:var(--black); font-size:.85rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .reviewer-name { font-size:.88rem; font-weight:600; color:var(--cream); }
+    .review-date  { font-size:.72rem; color:var(--gray-3); }
+    .review-stars { color:var(--gold); font-size:.85rem; letter-spacing:1px; }
+    .review-verified { font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#27ae60; background:rgba(39,174,96,.1); border:1px solid rgba(39,174,96,.2); padding:.15rem .5rem; border-radius:20px; }
+    .review-text { font-size:.85rem; color:var(--gray-2); line-height:1.8; }
+    /* Write review form */
+    .write-review { background:var(--black-3); border:1px solid var(--black-4); border-radius:var(--radius-lg); padding:1.75rem; margin-top:2rem; }
+    .write-review h4 { font-family:var(--font-display); font-size:1.2rem; color:var(--cream); margin-bottom:1.25rem; }
+    .star-picker { display:flex; gap:.35rem; margin-bottom:1.25rem; }
+    .star-pick-btn { font-size:1.4rem; color:var(--black-4); cursor:pointer; transition:color .15s; background:none; border:none; line-height:1; }
+    .star-pick-btn.lit { color:var(--gold); }
+    .form-input-dark { background:var(--black-4); border:1.5px solid rgba(255,255,255,.08); border-radius:var(--radius); color:var(--cream); font-family:var(--font-body); font-size:.87rem; padding:.75rem 1rem; outline:none; transition:border-color .2s; width:100%; }
+    .form-input-dark:focus { border-color:var(--gold); }
+    .form-input-dark::placeholder { color:var(--gray-3); }
+    /* Recently viewed */
+    .recently-section { padding:4rem 0; }
+    /* Share row */
+    .share-row { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; margin-top:1.5rem; }
+    .share-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .85rem; border-radius:var(--radius); border:1px solid var(--black-4); background:transparent; color:var(--gray-2); font-size:.75rem; font-weight:600; cursor:pointer; transition:all .2s; }
+    .share-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .share-btn.whatsapp:hover { border-color:#25d366; color:#25d366; }
+  </style>
 </head>
 <body>
-
-
-
 
 <nav class="nav" id="main-nav">
   <div class="nav__inner">
     <a href="index.html" class="nav__logo">LU<span>X</span>E</a>
     <ul class="nav__links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="products.html" class="active">Shop</a></li>
+      <li><a href="index.html" class="home-link">Home</a></li>
+      <li><a href="products.html" class="shop-link active">Shop</a></li>
+      <li><a href="wishlist.html" class="wishlist-link">Wishlist</a></li>
+      <li><a href="account.html" class="account-nav-link">Account</a></li>
     </ul>
     <div class="nav__actions">
-      <button class="nav__icon-btn" id="search-btn"><i class="fa fa-search"></i></button>
-      <button class="nav__icon-btn" id="nav-user-btn" title="My Account"
-        style="font-size:.75rem;font-weight:700;color:var(--gold)"><i class="fa fa-user"></i></button>
-      <button class="nav__icon-btn" id="nav-logout-btn" style="display:none;font-size:.9rem"
-        title="Sign Out"><i class="fa fa-sign-out-alt"></i></button>
-      <a href="cart.html" class="nav__icon-btn">
-        <i class="fa fa-shopping-bag"></i>
-        <span class="nav__cart-badge"></span>
+      <button class="nav__icon-btn" id="search-btn" title="Search (Ctrl+K)">
+        <i class="fa fa-search"></i>
+      </button>
+      <a href="wishlist.html" class="nav__icon-btn" title="Wishlist" id="nav-wishlist-btn">
+        <i class="fa fa-heart"></i>
       </a>
-      <button class="nav__burger"><span></span><span></span><span></span></button>
+      <a href="account.html" class="nav__icon-btn" id="nav-user-btn" title="My Account"
+        style="font-size:.75rem;font-weight:700;color:var(--gold)">
+        <i class="fa fa-user"></i>
+      </a>
+      <button class="nav__icon-btn" id="nav-logout-btn" title="Sign Out"
+        style="display:none;font-size:.9rem">
+        <i class="fa fa-sign-out-alt"></i>
+      </button>
+      <a href="cart.html" class="nav__icon-btn" title="Cart">
+        <i class="fa fa-shopping-bag"></i>
+        <span class="nav__cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
-
 <div class="mobile-menu__overlay"></div>
 <div class="mobile-menu">
   <button class="mobile-menu__close">✕</button>
   <nav>
     <a href="index.html">Home</a>
     <a href="products.html">Shop</a>
-    <a href="auth.html">Account</a>
+    <a href="wishlist.html">♡ Wishlist</a>
+    <a href="account.html">My Account</a>
     <a href="cart.html">Cart</a>
+    <a href="auth.html">Sign In / Register</a>
   </nav>
 </div>
 
-<!-- Main Content -->
+
+<!-- Main Product Detail (rendered by JS) -->
 <main class="product-detail container" id="product-detail-root">
-  <!-- Rendered by JS -->
   <div style="padding-top:5rem;text-align:center">
-    <div class="spin" style="display:inline-block;width:30px;height:30px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;"></div>
+    <div style="display:inline-block;width:30px;height:30px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>
   </div>
 </main>
+
+<!-- Share buttons injected after product loads -->
+<div id="share-section" style="display:none">
+  <div class="container" style="padding-bottom:2rem">
+    <div class="share-row">
+      <span style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3)">Share:</span>
+      <button class="share-btn whatsapp" id="share-wa"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+      <button class="share-btn" id="share-copy"><i class="fa fa-link"></i> Copy Link</button>
+      <button class="share-btn" id="share-native" style="display:none"><i class="fa fa-share-alt"></i> Share</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reviews Section -->
+<section class="reviews-section" id="reviews-section" style="display:none">
+  <div class="container">
+    <div class="section-header" style="margin-bottom:2rem">
+      <div class="section-header__left"><h4>Customer Feedback</h4><h2>Reviews</h2><div class="divider"></div></div>
+    </div>
+    <!-- Summary -->
+    <div class="review-summary" id="review-summary"></div>
+    <!-- Cards -->
+    <div class="review-cards" id="review-cards"></div>
+    <!-- Write Review -->
+    <div class="write-review" id="write-review-wrap">
+      <h4>Write a Review</h4>
+      <div id="review-login-msg" style="display:none;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.15);border-radius:var(--radius);padding:1rem;font-size:.85rem;color:var(--gray-2);margin-bottom:1rem">
+        <a href="auth.html" style="color:var(--gold)">Sign in</a> to write a review.
+      </div>
+      <form id="review-form">
+        <div style="margin-bottom:1rem">
+          <label style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3);display:block;margin-bottom:.5rem">Your Rating *</label>
+          <div class="star-picker" id="star-picker">
+            <button type="button" class="star-pick-btn" data-val="1">★</button>
+            <button type="button" class="star-pick-btn" data-val="2">★</button>
+            <button type="button" class="star-pick-btn" data-val="3">★</button>
+            <button type="button" class="star-pick-btn" data-val="4">★</button>
+            <button type="button" class="star-pick-btn" data-val="5">★</button>
+          </div>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3);display:block;margin-bottom:.5rem">Review Title</label>
+          <input type="text" class="form-input-dark" id="rev-title" placeholder="Summarise your experience" maxlength="80">
+        </div>
+        <div style="margin-bottom:1.25rem">
+          <label style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-3);display:block;margin-bottom:.5rem">Review *</label>
+          <textarea class="form-input-dark" id="rev-body" placeholder="Tell others what you think about this product…" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+      </form>
+    </div>
+  </div>
+</section>
 
 <!-- Related Products -->
 <section class="section" style="background:var(--black-2);border-top:1px solid var(--black-4)">
   <div class="container">
-    <div class="section-header">
-      <div class="section-header__left">
-        <h4>You May Also Like</h4>
-        <h2>Related Pieces</h2>
-        <div class="divider"></div>
-      </div>
-    </div>
+    <div class="section-header"><div class="section-header__left"><h4>You May Also Like</h4><h2>Related Pieces</h2><div class="divider"></div></div></div>
     <div class="products-grid" id="related-grid"></div>
+  </div>
+</section>
+
+<!-- Recently Viewed -->
+<section class="recently-section" id="recently-section" style="display:none">
+  <div class="container">
+    <div class="section-header"><div class="section-header__left"><h4>Your History</h4><h2>Recently Viewed</h2><div class="divider"></div></div></div>
+    <div class="products-grid" id="recently-grid"></div>
   </div>
 </section>
 
 <footer class="footer">
   <div class="container">
+    <div class="footer__grid">
+      <div class="footer__col footer__col--brand">
+        <div class="footer__logo">LU<span>X</span>E</div>
+        <p>India's most curated fashion destination.<br>Free delivery above ₹999 · Easy 7-day returns.</p>
+        <div class="footer__social">
+          <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" title="Pinterest"><i class="fab fa-pinterest"></i></a>
+          <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h5>Shop</h5>
+        <ul class="footer__links">
+          <li><a href="products.html">All Products</a></li>
+          <li><a href="products.html?cat=New">New Arrivals</a></li>
+          <li><a href="products.html?cat=Sale">Sale</a></li>
+          <li><a href="products.html?cat=Jackets">Jackets</a></li>
+          <li><a href="products.html?cat=Dresses">Dresses</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Account</h5>
+        <ul class="footer__links">
+          <li><a href="account.html">My Profile</a></li>
+          <li><a href="account.html">My Orders</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="auth.html">Sign In</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h5>Help</h5>
+        <ul class="footer__links">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
     <div class="footer__bottom">
-      <div class="footer__copy">© 2025 LUXE. All rights reserved.</div>
+      <div class="footer__copy">© 2025 LUXE. All rights reserved. Made with ♥ in India</div>
+      <div style="display:flex;gap:1.5rem">
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Privacy Policy</a>
+        <a href="#" style="font-size:0.75rem;color:var(--gray-3)">Terms of Service</a>
+      </div>
     </div>
   </div>
 </footer>
-
 <div class="toast-container"></div>
-
-<div class="search-overlay">
-  <div class="search-overlay__inner">
-    <div class="search-input-wrap">
-      <input type="text" placeholder="Search products…" autocomplete="off">
-      <button class="search-close">✕</button>
-    </div>
-  </div>
-</div>
+<div class="search-overlay"><div class="search-overlay__inner"><div class="search-input-wrap"><input type="text" placeholder="Search products…" autocomplete="off"><button class="search-close">✕</button></div></div></div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <script type="module" src="./js/auth-guard.js"></script>
 <script type="module">
-  import { initApp }              from './js/app.js';
-  import { initProductDetailPage } from './js/products.js';
+import { initApp, showToast, Wishlist } from './js/app.js';
+import { initProductDetailPage, renderProductGrid, fetchProductsByIds } from './js/products.js';
+import { auth, db } from './js/firebase-config.js';
+import { observeAuth } from './js/auth.js';
+import {
+  collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  initApp();
-  initProductDetailPage();
+initApp();
+const params = new URLSearchParams(location.search);
+const productId = params.get('id');
+
+let currentUser = null;
+let currentProduct = null;
+
+observeAuth(u => { currentUser = u; });
+
+// ── Init product detail ───────────────────────────────────
+await initProductDetailPage();
+
+// Get loaded product from DOM data attr (set by products.js)
+const root = document.getElementById('product-detail-root');
+if (root?.dataset?.productId) {
+  currentProduct = { id: root.dataset.productId, name: root.dataset.productName };
+  initShareButtons();
+  loadReviews();
+  saveRecentlyViewed();
+  loadRecentlyViewed();
+  document.getElementById('share-section').style.display  = 'block';
+  document.getElementById('reviews-section').style.display = 'block';
+}
+
+// ── SHARE BUTTONS ─────────────────────────────────────────
+function initShareButtons() {
+  const url   = window.location.href;
+  const name  = root.dataset.productName || 'Check this product';
+  const text  = `Check out ${name} on LUXE! ${url}`;
+  document.getElementById('share-wa').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  document.getElementById('share-copy').onclick = () => {
+    navigator.clipboard.writeText(url).then(() => showToast({ msg:'Link copied!', type:'success' }));
+  };
+  if (navigator.share) {
+    const btn = document.getElementById('share-native');
+    btn.style.display = 'inline-flex';
+    btn.onclick = () => navigator.share({ title: name, url });
+  }
+}
+
+// ── REVIEWS ───────────────────────────────────────────────
+let selectedRating = 0;
+const starBtns = document.querySelectorAll('.star-pick-btn');
+
+starBtns.forEach(btn => {
+  btn.addEventListener('mouseover', () => highlightStars(+btn.dataset.val));
+  btn.addEventListener('mouseout',  () => highlightStars(selectedRating));
+  btn.addEventListener('click',     () => { selectedRating = +btn.dataset.val; highlightStars(selectedRating); });
+});
+function highlightStars(n) { starBtns.forEach(b => b.classList.toggle('lit', +b.dataset.val <= n)); }
+
+async function loadReviews() {
+  if (!productId) return;
+  try {
+    const q = query(collection(db,'products',productId,'reviews'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    const reviews = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderReviewSummary(reviews);
+    renderReviewCards(reviews);
+  } catch { /* offline / no reviews yet */ }
+
+  // Auth state for review form
+  observeAuth(user => {
+    document.getElementById('review-login-msg').style.display = user ? 'none' : 'flex';
+    document.getElementById('review-form').style.display = user ? 'block' : 'none';
+  });
+}
+
+function renderReviewSummary(reviews) {
+  const el = document.getElementById('review-summary');
+  if (!reviews.length) { el.innerHTML = '<p style="color:var(--gray-3)">No reviews yet. Be the first!</p>'; return; }
+  const avg = reviews.reduce((s,r) => s + r.rating, 0) / reviews.length;
+  const counts = [0,0,0,0,0];
+  reviews.forEach(r => counts[r.rating - 1]++);
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+  el.innerHTML = `
+    <div class="review-avg">
+      <div class="review-big-score">${avg.toFixed(1)}</div>
+      <div class="review-stars-big">${stars(Math.round(avg))}</div>
+      <div style="font-size:.78rem;color:var(--gray-3)">${reviews.length} review${reviews.length!==1?'s':''}</div>
+    </div>
+    <div class="review-bars">${[5,4,3,2,1].map(n => `
+      <div class="rbar-row">
+        <span class="rbar-label">${n}★</span>
+        <div class="rbar-track"><div class="rbar-fill" style="width:${reviews.length?Math.round(counts[n-1]/reviews.length*100):0}%"></div></div>
+        <span class="rbar-count">${counts[n-1]}</span>
+      </div>`).join('')}
+    </div>`;
+}
+
+function renderReviewCards(reviews) {
+  const el = document.getElementById('review-cards');
+  if (!reviews.length) { el.innerHTML = ''; return; }
+  el.innerHTML = reviews.map(r => {
+    const date = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'N/A';
+    const init = (r.userName||'A').charAt(0).toUpperCase();
+    return `<div class="review-card">
+      <div class="review-card-head">
+        <div class="reviewer-avatar">${init}</div>
+        <div>
+          <div class="reviewer-name">${r.userName || 'Anonymous'} ${r.verified?'<span class="review-verified">✓ Verified Purchase</span>':''}</div>
+          <div class="review-date">${date}</div>
+        </div>
+        <div class="review-stars" style="margin-left:auto">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      </div>
+      ${r.title ? `<div style="font-size:.88rem;font-weight:600;color:var(--cream);margin-bottom:.4rem">${r.title}</div>` : ''}
+      <div class="review-text">${r.body}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('review-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!currentUser) { showToast({ msg:'Please sign in to review', type:'error' }); return; }
+  if (!selectedRating) { showToast({ msg:'Please select a star rating', type:'error' }); return; }
+  const body = document.getElementById('rev-body').value.trim();
+  if (!body) { showToast({ msg:'Please write your review', type:'error' }); return; }
+  try {
+    await addDoc(collection(db,'products',productId,'reviews'), {
+      userId:   currentUser.uid,
+      userName: currentUser.displayName || 'Verified Buyer',
+      rating:   selectedRating,
+      title:    document.getElementById('rev-title').value.trim(),
+      body,
+      verified: true,
+      createdAt: serverTimestamp()
+    });
+    // Update product rating average
+    await updateDoc(doc(db,'products',productId), { reviewCount: increment(1) });
+    showToast({ title:'Review submitted!', msg:'Thank you for your feedback.', type:'success' });
+    document.getElementById('review-form').reset();
+    selectedRating = 0; highlightStars(0);
+    loadReviews();
+  } catch(err) { showToast({ msg: err.message, type:'error' }); }
+});
+
+// ── RECENTLY VIEWED ───────────────────────────────────────
+const RV_KEY = 'luxe_recently';
+function saveRecentlyViewed() {
+  if (!productId) return;
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(RV_KEY)||'[]'); } catch{}
+  arr = [productId, ...arr.filter(i => i !== productId)].slice(0,10);
+  localStorage.setItem(RV_KEY, JSON.stringify(arr));
+}
+
+async function loadRecentlyViewed() {
+  let arr = [];
+  try { arr = JSON.parse(localStorage.getItem(RV_KEY)||'[]'); } catch{}
+  const others = arr.filter(i => i !== productId).slice(0,4);
+  if (!others.length) return;
+  const section = document.getElementById('recently-section');
+  const grid    = document.getElementById('recently-grid');
+  section.style.display = 'block';
+  try {
+    const products = await fetchProductsByIds(others);
+    renderProductGrid(grid, products);
+  } catch {}
+}
 </script>
 <script type="module" src="./js/admin-shortcut.js"></script>
+<script type="module" src="./js/global-widgets.js"></script>
 </body>
 </html>

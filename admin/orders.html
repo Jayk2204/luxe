@@ -220,7 +220,28 @@ window.openOrder=id=>{
       <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Subtotal</span><span>${formatCurrency(o.subtotal)}</span></div>
       <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Delivery</span><span>${o.shipping===0?'<span style="color:var(--green)">Free</span>':formatCurrency(o.shipping)}</span></div>
       ${o.codCharge>0?`<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">COD Fee</span><span>${formatCurrency(o.codCharge)}</span></div>`:''}
+      ${o.couponCode?`<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Coupon (${o.couponCode})</span><span style="color:var(--green)">− ${formatCurrency(o.couponDiscount||0)}</span></div>`:''}
       <div style="display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;padding-top:.6rem;border-top:1px solid var(--border)"><span>Total</span><span style="color:var(--green)">${formatCurrency(o.total)}</span></div>
+    </div>
+    <div style="margin-top:.75rem;background:var(--bg3);border-radius:var(--r);padding:.9rem">
+      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.65rem">Delivery Tracking</div>
+      <div style="display:flex;align-items:center;gap:0;position:relative">
+        ${['pending','processing','shipped','delivered'].map((s,i)=>{
+          const statuses = ['pending','processing','shipped','delivered'];
+          const curIdx   = statuses.indexOf(o.status||'pending');
+          const done  = i < curIdx;
+          const active= i === curIdx;
+          const icons = ['fa-clock','fa-cog','fa-truck','fa-check-circle'];
+          const labels= ['Placed','Processing','Shipped','Delivered'];
+          return \`<div style="flex:1;text-align:center;position:relative">
+            \${i<3?'<div style="position:absolute;top:13px;left:50%;right:-50%;height:2px;background:'+(done?'#10b981':'rgba(255,255,255,.08)')+';z-index:0"></div>':''}
+            <div style="width:26px;height:26px;border-radius:50%;border:2px solid \${done?'#10b981':active?'#3b82f6':'rgba(255,255,255,.12)'};background:\${done?'#10b981':active?'rgba(59,130,246,.15)':'var(--bg4)'};display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;position:relative;z-index:1;font-size:.5rem;color:\${done?'#fff':active?'#3b82f6':'var(--t4)'}">
+              <i class="fa \${icons[i]}"></i>
+            </div>
+            <div style="font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:\${done||active?'var(--t2)':'var(--t4)'}">\${labels[i]}</div>
+          </div>\`;
+        }).join('')}
+      </div>
     </div>
   `;
   OM('order-modal');

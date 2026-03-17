@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coupons — LUXE Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .coupon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; margin-top:1.25rem; }
+    .coupon-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2); padding:1.25rem; position:relative; transition:border-color .2s; }
+    .coupon-card.inactive { opacity:.55; }
+    .coupon-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:.75rem; }
+    .coupon-code { font-family:var(--mono); font-size:1.05rem; font-weight:700; color:var(--blue); letter-spacing:.1em; background:var(--blue-g); border:1px solid rgba(59,130,246,.2); border-radius:var(--r); padding:.3rem .75rem; }
+    .coupon-type-badge { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.2rem .6rem; border-radius:20px; }
+    .type-pct  { background:var(--green-g); color:var(--green); border:1px solid rgba(16,185,129,.2); }
+    .type-flat { background:var(--amber-g); color:var(--amber); border:1px solid rgba(245,158,11,.2); }
+    .type-ship { background:rgba(139,92,246,.12); color:#8b5cf6; border:1px solid rgba(139,92,246,.2); }
+    .coupon-discount { font-size:1.6rem; font-weight:800; color:var(--t1); margin:.3rem 0; }
+    .coupon-meta { display:grid; grid-template-columns:1fr 1fr; gap:.4rem .75rem; font-size:.74rem; color:var(--t3); margin-top:.65rem; padding-top:.65rem; border-top:1px solid var(--border); }
+    .coupon-meta-val { color:var(--t2); font-weight:600; }
+    .coupon-actions { display:flex; gap:.5rem; margin-top:1rem; }
+    .toggle-switch { position:relative; width:38px; height:20px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:var(--bg5); border-radius:20px; cursor:pointer; transition:.25s; }
+    .toggle-slider::before { content:''; position:absolute; height:14px; width:14px; left:3px; bottom:3px; background:var(--t3); border-radius:50%; transition:.25s; }
+    input:checked + .toggle-slider { background:var(--green); }
+    input:checked + .toggle-slider::before { transform:translateX(18px); background:#fff; }
+    .progress-usage { height:4px; background:var(--bg5); border-radius:2px; overflow:hidden; margin-top:.5rem; }
+    .progress-usage-fill { height:100%; background:var(--blue); border-radius:2px; transition:width .4s ease; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+<main class="main-content">
+<div class="page-body" id="page-body" style="display:none">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
+    <div>
+      <h2 style="font-size:1.15rem;font-weight:800">Coupons</h2>
+      <p id="count-lbl" style="font-size:.76rem;color:var(--t3);margin-top:.1rem">Loading…</p>
+    </div>
+    <button class="btn btn-primary" id="add-btn"><i class="fa fa-plus"></i> Create Coupon</button>
+  </div>
+
+  <!-- Filter tabs -->
+  <div style="display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap">
+    <button class="btn btn-sm btn-outline active" id="f-all"    onclick="setFilter('all',this)">All</button>
+    <button class="btn btn-sm btn-outline"         id="f-active" onclick="setFilter('active',this)">Active</button>
+    <button class="btn btn-sm btn-outline"         id="f-off"    onclick="setFilter('inactive',this)">Inactive</button>
+  </div>
+
+  <div class="coupon-grid" id="coupon-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem">
+      <div style="display:inline-block;width:22px;height:22px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>
+    </div>
+  </div>
+
+</div>
+</main>
+</div>
+
+<!-- CREATE / EDIT MODAL -->
+<div class="modal-overlay" id="coupon-modal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <h3 id="modal-title">Create Coupon</h3>
+      <button class="modal-close" onclick="CM('coupon-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cid">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="form-group">
+          <label class="form-label">Coupon Code *</label>
+          <input class="form-control" id="c-code" placeholder="e.g. LUXE20" style="text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Type *</label>
+          <select class="form-control" id="c-type" onchange="toggleTypeFields()">
+            <option value="pct">Percentage (%)</option>
+            <option value="flat">Flat Amount (₹)</option>
+            <option value="ship">Free Shipping</option>
+          </select>
+        </div>
+      </div>
+      <div id="value-row" style="margin-bottom:1rem">
+        <div class="form-group">
+          <label class="form-label" id="val-label">Discount Value *</label>
+          <input class="form-control" id="c-value" type="number" min="1" placeholder="e.g. 20">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="form-group">
+          <label class="form-label">Min. Order (₹)</label>
+          <input class="form-control" id="c-min" type="number" min="0" placeholder="0 = no minimum">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Uses (0 = unlimited)</label>
+          <input class="form-control" id="c-max" type="number" min="0" placeholder="0 = unlimited">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem">
+        <label class="form-label">Expiry Date (optional)</label>
+        <input class="form-control" id="c-expiry" type="date">
+      </div>
+      <div class="form-group" style="margin-bottom:1.5rem">
+        <label class="form-label">Description (internal note)</label>
+        <input class="form-control" id="c-desc" placeholder="e.g. Summer sale 20% off">
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem">
+        <label class="toggle-switch"><input type="checkbox" id="c-active" checked><span class="toggle-slider"></span></label>
+        <label for="c-active" style="font-size:.85rem;color:var(--t2);cursor:pointer">Active (usable by customers)</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="CM('coupon-modal')">Cancel</button>
+      <button class="btn btn-primary" id="save-btn"><i class="fa fa-save"></i> Save Coupon</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>Delete Coupon</h3><button class="modal-close" onclick="CM('del-modal')">✕</button></div>
+    <div class="modal-body"><p style="color:var(--t2)">Are you sure you want to delete coupon <strong id="del-code" style="color:var(--red)"></strong>? This cannot be undone.</p></div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="CM('del-modal')">Cancel</button><button class="btn" style="background:var(--red);color:#fff" id="confirm-del-btn"><i class="fa fa-trash"></i> Delete</button></div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<script type="module">
+import { injectLayout } from './js/admin-layout.js';
+import { requireAdmin, getCoupons, createCoupon, updateCoupon, deleteCoupon, showToast, setLoading, debounce, formatDate } from './js/admin-firebase.js';
+
+injectLayout('Coupons');
+requireAdmin(async () => {
+  document.getElementById('page-body').style.display = 'block';
+  await load();
+});
+
+let all = [], filterMode = 'all', editId = null;
+
+async function load() {
+  try {
+    all = await getCoupons();
+    render();
+    document.getElementById('count-lbl').textContent = `${all.length} coupon${all.length!==1?'s':''}`;
+  } catch(e) { showToast('Error', e.message, 'error'); }
+}
+
+function render() {
+  const list = filterMode === 'all' ? all
+    : filterMode === 'active' ? all.filter(c => c.active)
+    : all.filter(c => !c.active);
+  const grid = document.getElementById('coupon-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--t3)"><div style="font-size:2.5rem;margin-bottom:1rem">🎟️</div><p>No coupons yet. Create one!</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(c => {
+    const typeLabel = c.type==='pct'?'%':c.type==='flat'?'₹ Flat':'🚚';
+    const typeClass = c.type==='pct'?'type-pct':c.type==='flat'?'type-flat':'type-ship';
+    const discount  = c.type==='pct' ? `${c.value}% OFF` : c.type==='flat' ? `₹${c.value} OFF` : 'FREE SHIPPING';
+    const usagePct  = c.maxUses ? Math.min(Math.round((c.usedCount||0)/c.maxUses*100),100) : 0;
+    const expiredTxt = c.expiresAt ? `Expires ${formatDate(c.expiresAt)}` : 'No expiry';
+    return `<div class="coupon-card ${c.active?'':'inactive'}">
+      <div class="coupon-card-top">
+        <span class="coupon-code">${c.code}</span>
+        <span class="coupon-type-badge ${typeClass}">${typeLabel}</span>
+      </div>
+      <div class="coupon-discount">${discount}</div>
+      ${c.description ? `<div style="font-size:.78rem;color:var(--t3);margin-bottom:.4rem">${c.description}</div>` : ''}
+      <div class="coupon-meta">
+        <span>Min order</span><span class="coupon-meta-val">${c.minOrder?'₹'+c.minOrder:'None'}</span>
+        <span>Used</span><span class="coupon-meta-val">${c.usedCount||0}${c.maxUses?' / '+c.maxUses:' times'}</span>
+        <span>Expiry</span><span class="coupon-meta-val" style="grid-column:span 1">${expiredTxt}</span>
+        <span>Status</span><span class="coupon-meta-val" style="color:${c.active?'var(--green)':'var(--red)'}">${c.active?'Active':'Inactive'}</span>
+      </div>
+      ${c.maxUses ? `<div class="progress-usage"><div class="progress-usage-fill" style="width:${usagePct}%"></div></div>` : ''}
+      <div class="coupon-actions">
+        <button class="btn btn-sm btn-outline" onclick="openEdit('${c.id}')"><i class="fa fa-edit"></i> Edit</button>
+        <button class="btn btn-sm" style="background:${c.active?'var(--red-g)':'var(--green-g)'};color:${c.active?'var(--red)':'var(--green)'};border:1px solid ${c.active?'rgba(239,68,68,.2)':'rgba(16,185,129,.2)'}" onclick="toggleActive('${c.id}',${c.active})">${c.active?'Deactivate':'Activate'}</button>
+        <button class="btn btn-sm btn-icon" style="color:var(--red);margin-left:auto" onclick="openDelete('${c.id}','${c.code}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.setFilter = (mode, btn) => {
+  filterMode = mode;
+  document.querySelectorAll('[id^="f-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+};
+
+// ── Toggle active ─────────────────────────────────────────
+window.toggleActive = async (id, current) => {
+  try {
+    await updateCoupon(id, { active: !current });
+    showToast('Updated', !current ? 'Coupon activated.' : 'Coupon deactivated.', 'success');
+    await load();
+  } catch(e) { showToast('Error', e.message, 'error'); }
+};
+
+// ── Open modal for create ─────────────────────────────────
+document.getElementById('add-btn').onclick = () => {
+  editId = null;
+  document.getElementById('modal-title').textContent = 'Create Coupon';
+  document.getElementById('cid').value = '';
+  ['c-code','c-value','c-min','c-max','c-expiry','c-desc'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('c-type').value = 'pct';
+  document.getElementById('c-active').checked = true;
+  toggleTypeFields();
+  OM('coupon-modal');
+};
+
+// ── Open edit ─────────────────────────────────────────────
+window.openEdit = (id) => {
+  const c = all.find(x => x.id === id); if (!c) return;
+  editId = id;
+  document.getElementById('modal-title').textContent = 'Edit Coupon';
+  document.getElementById('c-code').value   = c.code;
+  document.getElementById('c-type').value   = c.type;
+  document.getElementById('c-value').value  = c.value || '';
+  document.getElementById('c-min').value    = c.minOrder || '';
+  document.getElementById('c-max').value    = c.maxUses  || '';
+  document.getElementById('c-desc').value   = c.description || '';
+  document.getElementById('c-active').checked = !!c.active;
+  if (c.expiresAt) {
+    const d = c.expiresAt.toDate ? c.expiresAt.toDate() : new Date(c.expiresAt);
+    document.getElementById('c-expiry').value = d.toISOString().split('T')[0];
+  }
+  toggleTypeFields();
+  OM('coupon-modal');
+};
+
+window.toggleTypeFields = () => {
+  const t = document.getElementById('c-type').value;
+  const vrow = document.getElementById('value-row');
+  const lbl  = document.getElementById('val-label');
+  vrow.style.display = t === 'ship' ? 'none' : 'block';
+  lbl.textContent = t === 'pct' ? 'Percentage (%) *' : 'Flat Discount (₹) *';
+};
+
+// ── Save ──────────────────────────────────────────────────
+document.getElementById('save-btn').onclick = async () => {
+  const btn  = document.getElementById('save-btn');
+  const code = document.getElementById('c-code').value.trim().toUpperCase();
+  const type = document.getElementById('c-type').value;
+  const val  = parseFloat(document.getElementById('c-value').value) || 0;
+  if (!code) { showToast('Error', 'Coupon code is required.', 'error'); return; }
+  if (type !== 'ship' && !val) { showToast('Error', 'Discount value is required.', 'error'); return; }
+  const expiryVal = document.getElementById('c-expiry').value;
+  const data = {
+    code, type, value: val,
+    minOrder: parseFloat(document.getElementById('c-min').value) || 0,
+    maxUses:  parseInt(document.getElementById('c-max').value)  || 0,
+    description: document.getElementById('c-desc').value.trim(),
+    active: document.getElementById('c-active').checked,
+    expiresAt: expiryVal ? new Date(expiryVal) : null,
+  };
+  setLoading(btn, true, '<i class="fa fa-save"></i> Save Coupon');
+  try {
+    if (editId) { await updateCoupon(editId, data); showToast('Updated', `Coupon ${code} updated.`, 'success'); }
+    else         { await createCoupon(data);         showToast('Created', `Coupon ${code} created.`, 'success'); }
+    CM('coupon-modal'); await load();
+  } catch(e) { showToast('Error', e.message, 'error'); }
+  setLoading(btn, false, '<i class="fa fa-save"></i> Save Coupon');
+};
+
+// ── Delete ────────────────────────────────────────────────
+let deleteId = null;
+window.openDelete = (id, code) => {
+  deleteId = id;
+  document.getElementById('del-code').textContent = code;
+  OM('del-modal');
+};
+document.getElementById('confirm-del-btn').onclick = async () => {
+  if (!deleteId) return;
+  const btn = document.getElementById('confirm-del-btn');
+  setLoading(btn, true);
+  try {
+    await deleteCoupon(deleteId);
+    showToast('Deleted', 'Coupon removed.', 'success');
+    CM('del-modal'); await load();
+  } catch(e) { showToast('Error', e.message, 'error'); }
+  setLoading(btn, false, '<i class="fa fa-trash"></i> Delete');
+};
+
+window.OM = id => document.getElementById(id)?.classList.add('open');
+window.CM = id => document.getElementById(id)?.classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(o => o.classList.remove('open')); });
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
 import {
   getFirestore, collection, doc,
   getDocs, getDoc, addDoc, updateDoc, deleteDoc,
-  query, orderBy, limit, where,
+  query, orderBy, limit, where, increment,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -271,4 +271,47 @@ function _cleanObj(data) {
     if (data[k] !== null && data[k] !== undefined && data[k] !== '') clean[k] = data[k];
   });
   return clean;
+}
+
+// ── Coupon CRUD ───────────────────────────────────────────
+export async function getCoupons() {
+  const snap = await getDocs(query(collection(db,'coupons'), orderBy('createdAt','desc')));
+  return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+}
+export async function createCoupon(data) {
+  return await addDoc(collection(db,'coupons'), { ...data, usedCount:0, createdAt:serverTimestamp() });
+}
+export async function updateCoupon(id, data) {
+  return await updateDoc(doc(db,'coupons',id), { ...data, updatedAt:serverTimestamp() });
+}
+export async function deleteCoupon(id) {
+  return await deleteDoc(doc(db,'coupons',id));
+}
+export async function validateCoupon(code, subtotal) {
+  const snap = await getDocs(query(collection(db,'coupons'), where('code','==',code.toUpperCase())));
+  if (snap.empty) throw new Error('Invalid coupon code.');
+  const d = snap.docs[0].data(); const id = snap.docs[0].id;
+  if (!d.active) throw new Error('This coupon is no longer active.');
+  if (d.expiresAt && d.expiresAt.toDate() < new Date()) throw new Error('This coupon has expired.');
+  if (d.minOrder && subtotal < d.minOrder) throw new Error(`Minimum order ₹${d.minOrder} required.`);
+  if (d.maxUses && d.usedCount >= d.maxUses) throw new Error('This coupon has reached its usage limit.');
+  return { id, ...d };
+}
+export async function incrementCouponUse(id) {
+  return await updateDoc(doc(db,'coupons',id), { usedCount: increment(1) });
+}
+// ── Daily revenue for chart ───────────────────────────────
+export async function getDailyRevenue(days = 7) {
+  const since = new Date(); since.setDate(since.getDate() - days);
+  const snap = await getDocs(query(collection(db,'orders'), orderBy('createdAt','desc')));
+  const map = {};
+  snap.docs.forEach(d => {
+    const o = d.data();
+    if (!o.createdAt) return;
+    const dt = o.createdAt.toDate();
+    if (dt < since) return;
+    const key = dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+    map[key] = (map[key]||0) + (o.total||0);
+  });
+  return map;
 }
