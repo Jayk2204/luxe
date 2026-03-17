@@ -646,7 +646,7 @@ window.doRegister = async e => {
     await updateProfile(user,{displayName:name});
     await saveProfile(user,{name});
     await sendEmailVerification(user,{
-      url:`${location.origin}/auth.html?verified=1&next=${encodeURIComponent(nextUrl)}`,
+      url:`https://shopzz-ca17e.firebaseapp.com/auth.html?verified=1&next=${encodeURIComponent(nextUrl)}`,
       handleCodeInApp:false,
     });
     await signOut(auth);
@@ -722,44 +722,59 @@ ge('back-to-login-btn').addEventListener('click', async()=>{
 window.doForgot = async e => {
   e.preventDefault();
   ge('fp-err').style.display='none'; ge('fp-email-msg').textContent='';
-  const email=ge('fp-email').value.trim();
+  const email = ge('fp-email').value.trim();
   if(!isEmailValid(email)){ fieldErr('fp-email','fp-email-msg','Enter a valid email address.'); return; }
   fieldOk('fp-email','fp-email-msg');
-  const btn=ge('btn-forgot'); setLoad(btn,true);
+  const btn = ge('btn-forgot'); setLoad(btn,true);
+
+  // Use Firebase authDomain as the continue URL — works on localhost AND live
+  const continueUrl = `https://shopzz-ca17e.firebaseapp.com/auth.html`;
+
   try {
-    await sendPasswordResetEmail(auth, email, { url:`${location.origin}/auth.html` });
+    await sendPasswordResetEmail(auth, email, { url: continueUrl });
+    // Success — show card
+    ge('fp-form-wrap').classList.add('hidden');
+    ge('fp-sent').classList.remove('hidden');
+    ge('fp-sent-email').textContent = email;
+    startFpCooldown();
   } catch(err) {
-    // Only surface invalid-email error; for user-not-found show success anyway (security)
-    if(err.code==='auth/invalid-email'){
-      ge('fp-err-msg').textContent='Please enter a valid email address.';
-      ge('fp-err').style.display='flex';
-      setLoad(btn,false); return;
-    }
-    // All other errors: still show success card (prevents user enumeration)
+    const msgs = {
+      'auth/invalid-email':      'Please enter a valid email address.',
+      'auth/user-not-found':     'No account found with this email. Please register first.',
+      'auth/too-many-requests':  'Too many attempts. Please wait a few minutes and try again.',
+      'auth/network-request-failed': 'Network error. Check your internet connection.',
+      'auth/invalid-api-key':    'Firebase config error. Contact support.',
+      'auth/unauthorized-domain':'This domain is not authorized in Firebase. Add it in Firebase Console → Authentication → Settings → Authorized Domains.',
+    };
+    const msg = msgs[err.code] || `Error: ${err.message}`;
+    ge('fp-err-msg').textContent = msg;
+    ge('fp-err').style.display = 'flex';
+    console.error('[LUXE Forgot Password]', err.code, err.message);
   }
-  // Show success card
-  ge('fp-form-wrap').classList.add('hidden');
-  ge('fp-sent').classList.remove('hidden');
-  ge('fp-sent-email').textContent=email;
-  startFpCooldown();
   setLoad(btn,false);
 };
 
 /* ── FORGOT RESEND ─────────────────────────────────────── */
 let fpCDTimer=null;
 window.doForgotResend = async () => {
-  const email=ge('fp-sent-email').textContent;
+  const email = ge('fp-sent-email').textContent;
   ge('fp-resend-ok').style.display='none'; ge('fp-resend-err').style.display='none';
-  const btn=ge('fp-resend-btn'); btn.disabled=true; btn.textContent='Sending…';
+  const btn = ge('fp-resend-btn'); btn.disabled=true; btn.textContent='Sending…';
+  const continueUrl = `https://shopzz-ca17e.firebaseapp.com/auth.html`;
   try {
-    await sendPasswordResetEmail(auth, email, {url:`${location.origin}/auth.html`});
-    ge('fp-resend-ok-msg').textContent='Reset email resent! Check your inbox.';
-    ge('fp-resend-ok').style.display='flex';
+    await sendPasswordResetEmail(auth, email, { url: continueUrl });
+    ge('fp-resend-ok-msg').textContent = 'Reset email resent! Check your inbox (and spam folder).';
+    ge('fp-resend-ok').style.display = 'flex';
     startFpCooldown();
   } catch(err) {
-    const msg=err.code==='auth/too-many-requests'?'Too many requests. Please wait a moment.':'Could not resend. Please try again.';
-    ge('fp-resend-err-msg').textContent=msg; ge('fp-resend-err').style.display='flex';
-    btn.disabled=false; btn.textContent='Resend email';
+    const msgs = {
+      'auth/too-many-requests': 'Too many attempts. Please wait a few minutes.',
+      'auth/user-not-found':    'No account found with this email.',
+      'auth/unauthorized-domain': 'Domain not authorized. Contact support.',
+    };
+    ge('fp-resend-err-msg').textContent = msgs[err.code] || 'Could not resend. Please try again.';
+    ge('fp-resend-err').style.display = 'flex';
+    btn.disabled = false; btn.textContent = 'Resend email';
   }
 };
 
