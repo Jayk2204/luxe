@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders — LUXE Admin</title>
+  <title>Orders - LUXE Admin</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -65,9 +65,9 @@
 
 <!-- ORDER DETAIL MODAL -->
 <div class="modal-overlay" id="order-modal">
-  <div class="modal" style="max-width:580px">
+  <div class="modal" style="max-width:600px">
     <div class="modal-head">
-      <h3>🛒 Order Details</h3>
+      <h3>(cart) Order Details</h3>
       <button class="modal-close" onclick="CM('order-modal')">✕</button>
     </div>
     <div class="modal-body" id="order-modal-body"></div>
@@ -83,7 +83,7 @@
           <option value="refunded">Refunded</option>
         </select>
         <button class="btn btn-primary" id="upd-btn">
-          <i class="fa fa-check"></i> Update
+          <i class="fa fa-check"></i> Update Status
         </button>
       </div>
     </div>
@@ -91,10 +91,11 @@
 </div>
 
 <div class="toast-container"></div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <script type="module">
 import {
-  requireAdmin, adminLogout, setActiveSidebarLink,
+  requireAdmin,
   getOrders, updateOrderStatus,
   showToast, setLoading, debounce,
   formatCurrency, formatDate, timeAgo, statusBadge
@@ -103,166 +104,260 @@ import { injectLayout } from './js/admin-layout.js';
 
 injectLayout('Orders');
 
-let all=[], current=null;
+let all = [], current = null;
 
-requireAdmin(async (user, profile) => {
-  document.getElementById('page-body').style.display='block';
+requireAdmin(async () => {
+  document.getElementById('page-body').style.display = 'block';
   await load();
 });
 
+// -- Load all orders ---------------------------------------
 async function load() {
   try {
-    all=await getOrders();
+    all = await getOrders();
     renderStats(all);
-    document.getElementById('count-lbl').textContent=`${all.length} orders total`;
+    document.getElementById('count-lbl').textContent = `${all.length} orders total`;
     render(all);
-  } catch(e){ showToast('Error','Could not load orders: '+e.message,'error'); }
-}
-
-function renderStats(orders) {
-  const cnt={pending:0,processing:0,shipped:0,delivered:0,cancelled:0};
-  orders.forEach(o=>{ if(cnt[o.status]!==undefined) cnt[o.status]++; });
-  const cfg={pending:{c:'var(--amber)',i:'⏳'},processing:{c:'var(--blue)',i:'⚙️'},shipped:{c:'var(--purple)',i:'🚚'},delivered:{c:'var(--green)',i:'✅'},cancelled:{c:'var(--red)',i:'❌'}};
-  document.getElementById('status-stats').innerHTML=Object.entries(cnt).map(([s,n])=>`
-    <div class="card" style="padding:.9rem;border-top:2px solid ${cfg[s].c}">
-      <div style="font-size:1.2rem;margin-bottom:.25rem">${cfg[s].i}</div>
-      <div style="font-size:1.35rem;font-weight:800;font-family:var(--mono);color:${cfg[s].c}">${n}</div>
-      <div style="font-size:.65rem;color:var(--t3);text-transform:capitalize;margin-top:.1rem">${s}</div>
-    </div>`).join('');
-}
-
-function render(orders) {
-  const tb=document.getElementById('tbl-body');
-  if(!orders.length){
-    tb.innerHTML=`<tr><td colspan="7"><div class="empty-state">
-      <div class="empty-state__icon">🛒</div><h3>No orders found</h3>
-      <p>Orders will appear here once customers place them.</p>
-    </div></td></tr>`; return;
+  } catch(e) {
+    showToast('Error', 'Could not load orders: ' + e.message, 'error');
   }
-  tb.innerHTML=orders.map(o=>`
-    <tr class="fade-in">
-      <td>
-        <span style="font-family:var(--mono);font-size:.76rem;color:var(--blue);cursor:pointer"
-          onclick="openOrder('${o.id}')">#${o.id.slice(-6).toUpperCase()}</span>
-      </td>
-      <td>
-        <div><strong>${o.shippingAddress?.name||o.userEmail||'—'}</strong></div>
-        <div style="font-size:.7rem;color:var(--t3)">${o.userEmail||''}</div>
-      </td>
-      <td><strong style="color:var(--green)">${formatCurrency(o.total)}</strong></td>
-      <td>${statusBadge(o.status)}</td>
-      <td class="hide-mobile">
-        <span class="badge badge-gray" style="text-transform:capitalize">${o.paymentMethod||'cod'}</span>
-      </td>
-      <td class="hide-mobile" style="font-size:.73rem;color:var(--t3);font-family:var(--mono)">${timeAgo(o.createdAt)}</td>
-      <td>
-        <button class="btn btn-icon" onclick="openOrder('${o.id}')" title="View"><i class="fa fa-eye"></i></button>
-      </td>
-    </tr>`).join('');
 }
 
-// Search + filter
-const si=document.getElementById('search'), sf=document.getElementById('status-filter');
+// -- Status stat cards -------------------------------------
+function renderStats(orders) {
+  const cnt = { pending:0, processing:0, shipped:0, delivered:0, cancelled:0 };
+  orders.forEach(o => { if (cnt[o.status] !== undefined) cnt[o.status]++; });
+  const cfg = {
+    pending:    { c:'var(--amber)',  i:'(pending)' },
+    processing: { c:'var(--blue)',   i:'(proc)'  },
+    shipped:    { c:'var(--purple)', i:'(ship)' },
+    delivered:  { c:'var(--green)',  i:'(done)' },
+    cancelled:  { c:'var(--red)',    i:'(cancel)' },
+  };
+  document.getElementById('status-stats').innerHTML = Object.entries(cnt).map(([s,n]) =>
+    '<div class="card" style="padding:.9rem;border-top:2px solid ' + cfg[s].c + '">' +
+      '<div style="font-size:1.2rem;margin-bottom:.25rem">' + cfg[s].i + '</div>' +
+      '<div style="font-size:1.35rem;font-weight:800;font-family:var(--mono);color:' + cfg[s].c + '">' + n + '</div>' +
+      '<div style="font-size:.65rem;color:var(--t3);text-transform:capitalize;margin-top:.1rem">' + s + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+// -- Render orders table -----------------------------------
+function render(orders) {
+  const tb = document.getElementById('tbl-body');
+  if (!orders.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty-state">' +
+      '<div class="empty-state__icon">(cart)</div>' +
+      '<h3>No orders found</h3>' +
+      '<p>Orders will appear here once customers place them.</p>' +
+      '</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = orders.map(o =>
+    '<tr class="fade-in">' +
+      '<td><span style="font-family:var(--mono);font-size:.76rem;color:var(--blue);cursor:pointer" onclick="openOrder(\'' + o.id + '\')">#' + o.id.slice(-6).toUpperCase() + '</span></td>' +
+      '<td><div><strong>' + (o.shippingAddress?.name || o.userEmail || '-') + '</strong></div>' +
+        '<div style="font-size:.7rem;color:var(--t3)">' + (o.userEmail || '') + '</div></td>' +
+      '<td><strong style="color:var(--green)">' + formatCurrency(o.total) + '</strong></td>' +
+      '<td>' + statusBadge(o.status) + '</td>' +
+      '<td class="hide-mobile"><span class="badge badge-gray" style="text-transform:capitalize">' + (o.paymentMethod || 'cod') + '</span></td>' +
+      '<td class="hide-mobile" style="font-size:.73rem;color:var(--t3);font-family:var(--mono)">' + timeAgo(o.createdAt) + '</td>' +
+      '<td><button class="btn btn-icon" onclick="openOrder(\'' + o.id + '\')" title="View"><i class="fa fa-eye"></i></button></td>' +
+    '</tr>'
+  ).join('');
+}
+
+// -- Search + filter ---------------------------------------
+const si = document.getElementById('search');
+const sf = document.getElementById('status-filter');
+
 function filter() {
-  const q=si.value.toLowerCase().trim(), s=sf.value;
-  const f=all.filter(o=>(!q||o.id.toLowerCase().includes(q)||(o.userEmail||'').toLowerCase().includes(q)||(o.shippingAddress?.name||'').toLowerCase().includes(q))&&(!s||o.status===s));
+  const q = si.value.toLowerCase().trim();
+  const s = sf.value;
+  const f = all.filter(o =>
+    (!q || o.id.toLowerCase().includes(q) ||
+     (o.userEmail||'').toLowerCase().includes(q) ||
+     (o.shippingAddress?.name||'').toLowerCase().includes(q)) &&
+    (!s || o.status === s)
+  );
   render(f);
-  document.getElementById('count-lbl').textContent=`${f.length} of ${all.length} orders`;
+  document.getElementById('count-lbl').textContent = f.length + ' of ' + all.length + ' orders';
 }
-si?.addEventListener('input',debounce(filter,250));
-sf?.addEventListener('change',filter);
+si?.addEventListener('input', debounce(filter, 250));
+sf?.addEventListener('change', filter);
 
-// Order detail modal
-window.openOrder=id=>{
-  const o=all.find(x=>x.id===id); if(!o) return;
-  current=o;
-  document.getElementById('new-status').value=o.status||'pending';
+// -- Build tracking timeline HTML (no nested template literals) --
+function buildTimeline(orderStatus) {
+  const statuses = ['pending','processing','shipped','delivered'];
+  const icons    = ['fa-clock','fa-cog','fa-truck','fa-check-circle'];
+  const labels   = ['Placed','Processing','Shipped','Delivered'];
+  const curIdx   = statuses.indexOf(orderStatus || 'pending');
 
-  document.getElementById('order-modal-body').innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem">
-      <div>
-        <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--blue)">#${o.id.slice(-8).toUpperCase()}</div>
-        <div style="font-size:.72rem;color:var(--t3);margin-top:.2rem">${formatDate(o.createdAt)}</div>
-      </div>
-      <div style="text-align:right">${statusBadge(o.status)}<div style="font-size:1.2rem;font-weight:800;color:var(--green);margin-top:.4rem">${formatCurrency(o.total)}</div></div>
-    </div>
+  var html = '<div style="display:flex;align-items:flex-start;position:relative;padding:.5rem 0">';
 
-    <div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">
-      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.5rem">Customer</div>
-      <strong>${o.shippingAddress?.name||o.userEmail||'—'}</strong>
-      <div style="font-size:.78rem;color:var(--t2)">${o.userEmail||'—'}</div>
-      ${o.shippingAddress?.phone?`<div style="font-size:.78rem;color:var(--t2)">${o.shippingAddress.phone}</div>`:''}
-    </div>
+  for (var i = 0; i < statuses.length; i++) {
+    var done   = i < curIdx;
+    var active = i === curIdx;
 
-    ${o.shippingAddress?`
-    <div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">
-      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.5rem">Delivery Address</div>
-      <div style="font-size:.82rem;color:var(--t2);line-height:1.7">
-        ${o.shippingAddress['address-line1']||''} ${o.shippingAddress.address||''}<br>
-        ${o.shippingAddress.city||''}, ${o.shippingAddress.state||''} — ${o.shippingAddress.pincode||o.shippingAddress.zip||''}
-      </div>
-    </div>`:'' }
+    var dotBorder = done   ? '#10b981' : active ? '#3b82f6' : 'rgba(255,255,255,.12)';
+    var dotBg     = done   ? '#10b981' : active ? 'rgba(59,130,246,.15)' : 'var(--bg4)';
+    var dotColor  = done   ? '#fff'    : active ? '#3b82f6' : 'var(--t4)';
+    var labelColor= (done || active) ? 'var(--t2)' : 'var(--t4)';
+    var lineBg    = done   ? '#10b981' : 'rgba(255,255,255,.08)';
 
-    <div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">
-      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.6rem">Items (${o.items?.length||0})</div>
-      ${(o.items||[]).map(i=>`
-        <div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
-          <div>
-            <strong>${i.name}</strong>
-            ${i.variant?.size?`<span style="color:var(--t3);margin-left:.35rem">Size: ${i.variant.size}</span>`:''}
-            <div style="color:var(--t3);font-size:.7rem">Qty: ${i.qty}</div>
-          </div>
-          <strong>${formatCurrency(i.price*i.qty)}</strong>
-        </div>`).join('')||'<div style="font-size:.8rem;color:var(--t3)">No items</div>'}
-    </div>
+    html += '<div style="flex:1;text-align:center;position:relative">';
 
-    <div style="background:var(--bg3);border-radius:var(--r);padding:.9rem">
-      <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Subtotal</span><span>${formatCurrency(o.subtotal)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Delivery</span><span>${o.shipping===0?'<span style="color:var(--green)">Free</span>':formatCurrency(o.shipping)}</span></div>
-      ${o.codCharge>0?`<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">COD Fee</span><span>${formatCurrency(o.codCharge)}</span></div>`:''}
-      ${o.couponCode?`<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Coupon (${o.couponCode})</span><span style="color:var(--green)">− ${formatCurrency(o.couponDiscount||0)}</span></div>`:''}
-      <div style="display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;padding-top:.6rem;border-top:1px solid var(--border)"><span>Total</span><span style="color:var(--green)">${formatCurrency(o.total)}</span></div>
-    </div>
-    <div style="margin-top:.75rem;background:var(--bg3);border-radius:var(--r);padding:.9rem">
-      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.65rem">Delivery Tracking</div>
-      <div style="display:flex;align-items:center;gap:0;position:relative">
-        ${['pending','processing','shipped','delivered'].map((s,i)=>{
-          const statuses = ['pending','processing','shipped','delivered'];
-          const curIdx   = statuses.indexOf(o.status||'pending');
-          const done  = i < curIdx;
-          const active= i === curIdx;
-          const icons = ['fa-clock','fa-cog','fa-truck','fa-check-circle'];
-          const labels= ['Placed','Processing','Shipped','Delivered'];
-          return \`<div style="flex:1;text-align:center;position:relative">
-            \${i<3?'<div style="position:absolute;top:13px;left:50%;right:-50%;height:2px;background:'+(done?'#10b981':'rgba(255,255,255,.08)')+';z-index:0"></div>':''}
-            <div style="width:26px;height:26px;border-radius:50%;border:2px solid \${done?'#10b981':active?'#3b82f6':'rgba(255,255,255,.12)'};background:\${done?'#10b981':active?'rgba(59,130,246,.15)':'var(--bg4)'};display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;position:relative;z-index:1;font-size:.5rem;color:\${done?'#fff':active?'#3b82f6':'var(--t4)'}">
-              <i class="fa \${icons[i]}"></i>
-            </div>
-            <div style="font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:\${done||active?'var(--t2)':'var(--t4)'}">\${labels[i]}</div>
-          </div>\`;
-        }).join('')}
-      </div>
-    </div>
-  `;
+    // Connecting line (not on last step)
+    if (i < 3) {
+      html += '<div style="position:absolute;top:13px;left:50%;right:-50%;height:2px;background:' + lineBg + ';z-index:0"></div>';
+    }
+
+    // Dot
+    html += '<div style="width:26px;height:26px;border-radius:50%;border:2px solid ' + dotBorder + ';background:' + dotBg + ';display:flex;align-items:center;justify-content:center;margin:0 auto .4rem;position:relative;z-index:1;font-size:.5rem;color:' + dotColor + '">';
+    html += '<i class="fa ' + icons[i] + '"></i>';
+    html += '</div>';
+
+    // Label
+    html += '<div style="font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:' + labelColor + '">' + labels[i] + '</div>';
+
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// -- Build full order modal HTML ---------------------------
+function buildOrderModal(o) {
+  var addr = '';
+  if (o.shippingAddress) {
+    var a = o.shippingAddress;
+    addr =
+      '<div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">' +
+        '<div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.5rem">Delivery Address</div>' +
+        '<div style="font-size:.82rem;color:var(--t2);line-height:1.7">' +
+          (a['address-line1'] || a.address || '') + '<br>' +
+          (a.city || '') + ', ' + (a.state || '') + ' - ' + (a.pincode || a.zip || '') +
+        '</div>' +
+      '</div>';
+  }
+
+  var itemsHtml = (o.items || []).map(function(i) {
+    return '<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.82rem">' +
+      '<div>' +
+        '<strong>' + (i.name || i.product?.name || '-') + '</strong>' +
+        (i.variant?.size ? '<span style="color:var(--t3);margin-left:.35rem">Size: ' + i.variant.size + '</span>' : '') +
+        '<div style="color:var(--t3);font-size:.7rem">Qty: ' + i.qty + '</div>' +
+      '</div>' +
+      '<strong>' + formatCurrency((i.price || i.product?.price || 0) * i.qty) + '</strong>' +
+    '</div>';
+  }).join('') || '<div style="font-size:.8rem;color:var(--t3)">No items</div>';
+
+  var couponHtml = o.couponCode
+    ? '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem">' +
+        '<span style="color:var(--t3)">Coupon (' + o.couponCode + ')</span>' +
+        '<span style="color:var(--green)">- ' + formatCurrency(o.couponDiscount || 0) + '</span>' +
+      '</div>'
+    : '';
+
+  var codHtml = o.codCharge > 0
+    ? '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem">' +
+        '<span style="color:var(--t3)">COD Fee</span><span>' + formatCurrency(o.codCharge) + '</span>' +
+      '</div>'
+    : '';
+
+  return (
+    // Header
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem">' +
+      '<div>' +
+        '<div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--blue)">#' + o.id.slice(-8).toUpperCase() + '</div>' +
+        '<div style="font-size:.72rem;color:var(--t3);margin-top:.2rem">' + formatDate(o.createdAt) + '</div>' +
+      '</div>' +
+      '<div style="text-align:right">' + statusBadge(o.status) +
+        '<div style="font-size:1.2rem;font-weight:800;color:var(--green);margin-top:.4rem">' + formatCurrency(o.total) + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Customer
+    '<div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">' +
+      '<div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.5rem">Customer</div>' +
+      '<strong>' + (o.shippingAddress?.name || o.userEmail || '-') + '</strong>' +
+      '<div style="font-size:.78rem;color:var(--t2)">' + (o.userEmail || '-') + '</div>' +
+      (o.shippingAddress?.phone ? '<div style="font-size:.78rem;color:var(--t2)">Ph: ' + o.shippingAddress.phone + '</div>' : '') +
+    '</div>' +
+
+    // Address
+    addr +
+
+    // Items
+    '<div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">' +
+      '<div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.6rem">Items (' + (o.items?.length || 0) + ')</div>' +
+      itemsHtml +
+    '</div>' +
+
+    // Totals
+    '<div style="background:var(--bg3);border-radius:var(--r);padding:.9rem;margin-bottom:.75rem">' +
+      '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Subtotal</span><span>' + formatCurrency(o.subtotal) + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--t3)">Delivery</span><span>' + (o.shipping === 0 ? '<span style="color:var(--green)">Free</span>' : formatCurrency(o.shipping)) + '</span></div>' +
+      codHtml +
+      couponHtml +
+      '<div style="display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;padding-top:.6rem;border-top:1px solid var(--border)">' +
+        '<span>Total</span><span style="color:var(--green)">' + formatCurrency(o.total) + '</span>' +
+      '</div>' +
+    '</div>' +
+
+    // Tracking timeline
+    '<div style="background:var(--bg3);border-radius:var(--r);padding:.9rem">' +
+      '<div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.65rem">Order: Delivery Tracking</div>' +
+      buildTimeline(o.status) +
+    '</div>'
+  );
+}
+
+// -- Open order modal --------------------------------------
+window.openOrder = function(id) {
+  const o = all.find(x => x.id === id);
+  if (!o) return;
+  current = o;
+  document.getElementById('new-status').value  = o.status || 'pending';
+  document.getElementById('order-modal-body').innerHTML = buildOrderModal(o);
   OM('order-modal');
 };
 
-document.getElementById('upd-btn').addEventListener('click',async()=>{
-  if(!current) return;
-  const btn=document.getElementById('upd-btn'), status=document.getElementById('new-status').value;
-  setLoading(btn,true,'<i class="fa fa-check"></i> Update');
+// -- Update status -----------------------------------------
+document.getElementById('upd-btn').addEventListener('click', async () => {
+  if (!current) return;
+  const btn    = document.getElementById('upd-btn');
+  const status = document.getElementById('new-status').value;
+  setLoading(btn, true, '<i class="fa fa-check"></i> Update Status');
   try {
-    await updateOrderStatus(current.id,status);
-    showToast('Updated!',`Status set to "${status}".`,'success');
-    CM('order-modal'); await load();
-  } catch(e){ showToast('Error',e.message,'error'); }
-  finally{ setLoading(btn,false,'<i class="fa fa-check"></i> Update'); }
+    await updateOrderStatus(current.id, status);
+    // Update local copy so timeline re-renders instantly
+    current.status = status;
+    all.find(x => x.id === current.id).status = status;
+    showToast('Updated!', 'Status changed to "' + status + '"', 'success');
+    // Re-render modal with new status
+    document.getElementById('order-modal-body').innerHTML = buildOrderModal(current);
+    document.getElementById('new-status').value = status;
+    // Refresh table row
+    render(all);
+    renderStats(all);
+  } catch(e) {
+    showToast('Error', e.message, 'error');
+  }
+  setLoading(btn, false, '<i class="fa fa-check"></i> Update Status');
 });
 
-window.OM=id=>document.getElementById(id)?.classList.add('open');
-window.CM=id=>document.getElementById(id)?.classList.remove('open');
-document.getElementById('order-modal')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) CM('order-modal'); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') CM('order-modal'); });
+// -- Modal helpers -----------------------------------------
+window.OM = id => document.getElementById(id)?.classList.add('open');
+window.CM = id => document.getElementById(id)?.classList.remove('open');
+document.getElementById('order-modal')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) CM('order-modal');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') CM('order-modal');
+});
 </script>
 </body>
 </html>
