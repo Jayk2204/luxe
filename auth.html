@@ -14,13 +14,13 @@
       --gold: #c9a96e; --gold-l: #e2c998; --gold-g: rgba(201,169,110,.1);
       --bg: #080808; --bg2: #0f0f0f; --bg3: #161616; --bg4: #1e1e1e; --bg5: #252525;
       --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.13);
-      --t1: #f5f0e8; --t2: #9a9a9a; --t3: #444; --t4: #2a2a2a;
+      --t1: #f5f0e8; --t2: #9a9a9a; --t3: #555; --t4: #333;
       --green: #22c55e; --red: #ef4444; --blue: #3b82f6; --amber: #f59e0b;
     }
     html, body { height: 100%; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t1); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-    /* ── LEFT panel ── */
+    /* LEFT */
     .left { flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; background:var(--bg2); }
     @media(max-width:860px){ .left { display:none; } }
     .left-grid { position:absolute; inset:0; background-image: linear-gradient(rgba(201,169,110,.04) 1px,transparent 1px), linear-gradient(90deg,rgba(201,169,110,.04) 1px,transparent 1px); background-size:56px 56px; animation:gridMove 18s linear infinite; }
@@ -31,13 +31,11 @@
     @keyframes orbP { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08) translateY(-20px)} }
     .fc-wrap { position:absolute; inset:0; pointer-events:none; }
     .fc { position:absolute; background:rgba(255,255,255,.03); border:1px solid rgba(201,169,110,.12); border-radius:12px; padding:.85rem 1rem; animation:fcF 6s ease-in-out infinite; backdrop-filter:blur(4px); }
-    .fc:nth-child(1){ top:18%; left:8%;  animation-delay:0s;  }
+    .fc:nth-child(1){ top:18%; left:8%; animation-delay:0s; }
     .fc:nth-child(2){ top:40%; right:8%; animation-delay:-2s; }
     .fc:nth-child(3){ bottom:22%; left:12%; animation-delay:-4s; }
     @keyframes fcF { 0%,100%{transform:translateY(0) rotate(-1.5deg)} 50%{transform:translateY(-14px) rotate(1.5deg)} }
-    .fc .em { font-size:1.8rem; }
-    .fc .nm { font-size:.68rem; color:var(--gold); margin-top:.3rem; }
-    .fc .pr { font-size:.72rem; color:var(--t3); }
+    .fc .em { font-size:1.8rem; } .fc .nm { font-size:.68rem; color:var(--gold); margin-top:.3rem; } .fc .pr { font-size:.72rem; color:var(--t3); }
     .left-inner { position:relative; z-index:1; text-align:center; padding:3rem; max-width:460px; }
     .left-logo { font-family:'Bebas Neue',sans-serif; font-size:4rem; letter-spacing:.2em; color:var(--t1); display:block; margin-bottom:.3rem; }
     .left-logo span { color:var(--gold); }
@@ -47,10 +45,10 @@
     .feat { display:flex; align-items:center; gap:.75rem; font-size:.8rem; color:var(--t2); }
     .feat-ico { width:30px; height:30px; flex-shrink:0; background:var(--gold-g); border:1px solid rgba(201,169,110,.18); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:.85rem; }
 
-    /* ── RIGHT panel ── */
-    .right { width:460px; flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:2rem 2.5rem; overflow-y:auto; }
+    /* RIGHT */
+    .right { width:480px; flex-shrink:0; background:var(--bg); border-left:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:2rem 2.5rem; overflow-y:auto; }
     @media(max-width:860px){ .right { width:100%; border-left:none; min-height:100vh; } }
-    .wrap { width:100%; max-width:360px; animation:slideUp .45s cubic-bezier(.16,1,.3,1) both; }
+    .wrap { width:100%; max-width:380px; animation:slideUp .45s cubic-bezier(.16,1,.3,1) both; }
     @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
     .form-head { margin-bottom:1.75rem; }
     .form-head h2 { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:400; color:var(--t1); }
@@ -63,72 +61,103 @@
 
     /* Alerts */
     .alert { border-radius:8px; padding:.72rem 1rem; font-size:.78rem; margin-bottom:1rem; display:none; align-items:center; gap:.5rem; line-height:1.5; }
-    .alert.err  { background:rgba(239,68,68,.08);  border:1px solid rgba(239,68,68,.2);  color:#f87171; }
-    .alert.ok   { background:rgba(34,197,94,.08);  border:1px solid rgba(34,197,94,.2);  color:#4ade80; }
-    .alert.warn { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); color:#fbbf24; }
-    .alert.info { background:rgba(59,130,246,.08); border:1px solid rgba(59,130,246,.2); color:#60a5fa; }
+    .alert.err  { background:rgba(239,68,68,.08);  border:1px solid rgba(239,68,68,.25);  color:#f87171; }
+    .alert.ok   { background:rgba(34,197,94,.08);  border:1px solid rgba(34,197,94,.25);  color:#4ade80; }
+    .alert.info { background:rgba(59,130,246,.08); border:1px solid rgba(59,130,246,.25); color:#60a5fa; }
 
-    /* Google */
-    .g-btn { width:100%; padding:.75rem; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:#ccc; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; cursor:pointer; transition:all .22s; display:flex; align-items:center; justify-content:center; gap:.6rem; }
+    /* Google btn */
+    .g-btn { width:100%; padding:.78rem; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:#ccc; font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:600; cursor:pointer; transition:all .22s; display:flex; align-items:center; justify-content:center; gap:.6rem; }
     .g-btn:hover { background:var(--bg4); border-color:var(--border2); color:#fff; }
     .div-or { text-align:center; font-size:.7rem; color:var(--t3); margin:1.1rem 0; position:relative; }
     .div-or::before, .div-or::after { content:''; position:absolute; top:50%; width:calc(50% - 1.4rem); height:1px; background:var(--bg4); }
     .div-or::before{ left:0; } .div-or::after{ right:0; }
 
     /* Inputs */
-    .fg { margin-bottom:.95rem; }
+    .fg { margin-bottom:.9rem; }
     .fl { display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
-    label.lbl, .fl label { font-size:.67rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--t3); }
+    label.lbl, .fl label { font-size:.67rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--t2); }
     .f-lnk { font-size:.72rem; color:var(--gold); background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
-    .f-lnk:hover { text-decoration:underline; }
+    .f-lnk:hover { text-decoration:underline; opacity:.8; }
     .fw { position:relative; }
-    .fi { position:absolute; left:.9rem; top:50%; transform:translateY(-50%); color:var(--t4); font-size:.8rem; pointer-events:none; transition:color .2s; }
-    .fi-inp { width:100%; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:var(--t1); font-family:'DM Sans',sans-serif; font-size:.87rem; padding:.72rem 1rem .72rem 2.5rem; outline:none; transition:all .22s; }
+    .fi { position:absolute; left:.9rem; top:50%; transform:translateY(-50%); color:var(--t4); font-size:.8rem; pointer-events:none; transition:color .2s; z-index:1; }
+    .fi-inp { width:100%; background:var(--bg3); border:1.5px solid var(--bg4); border-radius:9px; color:var(--t1); font-family:'DM Sans',sans-serif; font-size:.87rem; padding:.75rem 2.6rem .75rem 2.5rem; outline:none; transition:all .22s; }
     .fi-inp:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,169,110,.08); }
     .fi-inp:focus ~ .fi { color:var(--gold); }
     .fi-inp::placeholder { color:var(--t4); }
-    .eye { position:absolute; right:.9rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--t4); cursor:pointer; font-size:.82rem; transition:color .2s; }
+    .fi-inp.valid   { border-color:rgba(34,197,94,.55); }
+    .fi-inp.invalid { border-color:rgba(239,68,68,.55); }
+    .field-msg { font-size:.7rem; margin-top:5px; padding-left:2px; min-height:15px; display:block; }
+    .field-msg.ok  { color:#4ade80; }
+    .field-msg.bad { color:#f87171; }
+    .eye { position:absolute; right:.9rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--t4); cursor:pointer; font-size:.82rem; transition:color .2s; z-index:2; padding:4px; }
     .eye:hover { color:var(--gold); }
 
     /* Password strength */
-    .pwd-bars { display:flex; gap:3px; margin-top:6px; }
-    .pwd-bar  { flex:1; height:3px; background:var(--bg4); border-radius:2px; transition:background .3s; }
-    .bar-w { background:#ef4444; } .bar-m { background:#f59e0b; } .bar-s { background:#22c55e; }
+    .pwd-strength-wrap { margin-top:8px; display:none; }
+    .pwd-bars { display:flex; gap:4px; margin-bottom:5px; }
+    .pwd-bar { flex:1; height:4px; background:var(--bg4); border-radius:3px; transition:background .3s, transform .2s; }
+    .bar-weak   { background:#ef4444; transform:scaleY(1.4); }
+    .bar-fair   { background:#f59e0b; transform:scaleY(1.4); }
+    .bar-good   { background:#3b82f6; transform:scaleY(1.4); }
+    .bar-strong { background:#22c55e; transform:scaleY(1.4); }
+    .pwd-label { font-size:.68rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; margin-bottom:8px; }
+    .pwd-rules { display:grid; grid-template-columns:1fr 1fr; gap:5px 10px; }
+    .pwd-rule { display:flex; align-items:center; gap:5px; font-size:.7rem; color:var(--t3); transition:color .2s; }
+    .pwd-rule .r-ico { width:15px; height:15px; border-radius:50%; border:1.5px solid var(--t4); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .25s; }
+    .pwd-rule .r-ico i { font-size:.42rem; opacity:0; transition:opacity .2s; }
+    .pwd-rule.pass { color:#4ade80; }
+    .pwd-rule.pass .r-ico { background:#22c55e; border-color:#22c55e; }
+    .pwd-rule.pass .r-ico i { opacity:1; color:#fff; }
+    .pwd-rule.fail { color:#f87171; }
+    .pwd-rule.fail .r-ico { border-color:#ef4444; }
 
     /* Submit */
-    .sub-btn { width:100%; padding:.82rem; background:var(--gold); color:#080808; border:none; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:700; cursor:pointer; transition:all .25s; display:flex; align-items:center; justify-content:center; gap:.5rem; }
+    .sub-btn { width:100%; padding:.82rem; background:var(--gold); color:#080808; border:none; border-radius:9px; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:700; cursor:pointer; transition:all .25s; display:flex; align-items:center; justify-content:center; gap:.5rem; margin-top:.2rem; }
     .sub-btn:hover:not(:disabled) { background:var(--gold-l); transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,169,110,.28); }
-    .sub-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+    .sub-btn:disabled { opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
     .sub-btn.ghost { background:transparent; border:1.5px solid var(--border2); color:var(--t2); box-shadow:none; }
-    .sub-btn.ghost:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); background:var(--gold-g); transform:none; box-shadow:none; }
-
-    /* Spinner */
-    .spin { display:inline-block; width:16px; height:16px; border:2px solid rgba(8,8,8,.3); border-top-color:#080808; border-radius:50%; animation:sp .7s linear infinite; }
+    .sub-btn.ghost:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); background:var(--gold-g); transform:none; }
+    .spin { display:inline-block; width:16px; height:16px; border:2px solid rgba(8,8,8,.25); border-top-color:#080808; border-radius:50%; animation:sp .7s linear infinite; flex-shrink:0; }
+    .sub-btn.ghost .spin { border-color:rgba(255,255,255,.15); border-top-color:var(--t2); }
     @keyframes sp { to{transform:rotate(360deg)} }
-    .sub-btn.ghost .spin { border-color:rgba(255,255,255,.2); border-top-color:var(--t2); }
 
     .sw-txt { text-align:center; margin-top:1.25rem; font-size:.78rem; color:var(--t3); }
     .hidden { display:none !important; }
+    .terms-row { display:flex; align-items:flex-start; gap:.6rem; margin-bottom:1rem; }
+    .terms-row input[type="checkbox"] { accent-color:var(--gold); margin-top:3px; flex-shrink:0; }
+    .terms-row label { font-size:.74rem; color:var(--t3); line-height:1.55; cursor:pointer; }
+    .terms-row label a { color:var(--gold); }
 
     /* Verify screen */
     #verify-screen { text-align:center; padding:1rem 0; }
-    .verify-icon { width:70px; height:70px; border-radius:50%; background:var(--gold-g); border:2px solid rgba(201,169,110,.25); display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 1.5rem; animation:pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.3)} 50%{box-shadow:0 0 0 12px rgba(201,169,110,0)} }
-    .verify-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:400; margin-bottom:.75rem; }
-    .verify-sub   { font-size:.84rem; color:var(--t3); line-height:1.8; margin-bottom:1.5rem; }
+    .verify-icon { width:72px; height:72px; border-radius:50%; background:var(--gold-g); border:2px solid rgba(201,169,110,.25); display:flex; align-items:center; justify-content:center; font-size:1.9rem; margin:0 auto 1.5rem; animation:pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.3)} 50%{box-shadow:0 0 0 14px rgba(201,169,110,0)} }
+    .verify-title { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:400; margin-bottom:.75rem; }
+    .verify-sub   { font-size:.84rem; color:var(--t2); line-height:1.8; margin-bottom:1.5rem; }
     .verify-email-shown { color:var(--gold); font-weight:600; }
-    .verify-steps { display:flex; flex-direction:column; gap:.6rem; margin-bottom:2rem; text-align:left; }
+    .verify-steps { display:flex; flex-direction:column; gap:.6rem; margin-bottom:1.5rem; text-align:left; }
     .vstep { display:flex; align-items:flex-start; gap:.65rem; font-size:.8rem; color:var(--t2); }
     .vstep .num { width:22px; height:22px; border-radius:50%; background:var(--bg4); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:700; flex-shrink:0; margin-top:.05rem; }
+    .cooldown-wrap { margin:.75rem 0; }
+    .cooldown-bar-bg { height:3px; background:var(--bg4); border-radius:2px; overflow:hidden; margin-bottom:5px; }
+    .cooldown-bar { height:100%; background:var(--gold); border-radius:2px; transition:width 1s linear; }
+    .cooldown-txt { font-size:.72rem; color:var(--t3); text-align:center; }
 
     /* Forgot screen */
-    .back-btn { display:flex; align-items:center; gap:.4rem; font-size:.75rem; color:var(--t3); background:none; border:none; cursor:pointer; margin-bottom:1.5rem; font-family:'DM Sans',sans-serif; }
+    .back-btn { display:flex; align-items:center; gap:.5rem; font-size:.75rem; color:var(--t2); background:none; border:none; cursor:pointer; margin-bottom:1.5rem; font-family:'DM Sans',sans-serif; transition:color .2s; }
     .back-btn:hover { color:var(--gold); }
+    .fp-card { background:var(--bg3); border:1px solid rgba(201,169,110,.15); border-radius:12px; padding:1.5rem; text-align:center; }
+    .fp-card-icon { font-size:2.5rem; margin-bottom:.75rem; }
+    .fp-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; margin-bottom:.5rem; }
+    .fp-card p { font-size:.82rem; color:var(--t2); line-height:1.7; }
+    .fp-email-chip { display:inline-block; margin:.6rem 0; background:var(--gold-g); border:1px solid rgba(201,169,110,.2); border-radius:6px; padding:4px 12px; font-size:.82rem; color:var(--gold); word-break:break-all; }
+    .fp-tip { font-size:.72rem; color:var(--t3); margin-top:.65rem; }
+    .resend-row { text-align:center; margin-top:.85rem; font-size:.74rem; color:var(--t3); }
   </style>
 </head>
 <body>
 
-<!-- LEFT -->
+<!-- LEFT PANEL -->
 <div class="left">
   <div class="left-grid"></div>
   <div class="orb orb1"></div>
@@ -151,11 +180,11 @@
   </div>
 </div>
 
-<!-- RIGHT -->
+<!-- RIGHT PANEL -->
 <div class="right">
   <div class="wrap">
 
-    <!-- MAIN AUTH SCREEN -->
+    <!-- ═══════════════ SCREEN 1: MAIN AUTH ═══════════════ -->
     <div id="main-screen">
       <div class="form-head">
         <h2 id="fh-title">Welcome Back</h2>
@@ -167,9 +196,8 @@
         <button class="tab"    id="tab-register" onclick="switchTab('register')">Create Account</button>
       </div>
 
-      <div class="alert err"  id="a-err" ><i class="fa fa-exclamation-circle"></i><span id="a-err-msg"></span></div>
-      <div class="alert ok"   id="a-ok"  ><i class="fa fa-check-circle"></i><span id="a-ok-msg"></span></div>
-      <div class="alert warn" id="a-warn"><i class="fa fa-exclamation-triangle"></i><span id="a-warn-msg"></span></div>
+      <div class="alert err"  id="a-err"><i class="fa fa-circle-exclamation"></i><span id="a-err-msg"></span></div>
+      <div class="alert ok"   id="a-ok" ><i class="fa fa-circle-check"></i><span id="a-ok-msg"></span></div>
 
       <button class="g-btn" id="btn-google">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -180,169 +208,196 @@
         </svg>
         Continue with Google
       </button>
-
       <div class="div-or">or</div>
 
       <!-- LOGIN FORM -->
-      <form id="f-login" onsubmit="doLogin(event)">
+      <form id="f-login" onsubmit="doLogin(event)" novalidate>
         <div class="fg">
-          <label class="lbl">Email Address</label>
+          <label class="lbl" for="l-email">Email Address</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="l-email" placeholder="you@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="l-email" placeholder="you@example.com" autocomplete="email">
             <i class="fi fa fa-envelope"></i>
           </div>
+          <span class="field-msg" id="l-email-msg"></span>
         </div>
         <div class="fg">
           <div class="fl">
-            <label>Password</label>
-            <button type="button" class="f-lnk" onclick="showForgot()">Forgot password?</button>
+            <label for="l-pass">Password</label>
+            <button type="button" class="f-lnk" onclick="showForgot()">
+              <i class="fa fa-key" style="font-size:.6rem;margin-right:3px"></i>Forgot password?
+            </button>
           </div>
           <div class="fw">
-            <input type="password" class="fi-inp" id="l-pass" placeholder="••••••••" required autocomplete="current-password">
+            <input type="password" class="fi-inp" id="l-pass" placeholder="Your password" autocomplete="current-password">
             <i class="fi fa fa-lock"></i>
-            <button type="button" class="eye" onclick="toggleEye('l-pass',this)"><i class="fa fa-eye"></i></button>
+            <button type="button" class="eye" onclick="toggleEye('l-pass',this)" tabindex="-1"><i class="fa fa-eye"></i></button>
           </div>
+          <span class="field-msg" id="l-pass-msg"></span>
         </div>
-        <button class="sub-btn" id="btn-login" type="submit">
-          Sign In &nbsp;<i class="fa fa-arrow-right"></i>
-        </button>
+        <button class="sub-btn" id="btn-login" type="submit">Sign In &nbsp;<i class="fa fa-arrow-right"></i></button>
       </form>
 
       <!-- REGISTER FORM -->
-      <form id="f-reg" class="hidden" onsubmit="doRegister(event)">
+      <form id="f-reg" class="hidden" onsubmit="doRegister(event)" novalidate>
         <div class="fg">
-          <label class="lbl">Full Name</label>
+          <label class="lbl" for="r-name">Full Name</label>
           <div class="fw">
-            <input type="text" class="fi-inp" id="r-name" placeholder="Your full name" required autocomplete="name">
+            <input type="text" class="fi-inp" id="r-name" placeholder="Your full name" autocomplete="name" oninput="validateName(this.value)">
             <i class="fi fa fa-user"></i>
           </div>
+          <span class="field-msg" id="r-name-msg"></span>
         </div>
         <div class="fg">
-          <label class="lbl">Email Address</label>
+          <label class="lbl" for="r-email">Email Address</label>
           <div class="fw">
-            <input type="email" class="fi-inp" id="r-email" placeholder="you@example.com" required autocomplete="email">
+            <input type="email" class="fi-inp" id="r-email" placeholder="you@example.com" autocomplete="email" oninput="validateEmail('r-email','r-email-msg',this.value)">
             <i class="fi fa fa-envelope"></i>
           </div>
+          <span class="field-msg" id="r-email-msg"></span>
         </div>
         <div class="fg">
-          <label class="lbl">Password</label>
+          <label class="lbl" for="r-pass">Password</label>
           <div class="fw">
-            <input type="password" class="fi-inp" id="r-pass" placeholder="Min. 6 characters" required oninput="pwdStr(this.value)">
+            <input type="password" class="fi-inp" id="r-pass" placeholder="Create a strong password" autocomplete="new-password" oninput="onPasswordInput(this.value)">
             <i class="fi fa fa-lock"></i>
-            <button type="button" class="eye" onclick="toggleEye('r-pass',this)"><i class="fa fa-eye"></i></button>
+            <button type="button" class="eye" onclick="toggleEye('r-pass',this)" tabindex="-1"><i class="fa fa-eye"></i></button>
           </div>
-          <div class="pwd-bars"><div class="pwd-bar" id="pb1"></div><div class="pwd-bar" id="pb2"></div><div class="pwd-bar" id="pb3"></div><div class="pwd-bar" id="pb4"></div></div>
+          <!-- Strength meter -->
+          <div class="pwd-strength-wrap" id="pwd-strength-wrap">
+            <div class="pwd-bars">
+              <div class="pwd-bar" id="pb1"></div><div class="pwd-bar" id="pb2"></div>
+              <div class="pwd-bar" id="pb3"></div><div class="pwd-bar" id="pb4"></div>
+            </div>
+            <div class="pwd-label" id="pwd-label" style="color:var(--t3)">Enter a password</div>
+            <div class="pwd-rules">
+              <div class="pwd-rule" id="r-len">  <div class="r-ico"><i class="fa fa-check"></i></div><span>8+ characters</span></div>
+              <div class="pwd-rule" id="r-upper"><div class="r-ico"><i class="fa fa-check"></i></div><span>Uppercase (A–Z)</span></div>
+              <div class="pwd-rule" id="r-num">  <div class="r-ico"><i class="fa fa-check"></i></div><span>Number (0–9)</span></div>
+              <div class="pwd-rule" id="r-sym">  <div class="r-ico"><i class="fa fa-check"></i></div><span>Symbol (!@#…)</span></div>
+            </div>
+          </div>
         </div>
         <div class="fg">
-          <label class="lbl">Confirm Password</label>
+          <label class="lbl" for="r-confirm">Confirm Password</label>
           <div class="fw">
-            <input type="password" class="fi-inp" id="r-confirm" placeholder="Re-enter password" required>
+            <input type="password" class="fi-inp" id="r-confirm" placeholder="Re-enter your password" autocomplete="new-password" oninput="onConfirmInput(this.value)">
             <i class="fi fa fa-lock"></i>
+            <button type="button" class="eye" onclick="toggleEye('r-confirm',this)" tabindex="-1"><i class="fa fa-eye"></i></button>
           </div>
+          <span class="field-msg" id="r-confirm-msg"></span>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:1.1rem">
-          <input type="checkbox" id="r-terms" required style="accent-color:var(--gold);margin-top:3px;flex-shrink:0">
-          <label for="r-terms" style="font-size:.74rem;color:var(--t3);line-height:1.5;cursor:pointer">
-            I agree to the Terms of Service and Privacy Policy
-          </label>
+        <div class="terms-row">
+          <input type="checkbox" id="r-terms">
+          <label for="r-terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
         </div>
-        <button class="sub-btn" id="btn-reg" type="submit">
-          Create Account &nbsp;<i class="fa fa-arrow-right"></i>
-        </button>
+        <button class="sub-btn" id="btn-reg" type="submit">Create Account &nbsp;<i class="fa fa-arrow-right"></i></button>
       </form>
 
-      <p class="sw-txt" id="sw-txt">
-        New here?
-        <button class="f-lnk" onclick="switchTab('register')">Create account</button>
-      </p>
-    </div><!-- /main-screen -->
+      <p class="sw-txt" id="sw-txt">New here? <button class="f-lnk" onclick="switchTab('register')">Create account</button></p>
+    </div>
 
-    <!-- EMAIL VERIFICATION SCREEN -->
+    <!-- ═══════════════ SCREEN 2: EMAIL VERIFY ═══════════════ -->
     <div id="verify-screen" class="hidden">
-      <div class="verify-icon">📧</div>
-      <h2 class="verify-title">Verify Your Email</h2>
-      <p class="verify-sub">
-        We sent a verification email to:<br>
-        <span class="verify-email-shown" id="verify-email-shown">—</span>
-      </p>
-      <div class="verify-steps">
-        <div class="vstep"><div class="num">1</div><span>Open your email inbox</span></div>
-        <div class="vstep"><div class="num">2</div><span>Find the LUXE email (check spam too)</span></div>
-        <div class="vstep"><div class="num">3</div><span>Click the "Verify Email Address" link</span></div>
-        <div class="vstep"><div class="num">4</div><span>Return here and click "Done! I Verified" below</span></div>
-      </div>
-      <div class="alert info" id="v-info" style="display:flex;margin-bottom:1rem">
-        <i class="fa fa-info-circle"></i>
-        <span>You must verify your email before you can sign in.</span>
-      </div>
-      <div class="alert ok"  id="v-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="v-ok-msg"></span></div>
-      <div class="alert err" id="v-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="v-err-msg"></span></div>
-      <button class="sub-btn" id="verified-btn" style="margin-bottom:.75rem">
-        ✅ Done! I Verified
-      </button>
-      <button class="sub-btn ghost" id="resend-btn">
-        <i class="fa fa-paper-plane"></i> Resend Verification Email
-      </button>
-      <div style="text-align:center;margin-top:1.25rem">
-        <button class="f-lnk" id="back-to-login-btn" style="font-size:.75rem;color:var(--t3)">
-          <i class="fa fa-arrow-left"></i> Back to Sign In
-        </button>
-      </div>
-    </div><!-- /verify-screen -->
+      <div style="text-align:center;padding:1rem 0;">
+        <div class="verify-icon">📧</div>
+        <h2 class="verify-title">Check Your Email</h2>
+        <p class="verify-sub">We sent a verification link to:<br><span class="verify-email-shown" id="verify-email-shown">—</span></p>
+        <div class="verify-steps">
+          <div class="vstep"><div class="num">1</div><span>Open your inbox (check spam too)</span></div>
+          <div class="vstep"><div class="num">2</div><span>Click <strong style="color:var(--t1)">"Verify Email Address"</strong></span></div>
+          <div class="vstep"><div class="num">3</div><span>Come back and tap the button below</span></div>
+        </div>
+        <div class="alert info" id="v-info" style="display:flex;margin-bottom:.75rem;text-align:left">
+          <i class="fa fa-info-circle"></i><span>Email must be verified before you can sign in.</span>
+        </div>
+        <div class="alert ok"  id="v-ok"  style="margin-bottom:.75rem;text-align:left"><i class="fa fa-circle-check"></i><span id="v-ok-msg"></span></div>
+        <div class="alert err" id="v-err" style="margin-bottom:.75rem;text-align:left"><i class="fa fa-circle-exclamation"></i><span id="v-err-msg"></span></div>
 
-    <!-- FORGOT PASSWORD SCREEN -->
-    <div id="forgot-screen" class="hidden">
-      <button class="back-btn" onclick="showMainScreen()">
-        <i class="fa fa-arrow-left"></i> Back to Sign In
-      </button>
-      <div class="form-head">
-        <h2>Password Reset</h2>
-        <p>Enter your email — we will send a reset link</p>
-      </div>
-      <div class="alert ok"  id="fp-ok"  style="margin-bottom:1rem"><i class="fa fa-check-circle"></i><span id="fp-ok-msg"></span></div>
-      <div class="alert err" id="fp-err" style="margin-bottom:1rem"><i class="fa fa-exclamation-circle"></i><span id="fp-err-msg"></span></div>
-      <form id="f-forgot" onsubmit="doForgot(event)">
-        <div class="fg">
-          <label class="lbl">Registered Email</label>
-          <div class="fw">
-            <input type="email" class="fi-inp" id="fp-email" placeholder="you@example.com" required autocomplete="email">
-            <i class="fi fa fa-envelope"></i>
-          </div>
-        </div>
-        <button class="sub-btn" id="btn-forgot" type="submit">
-          <i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo
+        <button class="sub-btn" id="verified-btn" style="margin-bottom:.75rem">
+          ✅ I've Verified My Email
         </button>
-      </form>
-      <div id="fp-sent" class="hidden" style="margin-top:1.25rem">
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1.25rem">
-          <div style="font-size:.88rem;font-weight:600;margin-bottom:.75rem;color:var(--t1)">📬 Email Sent!</div>
-          <div class="verify-steps" style="margin-bottom:0">
-            <div class="vstep"><div class="num">1</div><span>Find the LUXE email in your inbox</span></div>
-            <div class="vstep"><div class="num">2</div><span>Click the "Reset Password" link</span></div>
-            <div class="vstep"><div class="num">3</div><span>Set your new password</span></div>
-            <div class="vstep"><div class="num">4</div><span>Come back and sign in</span></div>
-          </div>
+
+        <!-- Resend cooldown -->
+        <div id="v-cooldown" class="hidden cooldown-wrap">
+          <div class="cooldown-bar-bg"><div class="cooldown-bar" id="v-cooldown-bar"></div></div>
+          <p class="cooldown-txt">Resend available in <span id="v-cooldown-sec">60</span>s</p>
         </div>
+        <button class="sub-btn ghost" id="resend-btn" style="margin-bottom:.5rem">
+          <i class="fa fa-paper-plane"></i> Resend Verification Email
+        </button>
         <div style="text-align:center;margin-top:1rem">
-          <button class="f-lnk" onclick="showMainScreen()">Back to Sign In → →</button>
+          <button class="f-lnk" id="back-to-login-btn" style="color:var(--t3);font-size:.75rem">
+            <i class="fa fa-arrow-left"></i> Back to Sign In
+          </button>
         </div>
       </div>
-    </div><!-- /forgot-screen -->
+    </div>
+
+    <!-- ═══════════════ SCREEN 3: FORGOT PASSWORD ═══════════════ -->
+    <div id="forgot-screen" class="hidden">
+      <button class="back-btn" onclick="showMainScreen()"><i class="fa fa-arrow-left"></i> Back to Sign In</button>
+      <div class="form-head">
+        <h2>Reset Password</h2>
+        <p>Enter your registered email. We'll send a secure reset link right away.</p>
+      </div>
+
+      <!-- Step A: form -->
+      <div id="fp-form-wrap">
+        <div class="alert err" id="fp-err" style="margin-bottom:1rem"><i class="fa fa-circle-exclamation"></i><span id="fp-err-msg"></span></div>
+        <form id="f-forgot" onsubmit="doForgot(event)" novalidate>
+          <div class="fg">
+            <label class="lbl" for="fp-email">Registered Email</label>
+            <div class="fw">
+              <input type="email" class="fi-inp" id="fp-email" placeholder="you@example.com" autocomplete="email">
+              <i class="fi fa fa-envelope"></i>
+            </div>
+            <span class="field-msg" id="fp-email-msg"></span>
+          </div>
+          <button class="sub-btn" id="btn-forgot" type="submit">
+            <i class="fa fa-paper-plane"></i> &nbsp;Send Reset Link
+          </button>
+        </form>
+      </div>
+
+      <!-- Step B: success -->
+      <div id="fp-sent" class="hidden">
+        <div class="fp-card">
+          <div class="fp-card-icon">📬</div>
+          <h3>Reset Link Sent!</h3>
+          <p>We emailed a secure password reset link to:</p>
+          <div class="fp-email-chip" id="fp-sent-email">—</div>
+          <p>Click the link in that email to set a new password. The link <strong>expires in 1 hour</strong>.</p>
+          <p class="fp-tip">⚠️ Don't see it? Check your spam / junk folder.</p>
+        </div>
+
+        <div class="resend-row" id="fp-resend-row">
+          Didn't get it? &nbsp;<button class="f-lnk" id="fp-resend-btn" onclick="doForgotResend()">Resend email</button>
+        </div>
+        <div id="fp-cooldown" class="hidden cooldown-wrap" style="margin-top:.5rem">
+          <div class="cooldown-bar-bg"><div class="cooldown-bar" id="fp-cooldown-bar"></div></div>
+          <p class="cooldown-txt">Resend in <span id="fp-cooldown-sec">60</span>s</p>
+        </div>
+        <div class="alert ok"  id="fp-resend-ok"  style="display:none;margin-top:.75rem"><i class="fa fa-circle-check"></i><span id="fp-resend-ok-msg"></span></div>
+        <div class="alert err" id="fp-resend-err" style="display:none;margin-top:.75rem"><i class="fa fa-circle-exclamation"></i><span id="fp-resend-err-msg"></span></div>
+
+        <div style="text-align:center;margin-top:1.25rem">
+          <button class="f-lnk" onclick="showMainScreen()"><i class="fa fa-arrow-left"></i> Back to Sign In</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SINGLE <script type="module"> — fixes the duplicate-app crash
-     All Firebase logic lives here. No more multiple module blocks.
-════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════
+     FIREBASE — All logic in one module script
+════════════════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp }
+import { initializeApp, getApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth, onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
   signInWithPopup, GoogleAuthProvider,
   updateProfile, sendPasswordResetEmail,
   sendEmailVerification, reload, signOut,
@@ -351,356 +406,395 @@ import {
   getFirestore, doc, setDoc, getDoc, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── Firebase init (single instance) ──────────────────────
+/* ── Firebase init ─────────────────────────────────────── */
 const FC = {
-  apiKey:            "AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
-  authDomain:        "shopzz-ca17e.firebaseapp.com",
-  projectId:         "shopzz-ca17e",
-  storageBucket:     "shopzz-ca17e.firebasestorage.app",
-  messagingSenderId: "158388352339",
-  appId:             "1:158388352339:web:2c1016ed5c782ed6e6dda6",
+  apiKey:"AIzaSyCBZTHSR66dnkUz2uibhrvmGoAvv18vFdM",
+  authDomain:"shopzz-ca17e.firebaseapp.com",
+  projectId:"shopzz-ca17e",
+  storageBucket:"shopzz-ca17e.firebasestorage.app",
+  messagingSenderId:"158388352339",
+  appId:"1:158388352339:web:2c1016ed5c782ed6e6dda6",
 };
-
-// Guard against HMR / accidental double-import
 let app;
 try { app = initializeApp(FC); }
-catch (e) {
-  if (e.code === 'app/duplicate-app') {
-    const { getApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-    app = getApp();
-  } else throw e;
-}
-
+catch(e) { if(e.code==='app/duplicate-app') app=getApp(); else throw e; }
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── Redirect target ───────────────────────────────────────
 const params  = new URLSearchParams(location.search);
 const nextUrl = params.get('next') || 'index.html';
+let _email='', _pass='';
 
-// ── Temp credential store for verify screen ───────────────
-// FIX: store creds BEFORE signOut so resend/check can re-auth
-let _savedEmail = '';
-let _savedPass  = '';
+/* Redirect if already verified */
+onAuthStateChanged(auth, u => { if(u && u.emailVerified) window.location.replace(nextUrl); });
 
-// ── Auth state observer ───────────────────────────────────
-// If already fully verified, skip straight to the store
-onAuthStateChanged(auth, user => {
-  if (user && user.emailVerified) {
-    window.location.replace(nextUrl);
-  }
-});
+/* Banner if landing after email verification link */
+if(params.get('verified')==='1') showOk('✅ Email verified! You can now sign in.');
 
-// ── Firestore profile ─────────────────────────────────────
-async function saveProfile(user, extra = {}) {
-  const ref  = doc(db, 'users', user.uid);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      uid:         user.uid,
-      email:       user.email,
-      displayName: user.displayName || extra.name || '',
-      photoURL:    user.photoURL || '',
-      role:        'customer',
-      createdAt:   serverTimestamp(),
-      wishlist:    [],
-    });
-  }
+/* ── HELPERS ────────────────────────────────────────────── */
+const ge = id => document.getElementById(id);
+const isEmailValid = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+
+function fieldErr(inputId, msgId, msg) {
+  ge(inputId).classList.remove('valid'); ge(inputId).classList.add('invalid');
+  if(msgId){ const m=ge(msgId); m.textContent=msg; m.className='field-msg bad'; }
+}
+function fieldOk(inputId, msgId, msg='') {
+  ge(inputId).classList.remove('invalid'); ge(inputId).classList.add('valid');
+  if(msgId){ const m=ge(msgId); m.textContent=msg; m.className='field-msg ok'; }
+}
+function clearFields() {
+  document.querySelectorAll('.fi-inp').forEach(i=>i.classList.remove('valid','invalid'));
+  document.querySelectorAll('.field-msg').forEach(m=>{m.textContent='';m.className='field-msg';});
+}
+function setLoad(btn, on) {
+  btn.disabled=on;
+  if(!btn._orig) btn._orig=btn.innerHTML;
+  btn.innerHTML = on ? '<div class="spin"></div>' : btn._orig;
+}
+function showErr(h)  { ge('a-err-msg').innerHTML=h; ge('a-err').style.display='flex'; ge('a-ok').style.display='none'; }
+function showOk(h)   { ge('a-ok-msg').innerHTML=h;  ge('a-ok').style.display='flex';  ge('a-err').style.display='none'; }
+function clearAlerts(){ ge('a-err').style.display='none'; ge('a-ok').style.display='none'; }
+function showVOk(t)  { ge('v-ok-msg').textContent=t;  ge('v-ok').style.display='flex';  ge('v-err').style.display='none'; ge('v-info').style.display='none'; }
+function showVErr(t) { ge('v-err-msg').textContent=t; ge('v-err').style.display='flex'; }
+function clearVA()   { ge('v-ok').style.display='none'; ge('v-err').style.display='none'; ge('v-info').style.display='flex'; }
+
+function friendlyMsg(code) {
+  return ({
+    'auth/user-not-found':         'No account found with this email.',
+    'auth/wrong-password':         'Incorrect password. Please try again.',
+    'auth/invalid-credential':     'Invalid email or password. Please check and retry.',
+    'auth/email-already-in-use':   'This email is already registered. Sign in instead.',
+    'auth/invalid-email':          'Please enter a valid email address.',
+    'auth/weak-password':          'Password too weak. Use 8+ characters with uppercase, number, and symbol.',
+    'auth/too-many-requests':      'Too many failed attempts. Please wait a few minutes and try again.',
+    'auth/network-request-failed': 'Network error. Check your internet connection.',
+    'auth/popup-closed-by-user':   'Google sign-in was cancelled.',
+    'auth/user-disabled':          'This account has been disabled. Contact support.',
+  })[code] || 'Something went wrong. Please try again.';
 }
 
-// ── Tab switch ────────────────────────────────────────────
-window.switchTab = (tab) => {
-  const isL = tab === 'login';
-  document.getElementById('tab-login').classList.toggle('on', isL);
-  document.getElementById('tab-register').classList.toggle('on', !isL);
-  document.getElementById('f-login').classList.toggle('hidden', !isL);
-  document.getElementById('f-reg').classList.toggle('hidden', isL);
-  document.getElementById('fh-title').textContent = isL ? 'Welcome Back' : 'Create Account';
-  document.getElementById('fh-sub').textContent   = isL ? 'Sign in to continue shopping' : "Join LUXE — it's free!";
-  document.getElementById('sw-txt').innerHTML = isL
+async function saveProfile(user, extra={}) {
+  const ref=doc(db,'users',user.uid), snap=await getDoc(ref);
+  if(!snap.exists()) await setDoc(ref,{
+    uid:user.uid, email:user.email,
+    displayName:user.displayName||extra.name||'',
+    photoURL:user.photoURL||'', role:'customer',
+    createdAt:serverTimestamp(), wishlist:[],
+  });
+}
+
+/* ── PASSWORD STRENGTH ──────────────────────────────────── */
+window.onPasswordInput = v => {
+  const wrap=ge('pwd-strength-wrap');
+  wrap.style.display = v ? 'block' : 'none';
+  if(!v) return;
+  const rules = { len:v.length>=8, upper:/[A-Z]/.test(v), num:/[0-9]/.test(v), sym:/[^A-Za-z0-9]/.test(v) };
+  const score = Object.values(rules).filter(Boolean).length;
+  // Update rule chips
+  const setR = (id,p) => {
+    const el=ge(id); el.classList.toggle('pass',p);
+    el.classList.toggle('fail', !p && v.length>0);
+  };
+  setR('r-len',rules.len); setR('r-upper',rules.upper); setR('r-num',rules.num); setR('r-sym',rules.sym);
+  // Update bars
+  const bars=['pb1','pb2','pb3','pb4'].map(i=>ge(i));
+  bars.forEach(b=>b.className='pwd-bar');
+  const cfg=[
+    {cls:'bar-weak',  label:'Too Weak',  color:'#ef4444'},
+    {cls:'bar-fair',  label:'Fair',      color:'#f59e0b'},
+    {cls:'bar-good',  label:'Good',      color:'#3b82f6'},
+    {cls:'bar-strong',label:'Strong ✓',  color:'#22c55e'},
+  ];
+  const c = score===0 ? cfg[0] : cfg[score-1];
+  for(let i=0;i<score;i++) bars[i].className=`pwd-bar ${c.cls}`;
+  ge('pwd-label').textContent=c.label; ge('pwd-label').style.color=c.color;
+  // Sync confirm
+  if(ge('r-confirm').value) onConfirmInput(ge('r-confirm').value);
+};
+
+window.onConfirmInput = v => {
+  if(!v){ ge('r-confirm').classList.remove('valid','invalid'); ge('r-confirm-msg').textContent=''; return; }
+  v===ge('r-pass').value ? fieldOk('r-confirm','r-confirm-msg','Passwords match ✓') : fieldErr('r-confirm','r-confirm-msg','Passwords do not match.');
+};
+
+/* ── REAL-TIME VALIDATION ───────────────────────────────── */
+window.validateName = v => {
+  if(!v) return;
+  if(v.length<2) fieldErr('r-name','r-name-msg','Minimum 2 characters required.');
+  else if(!/^[a-zA-Z\s'\-]{2,50}$/.test(v)) fieldErr('r-name','r-name-msg','Only letters, spaces, hyphens and apostrophes allowed.');
+  else fieldOk('r-name','r-name-msg','Looks good!');
+};
+window.validateEmail = (inputId, msgId, v) => {
+  if(!v) return;
+  isEmailValid(v) ? fieldOk(inputId, msgId,'Valid email ✓') : fieldErr(inputId, msgId,'Enter a valid email address.');
+};
+
+/* ── EYE TOGGLE ─────────────────────────────────────────── */
+window.toggleEye = (id, btn) => {
+  const inp=ge(id); inp.type=inp.type==='password'?'text':'password';
+  btn.querySelector('i').className=`fa fa-eye${inp.type==='password'?'':'-slash'}`;
+};
+
+/* ── TAB SWITCH ─────────────────────────────────────────── */
+window.switchTab = tab => {
+  const isL=tab==='login';
+  ge('tab-login').classList.toggle('on',isL);
+  ge('tab-register').classList.toggle('on',!isL);
+  ge('f-login').classList.toggle('hidden',!isL);
+  ge('f-reg').classList.toggle('hidden',isL);
+  ge('fh-title').textContent=isL?'Welcome Back':'Create Account';
+  ge('fh-sub').textContent=isL?'Sign in to continue shopping':"Join LUXE — it's free!";
+  ge('sw-txt').innerHTML=isL
     ? 'New here? <button class="f-lnk" onclick="switchTab(\'register\')">Create account</button>'
     : 'Already have an account? <button class="f-lnk" onclick="switchTab(\'login\')">Sign in</button>';
-  clearAlerts();
+  clearAlerts(); clearFields();
 };
 
-// ── LOGIN ─────────────────────────────────────────────────
-window.doLogin = async (e) => {
-  e.preventDefault();
-  const btn   = ge('btn-login');
-  const email = ge('l-email').value.trim();
-  const pass  = ge('l-pass').value;
-  clearAlerts();
-  setLoad(btn, true, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
-
-  try {
-    const { user } = await signInWithEmailAndPassword(auth, email, pass);
-
-    // FIX: check email verification before allowing entry
-    if (!user.emailVerified) {
-      await signOut(auth);
-      // Store creds so user can resend / check from verify screen
-      _savedEmail = email;
-      _savedPass  = pass;
-      showVerifyScreen(email);
-      setLoad(btn, false, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
-      return;
-    }
-
-    await saveProfile(user);
-
-    // ── Admin role check — redirect to dashboard if admin ──
-    const snap = await getDoc(doc(db, 'users', user.uid));
-    if (snap.exists() && snap.data()?.role === 'admin') {
-      showOk('Admin verified! Redirecting to dashboard…');
-      setTimeout(() => window.location.replace('admin/dashboard.html'), 700);
-      return;
-    }
-
-    showOk('Login successful! Redirecting…');
-    setTimeout(() => window.location.replace(nextUrl), 700);
-  } catch (err) {
-    showErr(friendlyMsg(err.code));
-    setLoad(btn, false, 'Sign In &nbsp;<i class="fa fa-arrow-right"></i>');
-  }
-};
-
-// ── REGISTER ──────────────────────────────────────────────
-window.doRegister = async (e) => {
-  e.preventDefault();
-  const btn   = ge('btn-reg');
-  const name  = ge('r-name').value.trim();
-  const email = ge('r-email').value.trim();
-  const pass  = ge('r-pass').value;
-  const conf  = ge('r-confirm').value;
-  clearAlerts();
-
-  if (pass !== conf)   { showErr('Passwords do not match!'); return; }
-  if (pass.length < 6) { showErr('Password must be at least 6 characters.'); return; }
-
-  setLoad(btn, true, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
-  try {
-    // FIX: save creds BEFORE signOut so verify screen can use them
-    _savedEmail = email;
-    _savedPass  = pass;
-
-    const { user } = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(user, { displayName: name });
-    await saveProfile(user, { name });
-
-    await sendEmailVerification(user, {
-      url: `${location.origin}/auth.html?verified=1&next=${encodeURIComponent(nextUrl)}`,
-      handleCodeInApp: false,
-    });
-
-    // Sign out — must verify before entering the store
-    await signOut(auth);
-
-    showVerifyScreen(email);
-    setLoad(btn, false, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
-  } catch (err) {
-    _savedEmail = ''; _savedPass = '';
-    showErr(friendlyMsg(err.code));
-    setLoad(btn, false, 'Create Account &nbsp;<i class="fa fa-arrow-right"></i>');
-  }
-};
-
-// ── GOOGLE ────────────────────────────────────────────────
-ge('btn-google').addEventListener('click', async () => {
-  clearAlerts();
-  try {
-    const res = await signInWithPopup(auth, new GoogleAuthProvider());
-    await saveProfile(res.user);
-    showOk('Signed in with Google! Redirecting…');
-    setTimeout(() => window.location.replace(nextUrl), 700);
-  } catch (err) {
-    if (err.code !== 'auth/popup-closed-by-user') showErr(friendlyMsg(err.code));
-  }
-});
-
-// ── FORGOT PASSWORD ───────────────────────────────────────
-window.doForgot = async (e) => {
-  e.preventDefault();
-  const btn   = ge('btn-forgot');
-  const email = ge('fp-email').value.trim();
-  clearFpAlerts();
-  setLoad(btn, true, '<i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo');
-
-  try {
-    await sendPasswordResetEmail(auth, email, {
-      url: `${location.origin}/auth.html`,
-    });
-    showFpOk(`Password reset link sent to ${email} pe!`);
-    ge('fp-sent').classList.remove('hidden');
-    btn.style.display = 'none';
-  } catch (err) {
-    const map = {
-      'auth/user-not-found':    'No account found with this email.',
-      'auth/invalid-email':     'Please enter a valid email address.',
-      'auth/too-many-requests': 'Too many requests. Please try again later.',
-    };
-    showFpErr(map[err.code] || err.message);
-    setLoad(btn, false, '<i class="fa fa-paper-plane"></i> &nbsp;Reset Link Bhejo');
-  }
-};
-
-// ── VERIFY SCREEN: Check if verified ─────────────────────
-// FIX: re-sign-in with stored creds to call reload() properly
-ge('verified-btn').addEventListener('click', async () => {
-  const btn = ge('verified-btn');
-  setLoad(btn, true, '✅ Done! I Verified');
-  clearVAlerts();
-
-  if (!_savedEmail || !_savedPass) {
-    showVErr('Session expired. Please sign in again.');
-    setLoad(btn, false, '✅ Done! I Verified');
-    return;
-  }
-
-  try {
-    const { user } = await signInWithEmailAndPassword(auth, _savedEmail, _savedPass);
-    await reload(user); // force fresh token from Firebase
-
-    if (user.emailVerified) {
-      await saveProfile(user);
-      _savedEmail = ''; _savedPass = '';
-      showVOk('✅ Email verified! Taking you to the store…');
-      setTimeout(() => window.location.replace(nextUrl), 900);
-    } else {
-      await signOut(auth);
-      showVErr('Email not yet verified. Open your email and click the verification link.');
-      setLoad(btn, false, '✅ Done! I Verified');
-    }
-  } catch (err) {
-    showVErr(friendlyMsg(err.code));
-    setLoad(btn, false, '✅ Done! I Verified');
-  }
-});
-
-// ── VERIFY SCREEN: Resend ─────────────────────────────────
-ge('resend-btn').addEventListener('click', async () => {
-  const btn = ge('resend-btn');
-  setLoad(btn, true, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
-  clearVAlerts();
-
-  if (!_savedEmail || !_savedPass) {
-    showVErr('Something went wrong. Please register again.');
-    setLoad(btn, false, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
-    return;
-  }
-
-  try {
-    const { user } = await signInWithEmailAndPassword(auth, _savedEmail, _savedPass);
-    await sendEmailVerification(user, {
-      url: `${location.origin}/auth.html?next=${encodeURIComponent(nextUrl)}`,
-    });
-    await signOut(auth);
-    showVOk('Verification email resent! Check your inbox.');
-  } catch (err) {
-    const m = err.code === 'auth/too-many-requests'
-      ? 'Sent too many times. Please wait a minute.'
-      : friendlyMsg(err.code);
-    showVErr(m);
-  }
-  setLoad(btn, false, '<i class="fa fa-paper-plane"></i> Resend Verification Email');
-});
-
-// ── Back to login from verify screen ─────────────────────
-ge('back-to-login-btn').addEventListener('click', async () => {
-  try { await signOut(auth); } catch {}
-  _savedEmail = ''; _savedPass = '';
-  showMainScreen();
-  switchTab('login');
-});
-
-// ── Screen navigation ─────────────────────────────────────
+/* ── SCREENS ─────────────────────────────────────────────── */
 function showVerifyScreen(email) {
   ge('main-screen').classList.add('hidden');
   ge('forgot-screen').classList.add('hidden');
   ge('verify-screen').classList.remove('hidden');
-  ge('verify-email-shown').textContent = email;
+  ge('verify-email-shown').textContent=email;
+  clearVA();
 }
-
 window.showForgot = () => {
   ge('main-screen').classList.add('hidden');
   ge('verify-screen').classList.add('hidden');
   ge('forgot-screen').classList.remove('hidden');
-  ge('f-forgot').reset();
+  ge('fp-form-wrap').classList.remove('hidden');
   ge('fp-sent').classList.add('hidden');
-  ge('btn-forgot').style.display = '';
-  clearFpAlerts();
+  ge('f-forgot').reset();
+  ge('fp-email-msg').textContent=''; ge('fp-email').className='fi-inp';
+  ge('fp-err').style.display='none';
+  ge('btn-forgot').disabled=false; ge('btn-forgot').innerHTML='<i class="fa fa-paper-plane"></i> &nbsp;Send Reset Link';
 };
-
 window.showMainScreen = () => {
   ge('forgot-screen').classList.add('hidden');
   ge('verify-screen').classList.add('hidden');
   ge('main-screen').classList.remove('hidden');
 };
 
-// Show success banner if landing after email link click
-if (params.get('verified') === '1') {
-  showOk('✅ Email verified! You can now sign in.');
-}
-
-// ── Password strength meter ───────────────────────────────
-window.pwdStr = (v) => {
-  const bars = ['pb1','pb2','pb3','pb4'].map(id => ge(id));
-  bars.forEach(b => b.className = 'pwd-bar');
-  let s = 0;
-  if (v.length >= 6) s++;
-  if (v.length >= 10) s++;
-  if (/[A-Z]/.test(v) && /[0-9]/.test(v)) s++;
-  if (/[^A-Za-z0-9]/.test(v)) s++;
-  const cls = s <= 1 ? 'bar-w' : s <= 2 ? 'bar-m' : 'bar-s';
-  for (let i = 0; i < s; i++) bars[i].className = `pwd-bar ${cls}`;
+/* ════════════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════════════ */
+window.doLogin = async e => {
+  e.preventDefault(); clearAlerts();
+  const email=ge('l-email').value.trim(), pass=ge('l-pass').value;
+  let ok=true;
+  if(!isEmailValid(email)){ fieldErr('l-email','l-email-msg','Enter a valid email address.'); ok=false; } else fieldOk('l-email','l-email-msg');
+  if(!pass)                { fieldErr('l-pass','l-pass-msg','Password is required.'); ok=false; }         else fieldOk('l-pass','l-pass-msg');
+  if(!ok) return;
+  const btn=ge('btn-login'); setLoad(btn,true);
+  try {
+    const {user}=await signInWithEmailAndPassword(auth,email,pass);
+    if(!user.emailVerified){ await signOut(auth); _email=email; _pass=pass; showVerifyScreen(email); setLoad(btn,false); return; }
+    await saveProfile(user);
+    const snap=await getDoc(doc(db,'users',user.uid));
+    showOk('✅ Welcome back! Redirecting…');
+    const dest=snap.exists()&&snap.data()?.role==='admin'?'admin/dashboard.html':nextUrl;
+    setTimeout(()=>window.location.replace(dest),750);
+  } catch(err){ showErr(friendlyMsg(err.code)); setLoad(btn,false); }
 };
 
-// ── Password eye toggle ───────────────────────────────────
-window.toggleEye = (id, btn) => {
-  const inp = ge(id);
-  inp.type  = inp.type === 'password' ? 'text' : 'password';
-  btn.querySelector('i').className = `fa fa-eye${inp.type === 'password' ? '' : '-slash'}`;
+/* ════════════════════════════════════════════════════════
+   REGISTER
+════════════════════════════════════════════════════════ */
+window.doRegister = async e => {
+  e.preventDefault(); clearAlerts();
+  const name=ge('r-name').value.trim(), email=ge('r-email').value.trim(),
+        pass=ge('r-pass').value, confirm=ge('r-confirm').value, terms=ge('r-terms').checked;
+  let ok=true;
+
+  /* Name */
+  if(name.length<2){ fieldErr('r-name','r-name-msg','Enter your full name (min 2 characters).'); ok=false; }
+  else if(!/^[a-zA-Z\s'\-]{2,50}$/.test(name)){ fieldErr('r-name','r-name-msg','Only letters, spaces, hyphens and apostrophes allowed.'); ok=false; }
+  else fieldOk('r-name','r-name-msg','Looks good!');
+
+  /* Email */
+  if(!isEmailValid(email)){ fieldErr('r-email','r-email-msg','Enter a valid email address.'); ok=false; }
+  else fieldOk('r-email','r-email-msg','Valid email ✓');
+
+  /* Password — must meet all 4 rules */
+  const pRules = { len:pass.length>=8, upper:/[A-Z]/.test(pass), num:/[0-9]/.test(pass), sym:/[^A-Za-z0-9]/.test(pass) };
+  if(!Object.values(pRules).every(Boolean)){
+    fieldErr('r-pass',null,'');
+    const missing=[];
+    if(!pRules.len)   missing.push('8+ characters');
+    if(!pRules.upper) missing.push('uppercase letter');
+    if(!pRules.num)   missing.push('a number');
+    if(!pRules.sym)   missing.push('a symbol (!@#…)');
+    showErr(`Password needs: ${missing.join(', ')}.`); ok=false;
+  }
+
+  /* Confirm */
+  if(pass!==confirm){ fieldErr('r-confirm','r-confirm-msg','Passwords do not match.'); ok=false; }
+  else if(confirm)  fieldOk('r-confirm','r-confirm-msg','Passwords match ✓');
+
+  /* Terms */
+  if(!terms){ showErr('Please accept the Terms of Service to continue.'); ok=false; }
+
+  if(!ok) return;
+
+  const btn=ge('btn-reg'); setLoad(btn,true);
+  _email=email; _pass=pass;
+  try {
+    const {user}=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(user,{displayName:name});
+    await saveProfile(user,{name});
+    await sendEmailVerification(user,{
+      url:`${location.origin}/auth.html?verified=1&next=${encodeURIComponent(nextUrl)}`,
+      handleCodeInApp:false,
+    });
+    await signOut(auth);
+    showVerifyScreen(email);
+  } catch(err){
+    _email=''; _pass='';
+    showErr(friendlyMsg(err.code));
+  }
+  setLoad(btn,false);
 };
 
-// ── Helpers ───────────────────────────────────────────────
-function ge(id) { return document.getElementById(id); }
+/* ════════════════════════════════════════════════════════
+   GOOGLE
+════════════════════════════════════════════════════════ */
+ge('btn-google').addEventListener('click', async()=>{
+  clearAlerts();
+  try {
+    const res=await signInWithPopup(auth,new GoogleAuthProvider());
+    await saveProfile(res.user);
+    showOk('Signed in with Google! Redirecting…');
+    setTimeout(()=>window.location.replace(nextUrl),700);
+  } catch(err){ if(err.code!=='auth/popup-closed-by-user') showErr(friendlyMsg(err.code)); }
+});
 
-function setLoad(btn, on, html = '') {
-  btn.disabled = on;
-  if (html) btn.dataset.orig = html;
-  btn.innerHTML = on
-    ? (btn.classList.contains('ghost')
-        ? '<div class="spin"></div>'
-        : '<div class="spin"></div>')
-    : (btn.dataset.orig || html);
+/* ════════════════════════════════════════════════════════
+   VERIFY — CHECK BUTTON
+════════════════════════════════════════════════════════ */
+ge('verified-btn').addEventListener('click', async()=>{
+  const btn=ge('verified-btn'); clearVA(); setLoad(btn,true);
+  if(!_email||!_pass){ showVErr('Session expired. Please go back and sign in again.'); setLoad(btn,false); return; }
+  try {
+    const {user}=await signInWithEmailAndPassword(auth,_email,_pass);
+    await reload(user);
+    if(user.emailVerified){
+      await saveProfile(user); _email=''; _pass='';
+      showVOk('✅ Verified! Taking you to the store…');
+      setTimeout(()=>window.location.replace(nextUrl),900);
+    } else {
+      await signOut(auth);
+      showVErr('Not verified yet. Open your email and click the verification link, then try again.');
+      setLoad(btn,false);
+    }
+  } catch(err){ showVErr(friendlyMsg(err.code)); setLoad(btn,false); }
+});
+
+/* ════════════════════════════════════════════════════════
+   VERIFY — RESEND (60s cooldown)
+════════════════════════════════════════════════════════ */
+let vCDTimer=null;
+ge('resend-btn').addEventListener('click', async()=>{
+  const btn=ge('resend-btn'); clearVA(); setLoad(btn,true);
+  if(!_email||!_pass){ showVErr('Session expired. Please go back and sign up again.'); setLoad(btn,false); return; }
+  try {
+    const {user}=await signInWithEmailAndPassword(auth,_email,_pass);
+    await sendEmailVerification(user,{url:`${location.origin}/auth.html?next=${encodeURIComponent(nextUrl)}`});
+    await signOut(auth);
+    showVOk('Verification email resent! Check your inbox and spam folder.');
+    startCooldown('v-cooldown','v-cooldown-bar','v-cooldown-sec',btn,60,vCDTimer,t=>vCDTimer=t);
+  } catch(err){
+    showVErr(err.code==='auth/too-many-requests'?'Please wait before resending.':friendlyMsg(err.code));
+    setLoad(btn,false);
+  }
+});
+
+ge('back-to-login-btn').addEventListener('click', async()=>{
+  try{await signOut(auth);}catch{}
+  _email=''; _pass=''; showMainScreen(); switchTab('login');
+});
+
+/* ════════════════════════════════════════════════════════
+   FORGOT — SEND
+════════════════════════════════════════════════════════ */
+window.doForgot = async e => {
+  e.preventDefault();
+  ge('fp-err').style.display='none'; ge('fp-email-msg').textContent='';
+  const email=ge('fp-email').value.trim();
+  if(!isEmailValid(email)){ fieldErr('fp-email','fp-email-msg','Enter a valid email address.'); return; }
+  fieldOk('fp-email','fp-email-msg');
+  const btn=ge('btn-forgot'); setLoad(btn,true);
+  try {
+    await sendPasswordResetEmail(auth, email, { url:`${location.origin}/auth.html` });
+  } catch(err) {
+    // Only surface invalid-email error; for user-not-found show success anyway (security)
+    if(err.code==='auth/invalid-email'){
+      ge('fp-err-msg').textContent='Please enter a valid email address.';
+      ge('fp-err').style.display='flex';
+      setLoad(btn,false); return;
+    }
+    // All other errors: still show success card (prevents user enumeration)
+  }
+  // Show success card
+  ge('fp-form-wrap').classList.add('hidden');
+  ge('fp-sent').classList.remove('hidden');
+  ge('fp-sent-email').textContent=email;
+  startFpCooldown();
+  setLoad(btn,false);
+};
+
+/* ── FORGOT RESEND ─────────────────────────────────────── */
+let fpCDTimer=null;
+window.doForgotResend = async () => {
+  const email=ge('fp-sent-email').textContent;
+  ge('fp-resend-ok').style.display='none'; ge('fp-resend-err').style.display='none';
+  const btn=ge('fp-resend-btn'); btn.disabled=true; btn.textContent='Sending…';
+  try {
+    await sendPasswordResetEmail(auth, email, {url:`${location.origin}/auth.html`});
+    ge('fp-resend-ok-msg').textContent='Reset email resent! Check your inbox.';
+    ge('fp-resend-ok').style.display='flex';
+    startFpCooldown();
+  } catch(err) {
+    const msg=err.code==='auth/too-many-requests'?'Too many requests. Please wait a moment.':'Could not resend. Please try again.';
+    ge('fp-resend-err-msg').textContent=msg; ge('fp-resend-err').style.display='flex';
+    btn.disabled=false; btn.textContent='Resend email';
+  }
+};
+
+function startFpCooldown() {
+  ge('fp-resend-row').classList.add('hidden');
+  ge('fp-cooldown').classList.remove('hidden');
+  ge('fp-cooldown-bar').style.width='100%';
+  let s=60; ge('fp-cooldown-sec').textContent=s;
+  fpCDTimer=setInterval(()=>{
+    s--; ge('fp-cooldown-sec').textContent=s;
+    ge('fp-cooldown-bar').style.width=`${(s/60)*100}%`;
+    if(s<=0){
+      clearInterval(fpCDTimer); fpCDTimer=null;
+      ge('fp-cooldown').classList.add('hidden');
+      ge('fp-resend-row').classList.remove('hidden');
+      ge('fp-resend-btn').disabled=false; ge('fp-resend-btn').textContent='Resend email';
+    }
+  },1000);
 }
 
-function showErr(html)  { const e=ge('a-err');  ge('a-err-msg').innerHTML=html;   e.style.display='flex'; }
-function showOk(html)   { const e=ge('a-ok');   ge('a-ok-msg').innerHTML=html;    e.style.display='flex'; }
-function showWarn(html) { const e=ge('a-warn'); ge('a-warn-msg').innerHTML=html;  e.style.display='flex'; }
-function clearAlerts()  { ['a-err','a-ok','a-warn'].forEach(id => ge(id).style.display='none'); }
-
-function showVOk(t)     { ge('v-ok-msg').textContent=t;  ge('v-ok').style.display='flex';  ge('v-err').style.display='none'; }
-function showVErr(t)    { ge('v-err-msg').textContent=t; ge('v-err').style.display='flex'; ge('v-ok').style.display='none';  }
-function clearVAlerts() { ['v-ok','v-err'].forEach(id => ge(id).style.display='none'); }
-
-function showFpOk(t)    { ge('fp-ok-msg').textContent=t;  ge('fp-ok').style.display='flex';  ge('fp-err').style.display='none'; }
-function showFpErr(t)   { ge('fp-err-msg').textContent=t; ge('fp-err').style.display='flex'; ge('fp-ok').style.display='none';  }
-function clearFpAlerts(){ ['fp-ok','fp-err'].forEach(id => ge(id).style.display='none'); }
-
-function friendlyMsg(code) {
-  return ({
-    'auth/user-not-found':         'No account found with this email.',
-    'auth/wrong-password':         'Incorrect password.',
-    'auth/invalid-credential':     'Invalid email or password.',
-    'auth/email-already-in-use':   'This email is already registered. Please sign in.',
-    'auth/invalid-email':          'Please enter a valid email address.',
-    'auth/weak-password':          'Please choose a stronger password (6+ characters).',
-    'auth/too-many-requests':      'Too many attempts. Please try again later.',
-    'auth/network-request-failed': 'Network error. Please check your connection.',
-    'auth/popup-closed-by-user':   'Google sign-in was cancelled.',
-  })[code] || 'Something went wrong. Please try again.';
+/* Generic cooldown helper */
+function startCooldown(wrapId, barId, secId, btn, secs, timer, setTimer) {
+  ge(wrapId).classList.remove('hidden');
+  ge(barId).style.width='100%';
+  ge(secId).textContent=secs;
+  const t=setInterval(()=>{
+    secs--; ge(secId).textContent=secs;
+    ge(barId).style.width=`${(secs/60)*100}%`;
+    if(secs<=0){
+      clearInterval(t); setTimer(null);
+      ge(wrapId).classList.add('hidden');
+      btn.disabled=false; btn._orig=null;
+      btn.innerHTML='<i class="fa fa-paper-plane"></i> Resend Verification Email';
+    }
+  },1000);
+  setTimer(t);
 }
 </script>
-
 </body>
 </html>
