@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports - LUXE Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .report-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .report-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; transition:border-color .2s; }
+    .report-card:hover { border-color:var(--border2); }
+    .report-card-head { padding:1.25rem 1.5rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:.85rem; }
+    .report-icon { width:42px; height:42px; border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .report-card-title { font-size:.95rem; font-weight:800; color:var(--t1); }
+    .report-card-sub { font-size:.72rem; color:var(--t3); margin-top:.15rem; }
+    .report-card-body { padding:1.1rem 1.5rem 1.25rem; }
+    .report-meta { display:grid; grid-template-columns:1fr 1fr; gap:.4rem .75rem; margin-bottom:1.1rem; font-size:.78rem; }
+    .rml { color:var(--t3); }
+    .rmv { color:var(--t1); font-weight:600; font-family:var(--mono); }
+    .report-btns { display:flex; gap:.6rem; }
+    .btn-csv { flex:1; padding:.65rem; border-radius:var(--r); background:var(--green-g); color:var(--green); border:1px solid rgba(16,185,129,.25); font-family:var(--font); font-size:.78rem; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:.4rem; }
+    .btn-csv:hover { background:rgba(16,185,129,.2); border-color:var(--green); }
+    .btn-pdf { flex:1; padding:.65rem; border-radius:var(--r); background:var(--red-g); color:var(--red); border:1px solid rgba(239,68,68,.25); font-family:var(--font); font-size:.78rem; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:.4rem; }
+    .btn-pdf:hover { background:rgba(239,68,68,.2); border-color:var(--red); }
+    .filter-row { display:flex; gap:.65rem; flex-wrap:wrap; align-items:center; margin-bottom:.85rem; }
+    .filter-row label { font-size:.72rem; color:var(--t3); }
+    .di { background:var(--bg3); border:1px solid var(--border); color:var(--t1); border-radius:var(--r); padding:.42rem .65rem; font-size:.75rem; font-family:var(--font); }
+    .di:focus { outline:none; border-color:var(--blue); }
+    .summary-row { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; margin-bottom:1.75rem; }
+    @media(max-width:900px){ .summary-row { grid-template-columns:1fr 1fr; } }
+    .sc { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:.85rem 1rem; }
+    .sc .sl { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--t3); margin-bottom:.3rem; }
+    .sc .sv { font-size:1.2rem; font-weight:800; font-family:var(--mono); color:var(--t1); }
+    .preview-section { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; }
+    .preview-head { padding:.85rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .loading-overlay { position:fixed; inset:0; background:rgba(7,11,18,.88); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:1rem; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .loading-overlay.show { opacity:1; pointer-events:all; }
+    .spin-lg { width:40px; height:40px; border:3px solid rgba(59,130,246,.2); border-top-color:var(--blue); border-radius:50%; animation:spin .75s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-text { font-size:.85rem; color:var(--t2); }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+<main class="main-content">
+<div class="page-body" id="page-body" style="display:none">
+
+  <!-- Summary -->
+  <div class="summary-row">
+    <div class="sc"><div class="sl">Products</div><div class="sv" id="sm-products">-</div></div>
+    <div class="sc"><div class="sl">Orders</div><div class="sv" id="sm-orders">-</div></div>
+    <div class="sc"><div class="sl">Users</div><div class="sv" id="sm-users">-</div></div>
+    <div class="sc"><div class="sl">Revenue</div><div class="sv" id="sm-revenue">-</div></div>
+  </div>
+
+  <!-- Report Cards -->
+  <div class="report-grid">
+
+    <!-- PRODUCTS -->
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-icon" style="background:rgba(59,130,246,.12)">P</div>
+        <div><div class="report-card-title">Products Report</div><div class="report-card-sub">Name, category, price, stock, rating</div></div>
+      </div>
+      <div class="report-card-body">
+        <div class="report-meta">
+          <span class="rml">Total Products</span><span class="rmv" id="prod-count">-</span>
+          <span class="rml">Out of Stock</span><span class="rmv" id="prod-oos">-</span>
+          <span class="rml">Avg Price</span><span class="rmv" id="prod-avg">-</span>
+          <span class="rml">Categories</span><span class="rmv" id="prod-cats">-</span>
+        </div>
+        <div class="report-btns">
+          <button class="btn-csv" onclick="exportCSV('products')"><i class="fa fa-file-csv"></i> Download CSV</button>
+          <button class="btn-pdf" onclick="exportPDF('products')"><i class="fa fa-file-pdf"></i> Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-icon" style="background:rgba(16,185,129,.12)">O</div>
+        <div><div class="report-card-title">Orders Report</div><div class="report-card-sub">Customer, items, total, status, date</div></div>
+      </div>
+      <div class="report-card-body">
+        <div class="filter-row">
+          <label>From:</label><input type="date" id="ord-from" class="di">
+          <label>To:</label><input type="date" id="ord-to" class="di">
+          <select id="ord-status" class="di">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="report-meta">
+          <span class="rml">Orders</span><span class="rmv" id="ord-count">-</span>
+          <span class="rml">Revenue</span><span class="rmv" id="ord-rev">-</span>
+          <span class="rml">Avg Order</span><span class="rmv" id="ord-avg">-</span>
+          <span class="rml">Delivered</span><span class="rmv" id="ord-del">-</span>
+        </div>
+        <div class="report-btns">
+          <button class="btn-csv" onclick="exportCSV('orders')"><i class="fa fa-file-csv"></i> Download CSV</button>
+          <button class="btn-pdf" onclick="exportPDF('orders')"><i class="fa fa-file-pdf"></i> Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-icon" style="background:rgba(139,92,246,.12)">U</div>
+        <div><div class="report-card-title">Users Report</div><div class="report-card-sub">Name, email, role, join date</div></div>
+      </div>
+      <div class="report-card-body">
+        <div class="report-meta">
+          <span class="rml">Total Users</span><span class="rmv" id="usr-count">-</span>
+          <span class="rml">Admins</span><span class="rmv" id="usr-admins">-</span>
+          <span class="rml">Banned</span><span class="rmv" id="usr-banned">-</span>
+          <span class="rml">This Month</span><span class="rmv" id="usr-new">-</span>
+        </div>
+        <div class="report-btns">
+          <button class="btn-csv" onclick="exportCSV('users')"><i class="fa fa-file-csv"></i> Download CSV</button>
+          <button class="btn-pdf" onclick="exportPDF('users')"><i class="fa fa-file-pdf"></i> Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-icon" style="background:rgba(245,158,11,.12)">R</div>
+        <div><div class="report-card-title">Revenue Summary</div><div class="report-card-sub">Monthly breakdown, payment methods</div></div>
+      </div>
+      <div class="report-card-body">
+        <div class="report-meta">
+          <span class="rml">Total Revenue</span><span class="rmv" id="rev-total">-</span>
+          <span class="rml">This Month</span><span class="rmv" id="rev-month">-</span>
+          <span class="rml">COD Orders</span><span class="rmv" id="rev-cod">-</span>
+          <span class="rml">Coupon Savings</span><span class="rmv" id="rev-coupon">-</span>
+        </div>
+        <div class="report-btns">
+          <button class="btn-csv" onclick="exportCSV('revenue')"><i class="fa fa-file-csv"></i> Download CSV</button>
+          <button class="btn-pdf" onclick="exportPDF('revenue')"><i class="fa fa-file-pdf"></i> Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Preview Table -->
+  <div class="preview-section">
+    <div class="preview-head">
+      <span style="font-size:.82rem;font-weight:700;color:var(--t1)" id="preview-title">Data Preview</span>
+      <span style="font-size:.72rem;color:var(--t3)" id="preview-count">Click any export button to see a preview</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="preview-table" style="font-size:.75rem">
+        <thead id="preview-thead"></thead>
+        <tbody id="preview-tbody">
+          <tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--t3)">Select a report to preview data here.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</main>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spin-lg"></div>
+  <div class="loading-text" id="loading-text">Generating report...</div>
+</div>
+<div class="toast-container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+
+<script type="module">
+import { requireAdmin, getProducts, getOrders, getUsers, formatCurrency, formatDate, showToast } from './js/admin-firebase.js';
+import { injectLayout } from './js/admin-layout.js';
+
+injectLayout('Reports');
+
+let D = { products:[], orders:[], users:[] };
+
+requireAdmin(async () => {
+  ge('page-body').style.display = 'block';
+  showLoad('Loading all data...');
+  try {
+    const [p, o, u] = await Promise.all([ getProducts(), getOrders(), getUsers() ]);
+    D.products = p; D.orders = o; D.users = u;
+    fillStats();
+  } catch(e) { showToast('Error', e.message, 'error'); }
+  hideLoad();
+});
+
+function fillStats() {
+  const p = D.products, o = D.orders, u = D.users;
+  const revenue  = o.reduce((s,x) => s+(x.total||0), 0);
+  const oos      = p.filter(x => (x.stock||0) <= 0).length;
+  const cats     = new Set(p.map(x => x.category).filter(Boolean)).size;
+  const avgPrice = p.length ? p.reduce((s,x) => s+(x.price||0),0)/p.length : 0;
+  const delivered = o.filter(x => x.status==='delivered').length;
+  const avgOrder  = o.length ? revenue/o.length : 0;
+  const admins    = u.filter(x => x.role==='admin').length;
+  const banned    = u.filter(x => x.banned).length;
+  const now       = new Date();
+  const newUsers  = u.filter(x => {
+    if (!x.createdAt) return false;
+    const d = x.createdAt.toDate ? x.createdAt.toDate() : new Date(x.createdAt);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).length;
+  const monthRev = o.filter(x => {
+    if (!x.createdAt) return false;
+    const d = x.createdAt.toDate ? x.createdAt.toDate() : new Date(x.createdAt);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).reduce((s,x) => s+(x.total||0), 0);
+  const codOrders   = o.filter(x => x.paymentMethod==='cod').length;
+  const couponSaved = o.reduce((s,x) => s+(x.couponDiscount||0), 0);
+
+  s('sm-products', p.length);  s('sm-orders', o.length);
+  s('sm-users', u.length);     s('sm-revenue', formatCurrency(revenue));
+  s('prod-count', p.length);   s('prod-oos', oos);
+  s('prod-avg', formatCurrency(avgPrice)); s('prod-cats', cats);
+  s('ord-count', o.length);    s('ord-rev', formatCurrency(revenue));
+  s('ord-avg', formatCurrency(avgOrder)); s('ord-del', delivered);
+  s('usr-count', u.length);    s('usr-admins', admins);
+  s('usr-banned', banned);     s('usr-new', newUsers);
+  s('rev-total', formatCurrency(revenue)); s('rev-month', formatCurrency(monthRev));
+  s('rev-cod', codOrders);     s('rev-coupon', formatCurrency(couponSaved));
+}
+
+function filteredOrders() {
+  const from = ge('ord-from').value, to = ge('ord-to').value, st = ge('ord-status').value;
+  return D.orders.filter(o => {
+    if (st && o.status !== st) return false;
+    if (from||to) {
+      const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt||0);
+      if (from && d < new Date(from)) return false;
+      if (to   && d > new Date(to+'T23:59:59')) return false;
+    }
+    return true;
+  });
+}
+
+function monthlyRevenue() {
+  const map = {};
+  D.orders.forEach(o => {
+    if (!o.createdAt) return;
+    const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    if (!map[k]) map[k] = { orders:0, revenue:0, cod:0, coupon:0 };
+    map[k].orders++;
+    map[k].revenue += o.total||0;
+    if (o.paymentMethod==='cod') map[k].cod++;
+    map[k].coupon += o.couponDiscount||0;
+  });
+  return map;
+}
+
+// ====================================
+//  CSV
+// ====================================
+window.exportCSV = function(type) {
+  showLoad('Generating CSV...');
+  setTimeout(() => {
+    try {
+      let csv='', fname='';
+      if (type==='products') {
+        fname = 'LUXE_Products_'+ds()+'.csv';
+        csv = makeCSV(
+          ['ID','Name','Category','Price','Original Price','Stock','Rating','Reviews','Badge','Featured','Created'],
+          D.products.map(p => [p.id, p.name||'', p.category||'', p.price||0, p.originalPrice||'', p.stock||0, (p.rating||0).toFixed(1), p.reviews||p.reviewCount||0, p.badge||'', p.featured?'Yes':'No', formatDate(p.createdAt)])
+        );
+        renderPreview('products', D.products);
+      } else if (type==='orders') {
+        const orders = filteredOrders();
+        fname = 'LUXE_Orders_'+ds()+'.csv';
+        csv = makeCSV(
+          ['Order ID','Customer Name','Email','Phone','No. of Items','Subtotal','Shipping','COD Fee','Coupon Code','Coupon Discount','Total','Payment','Status','City','State','Pincode','Date'],
+          orders.map(o => ['#'+o.id.slice(-8).toUpperCase(), o.shippingAddress?.name||'', o.userEmail||'', o.shippingAddress?.phone||'', (o.items||[]).length, o.subtotal||0, o.shipping||0, o.codCharge||0, o.couponCode||'', o.couponDiscount||0, o.total||0, o.paymentMethod||'cod', o.status||'pending', o.shippingAddress?.city||'', o.shippingAddress?.state||'', o.shippingAddress?.pincode||'', formatDate(o.createdAt)])
+        );
+        renderPreview('orders', orders);
+      } else if (type==='users') {
+        fname = 'LUXE_Users_'+ds()+'.csv';
+        csv = makeCSV(
+          ['User ID','Name','Email','Role','Active','Phone','Joined'],
+          D.users.map(u => [u.id, u.displayName||u.name||'', u.email||'', u.role||'customer', u.banned?'Banned':'Active', u.phone||'', formatDate(u.createdAt)])
+        );
+        renderPreview('users', D.users);
+      } else if (type==='revenue') {
+        fname = 'LUXE_Revenue_'+ds()+'.csv';
+        const map = monthlyRevenue();
+        csv = makeCSV(
+          ['Month','Total Orders','Revenue (INR)','COD Orders','Coupon Savings (INR)'],
+          Object.entries(map).sort().map(([m,d]) => [m, d.orders, Math.round(d.revenue), d.cod, Math.round(d.coupon)])
+        );
+      }
+      dlCSV(csv, fname);
+      showToast('Downloaded!', fname, 'success');
+    } catch(e) { showToast('Error', e.message, 'error'); }
+    hideLoad();
+  }, 250);
+};
+
+// ====================================
+//  PDF
+// ====================================
+window.exportPDF = function(type) {
+  showLoad('Generating PDF...');
+  setTimeout(() => {
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc  = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+      const pw   = doc.internal.pageSize.getWidth();
+      const ph   = doc.internal.pageSize.getHeight();
+
+      function drawHeader(subtitle) {
+        doc.setFillColor(10, 14, 20);
+        doc.rect(0, 0, pw, 24, 'F');
+        doc.setFillColor(201, 169, 110);
+        doc.rect(0, 24, pw, 1.5, 'F');
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(15);
+        doc.setTextColor(245, 240, 232);
+        doc.text('LUXE', 14, 15);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(9);
+        doc.setTextColor(154, 154, 154);
+        const titles = { products:'Products Report', orders:'Orders Report', users:'Users Report', revenue:'Revenue Summary' };
+        doc.text(titles[type]||'Report', 30, 15);
+        doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 15, {align:'right'});
+        doc.setFontSize(8);
+        doc.text(subtitle, 14, 31);
+      }
+
+      function drawFooter() {
+        const pages = doc.internal.getNumberOfPages();
+        for (let i=1; i<=pages; i++) {
+          doc.setPage(i);
+          doc.setFillColor(201, 169, 110);
+          doc.rect(0, ph-3, pw, 1.2, 'F');
+          doc.setFontSize(7);
+          doc.setTextColor(80, 85, 100);
+          doc.text('LUXE Admin - Confidential Report', 14, ph-6);
+          doc.text('Page '+i+' of '+pages, pw-14, ph-6, {align:'right'});
+        }
+      }
+
+      const tStyles = {
+        styles:{ font:'helvetica', fontSize:8, cellPadding:{top:3.5,bottom:3.5,left:4,right:4}, lineColor:[30,35,50], lineWidth:0.3, textColor:[210,205,195], fillColor:[13,17,23] },
+        headStyles:{ fillColor:[28,38,52], textColor:[201,169,110], fontStyle:'bold', fontSize:8.5, halign:'center' },
+        alternateRowStyles:{ fillColor:[18,24,32] },
+        columnStyles:{ 0:{ halign:'center', cellWidth:9 } },
+        margin:{ left:14, right:14 },
+        startY:36,
+      };
+
+      let fname='', head=[], body=[], subtitle='';
+
+      if (type==='products') {
+        fname = 'LUXE_Products_'+ds()+'.pdf';
+        subtitle = 'Total products: '+D.products.length+' | Out of stock: '+D.products.filter(x=>(x.stock||0)<=0).length;
+        head = [['#','Name','Category','Price','Orig. Price','Stock','Rating','Reviews','Badge','Featured']];
+        body = D.products.map((p,i) => [i+1, (p.name||'').slice(0,28), p.category||'-', formatCurrency(p.price||0), p.originalPrice?formatCurrency(p.originalPrice):'-', p.stock||0, (p.rating||0).toFixed(1), p.reviews||p.reviewCount||0, p.badge||'-', p.featured?'Yes':'No']);
+        renderPreview('products', D.products);
+      } else if (type==='orders') {
+        const orders = filteredOrders();
+        fname = 'LUXE_Orders_'+ds()+'.pdf';
+        const rev = orders.reduce((s,o)=>s+(o.total||0),0);
+        subtitle = 'Total orders: '+orders.length+' | Revenue: '+formatCurrency(rev);
+        head = [['#','Order ID','Customer','Email','Items','Total','Payment','Status','City','Date']];
+        body = orders.map((o,i) => [i+1,'#'+o.id.slice(-8).toUpperCase(),(o.shippingAddress?.name||'').slice(0,16),(o.userEmail||'').slice(0,20),(o.items||[]).length,formatCurrency(o.total||0),(o.paymentMethod||'cod').toUpperCase(),(o.status||'pending').toUpperCase(),(o.shippingAddress?.city||'-').slice(0,10),formatDate(o.createdAt)]);
+        renderPreview('orders', orders);
+      } else if (type==='users') {
+        fname = 'LUXE_Users_'+ds()+'.pdf';
+        subtitle = 'Total users: '+D.users.length+' | Admins: '+D.users.filter(x=>x.role==='admin').length;
+        head = [['#','Name','Email','Role','Status','Phone','Joined']];
+        body = D.users.map((u,i) => [i+1,(u.displayName||u.name||'').slice(0,18),(u.email||'').slice(0,26),(u.role||'customer').toUpperCase(),u.banned?'BANNED':'Active',u.phone||'-',formatDate(u.createdAt)]);
+        renderPreview('users', D.users);
+      } else if (type==='revenue') {
+        fname = 'LUXE_Revenue_'+ds()+'.pdf';
+        const totalRev = D.orders.reduce((s,o)=>s+(o.total||0),0);
+        subtitle = 'Total revenue: '+formatCurrency(totalRev);
+        const map = monthlyRevenue();
+        head = [['Month','Total Orders','Revenue (INR)','COD Orders','Coupon Savings']];
+        body = Object.entries(map).sort().map(([m,d]) => [m, d.orders, formatCurrency(d.revenue), d.cod, formatCurrency(d.coupon)]);
+      }
+
+      drawHeader(subtitle);
+      doc.autoTable({ ...tStyles, head, body });
+      drawFooter();
+      doc.save(fname);
+      showToast('Downloaded!', fname, 'success');
+    } catch(e) { showToast('Error', 'PDF failed: '+e.message, 'error'); console.error(e); }
+    hideLoad();
+  }, 350);
+};
+
+// ====================================
+//  PREVIEW TABLE
+// ====================================
+function renderPreview(type, data) {
+  const limit = 8;
+  const title = { products:'Products', orders:'Orders', users:'Users' };
+  ge('preview-title').textContent = (title[type]||type) + ' Preview';
+  ge('preview-count').textContent = 'Showing '+Math.min(limit,data.length)+' of '+data.length;
+
+  if (type==='products') {
+    ge('preview-thead').innerHTML = '<tr><th>#</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Rating</th><th>Badge</th></tr>';
+    ge('preview-tbody').innerHTML = data.slice(0,limit).map((p,i) =>
+      '<tr><td>'+(i+1)+'</td><td style="font-weight:600">'+(p.name||'-')+'</td><td>'+(p.category||'-')+'</td><td style="color:var(--green)">'+formatCurrency(p.price||0)+'</td><td style="color:'+((p.stock||0)<=5?'var(--red)':'var(--t2)')+'">'+((p.stock||0))+'</td><td>'+(p.rating||0).toFixed(1)+'</td><td>'+(p.badge||'-')+'</td></tr>'
+    ).join('');
+  } else if (type==='orders') {
+    const sc = {pending:'var(--amber)',processing:'var(--blue)',shipped:'var(--purple)',delivered:'var(--green)',cancelled:'var(--red)'};
+    ge('preview-thead').innerHTML = '<tr><th>#</th><th>Order ID</th><th>Customer</th><th>Total</th><th>Items</th><th>Status</th><th>Date</th></tr>';
+    ge('preview-tbody').innerHTML = data.slice(0,limit).map((o,i) =>
+      '<tr><td>'+(i+1)+'</td><td style="font-family:var(--mono);font-size:.7rem;color:var(--blue)">#'+o.id.slice(-8).toUpperCase()+'</td><td style="font-weight:600">'+(o.shippingAddress?.name||o.userEmail||'-')+'</td><td style="color:var(--green)">'+formatCurrency(o.total||0)+'</td><td>'+(o.items||[]).length+'</td><td style="color:'+(sc[o.status]||'var(--t2)')+';font-weight:700">'+(o.status||'pending')+'</td><td style="font-size:.7rem;color:var(--t3)">'+formatDate(o.createdAt)+'</td></tr>'
+    ).join('');
+  } else if (type==='users') {
+    ge('preview-thead').innerHTML = '<tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Phone</th><th>Joined</th></tr>';
+    ge('preview-tbody').innerHTML = data.slice(0,limit).map((u,i) =>
+      '<tr><td>'+(i+1)+'</td><td style="font-weight:600">'+(u.displayName||u.name||'-')+'</td><td style="font-size:.7rem">'+(u.email||'-')+'</td><td style="color:'+(u.role==='admin'?'var(--blue)':'var(--t2)')+';font-weight:700">'+(u.role||'customer')+'</td><td style="color:'+(u.banned?'var(--red)':'var(--green)')+'">'+( u.banned?'Banned':'Active')+'</td><td>'+(u.phone||'-')+'</td><td style="font-size:.7rem;color:var(--t3)">'+formatDate(u.createdAt)+'</td></tr>'
+    ).join('');
+  }
+}
+
+// ====================================
+//  HELPERS
+// ====================================
+function makeCSV(headers, rows) {
+  const esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  return '\uFEFF' + [headers.map(esc), ...rows.map(r => r.map(esc))].map(r=>r.join(',')).join('\r\n');
+}
+function dlCSV(csv, fname) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = fname; a.click();
+}
+function ds() { return new Date().toISOString().slice(0,10); }
+function ge(id) { return document.getElementById(id); }
+function s(id,v) { const el=ge(id); if(el) el.textContent=v; }
+function showLoad(msg) { ge('loading-text').textContent=msg||'Loading...'; ge('loading-overlay').classList.add('show'); }
+function hideLoad() { ge('loading-overlay').classList.remove('show'); }
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Users — LUXE Admin</title>
+  <title>Users - LUXE Admin</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -28,6 +28,12 @@
         <option value="admin">Admin</option>
         <option value="customer">Customer</option>
       </select>
+      <button class="btn btn-outline btn-sm" style="font-size:.75rem;color:var(--green);border-color:rgba(16,185,129,.3)" onclick="doExport('csv')">
+        <i class="fa fa-file-csv"></i> CSV
+      </button>
+      <button class="btn btn-outline btn-sm" style="font-size:.75rem;color:var(--red);border-color:rgba(239,68,68,.3)" onclick="doExport('pdf')">
+        <i class="fa fa-file-pdf"></i> PDF
+      </button>
     </div>
   </div>
 
@@ -143,7 +149,7 @@ function render(users) {
           </div>
         </div>
       </td>
-      <td style="font-size:.78rem;color:var(--t2)">${u.email||'—'}</td>
+      <td style="font-size:.78rem;color:var(--t2)">${u.email||'-'}</td>
       <td>${u.role==='admin'?'<span class="badge badge-blue">Admin</span>':'<span class="badge badge-gray">Customer</span>'}</td>
       <td class="hide-mobile">${u.banned?'<span class="badge badge-red">Banned</span>':'<span class="badge badge-green">Active</span>'}</td>
       <td class="hide-mobile" style="font-size:.73rem;color:var(--t3);font-family:var(--mono)">${formatDate(u.createdAt)}</td>
@@ -225,7 +231,7 @@ window.openUser=id=>{
 function row(label,val){
   return `<div style="display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.82rem">
     <span style="color:var(--t3)">${label}</span>
-    <span style="color:var(--t1)">${val||'—'}</span>
+    <span style="color:var(--t1)">${val||'-'}</span>
   </div>`;
 }
 
@@ -233,6 +239,68 @@ window.OM=id=>document.getElementById(id)?.classList.add('open');
 window.CM=id=>document.getElementById(id)?.classList.remove('open');
 document.getElementById('user-modal')?.addEventListener('click',e=>{ if(e.target===e.currentTarget) CM('user-modal'); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') CM('user-modal'); });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+// == EXPORT (CSV + PDF) ==============================
+const _ds = () => new Date().toISOString().slice(0,10);
+const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+function _dlCSV(csv,fname){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=fname; a.click();
+}
+function _makeCSV(headers,rows){
+  return '\uFEFF'+[headers.map(_esc),...rows.map(r=>r.map(_esc))].map(r=>r.join(',')).join('\r\n');
+}
+
+window.doExport = function(type) {
+  if (!all.length) { alert('No users to export!'); return; }
+  const headers = ['#','Name','Email','Role','Status','Phone','Joined Date'];
+  const rows = all.map((u,i) => [
+    i+1, u.displayName||u.name||'', u.email||'',
+    u.role||'customer', u.banned?'Banned':'Active',
+    u.phone||'', formatDate(u.createdAt)
+  ]);
+
+  if (type === 'csv') {
+    _dlCSV(_makeCSV(headers, rows), 'LUXE_Users_'+_ds()+'.csv');
+    return;
+  }
+
+  // PDF
+  if (!window.jspdf) { alert('PDF library loading... try again in 2 seconds.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const pw  = doc.internal.pageSize.getWidth();
+  const ph  = doc.internal.pageSize.getHeight();
+  doc.setFillColor(10,14,20); doc.rect(0,0,pw,22,'F');
+  doc.setFillColor(201,169,110); doc.rect(0,22,pw,1.5,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(245,240,232);
+  doc.text('LUXE', 14, 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(154,154,154);
+  doc.text('Users Report', 28, 14);
+  doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
+  doc.setFontSize(8);
+  doc.text('Total users: '+all.length+' | Admins: '+all.filter(u=>u.role==="admin").length, 14, 29);
+  doc.autoTable({
+    head: [headers], body: rows, startY: 33,
+    styles:{ font:'helvetica',fontSize:8,cellPadding:{top:3,bottom:3,left:3.5,right:3.5},lineColor:[30,35,50],lineWidth:0.3,textColor:[210,205,195],fillColor:[13,17,23] },
+    headStyles:{ fillColor:[28,38,52],textColor:[201,169,110],fontStyle:'bold' },
+    alternateRowStyles:{ fillColor:[18,24,32] },
+    columnStyles:{ 0:{halign:'center',cellWidth:8} },
+    margin:{ left:14, right:14 },
+    didDrawPage: d => {
+      const pg=d.pageNumber, tot=doc.internal.getNumberOfPages();
+      doc.setFillColor(201,169,110); doc.rect(0,ph-3,pw,1.2,'F');
+      doc.setFontSize(7); doc.setTextColor(80,85,100);
+      doc.text('LUXE Admin - Confidential',14,ph-6);
+      doc.text('Page '+pg+' of '+tot,pw-14,ph-6,{align:'right'});
+    }
+  });
+  doc.save('LUXE_Users_'+_ds()+'.pdf');
+};
+
 </script>
 </body>
 </html>

@@ -31,6 +31,9 @@ export function injectLayout(pageTitle = 'Dashboard') {
       <a href="coupons.html" class="sidebar__link">
         <span class="icon">🎟️</span><span>Coupons</span>
       </a>
+      <a href="reports.html" class="sidebar__link">
+        <span class="icon">R</span><span>Reports</span>
+      </a>
       <div class="sidebar__section-label" style="margin-top:1.5rem">Store</div>
       <a href="../index.html" class="sidebar__link" target="_blank">
         <span class="icon">🏪</span><span>View Store</span>

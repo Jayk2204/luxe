@@ -31,6 +31,12 @@
         <option value="delivered">Delivered</option>
         <option value="cancelled">Cancelled</option>
       </select>
+      <button class="btn btn-outline btn-sm" style="font-size:.75rem;color:var(--green);border-color:rgba(16,185,129,.3)" onclick="doExport('csv')">
+        <i class="fa fa-file-csv"></i> CSV
+      </button>
+      <button class="btn btn-outline btn-sm" style="font-size:.75rem;color:var(--red);border-color:rgba(239,68,68,.3)" onclick="doExport('pdf')">
+        <i class="fa fa-file-pdf"></i> PDF
+      </button>
     </div>
   </div>
 
@@ -358,6 +364,84 @@ document.getElementById('order-modal')?.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') CM('order-modal');
 });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+// == EXPORT (CSV + PDF) ==============================
+const _ds = () => new Date().toISOString().slice(0,10);
+const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+function _dlCSV(csv,fname){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=fname; a.click();
+}
+function _makeCSV(headers,rows){
+  return '\uFEFF'+[headers.map(_esc),...rows.map(r=>r.map(_esc))].map(r=>r.join(',')).join('\r\n');
+}
+function _fmt(n){ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:0}).format(Math.round(n||0)); }
+
+window.doExport = function(type) {
+  const data = all;
+  if (!data.length) { alert('No orders to export!'); return; }
+  const headers = ['#','Order ID','Customer','Email','Phone','Items','Subtotal','Shipping','COD Fee','Coupon','Discount','Total','Payment','Status','City','State','Pincode','Date'];
+  const rows = data.map((o,i) => [
+    i+1, '#'+o.id.slice(-8).toUpperCase(),
+    o.shippingAddress?.name||'', o.userEmail||'',
+    o.shippingAddress?.phone||'', (o.items||[]).length,
+    o.subtotal||0, o.shipping||0, o.codCharge||0,
+    o.couponCode||'', o.couponDiscount||0, o.total||0,
+    o.paymentMethod||'cod', o.status||'pending',
+    o.shippingAddress?.city||'', o.shippingAddress?.state||'',
+    o.shippingAddress?.pincode||'', formatDate(o.createdAt)
+  ]);
+
+  if (type === 'csv') {
+    _dlCSV(_makeCSV(headers, rows), 'LUXE_Orders_'+_ds()+'.csv');
+    return;
+  }
+
+  // PDF
+  if (!window.jspdf) { alert('PDF library loading... try again in 2 seconds.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const pw  = doc.internal.pageSize.getWidth();
+  const ph  = doc.internal.pageSize.getHeight();
+  const rev = data.reduce((s,o)=>s+(o.total||0),0);
+  doc.setFillColor(10,14,20); doc.rect(0,0,pw,22,'F');
+  doc.setFillColor(201,169,110); doc.rect(0,22,pw,1.5,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(245,240,232);
+  doc.text('LUXE', 14, 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(154,154,154);
+  doc.text('Orders Report', 28, 14);
+  doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
+  doc.setFontSize(8); doc.text('Total orders: '+data.length+' | Revenue: '+_fmt(rev), 14, 29);
+  // Compact PDF columns (fewer cols fit better)
+  const pdfHeaders = [['#','Order ID','Customer','Email','Items','Total','Payment','Status','City','Date']];
+  const pdfRows = data.map((o,i) => [
+    i+1, '#'+o.id.slice(-8).toUpperCase(),
+    (o.shippingAddress?.name||'').slice(0,16), (o.userEmail||'').slice(0,20),
+    (o.items||[]).length, _fmt(o.total||0),
+    (o.paymentMethod||'cod').toUpperCase(), (o.status||'pending').toUpperCase(),
+    (o.shippingAddress?.city||'-').slice(0,10), formatDate(o.createdAt)
+  ]);
+  doc.autoTable({
+    head: pdfHeaders, body: pdfRows, startY: 33,
+    styles:{ font:'helvetica',fontSize:8,cellPadding:{top:3,bottom:3,left:3.5,right:3.5},lineColor:[30,35,50],lineWidth:0.3,textColor:[210,205,195],fillColor:[13,17,23] },
+    headStyles:{ fillColor:[28,38,52],textColor:[201,169,110],fontStyle:'bold' },
+    alternateRowStyles:{ fillColor:[18,24,32] },
+    columnStyles:{ 0:{halign:'center',cellWidth:8} },
+    margin:{ left:14, right:14 },
+    didDrawPage: d => {
+      const pg=d.pageNumber, tot=doc.internal.getNumberOfPages();
+      doc.setFillColor(201,169,110); doc.rect(0,ph-3,pw,1.2,'F');
+      doc.setFontSize(7); doc.setTextColor(80,85,100);
+      doc.text('LUXE Admin - Confidential',14,ph-6);
+      doc.text('Page '+pg+' of '+tot,pw-14,ph-6,{align:'right'});
+    }
+  });
+  doc.save('LUXE_Orders_'+_ds()+'.pdf');
+};
+
 </script>
 </body>
 </html>

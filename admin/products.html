@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products — LUXE Admin</title>
+  <title>Products - LUXE Admin</title>
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -37,7 +37,15 @@
         <option>Jackets</option><option>Dresses</option><option>Blazers</option>
         <option>Tops</option><option>Suits</option><option>Coats</option><option>Accessories</option>
       </select>
-      <button class="btn btn-primary" id="add-btn"><i class="fa fa-plus"></i> Add Product</button>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-outline btn-sm" id="btn-csv-prod" style="font-size:.75rem;color:var(--green);border-color:rgba(16,185,129,.3)" onclick="doExport('csv')">
+          <i class="fa fa-file-csv"></i> CSV
+        </button>
+        <button class="btn btn-outline btn-sm" id="btn-pdf-prod" style="font-size:.75rem;color:var(--red);border-color:rgba(239,68,68,.3)" onclick="doExport('pdf')">
+          <i class="fa fa-file-pdf"></i> PDF
+        </button>
+        <button class="btn btn-primary" id="add-btn"><i class="fa fa-plus"></i> Add Product</button>
+      </div>
     </div>
   </div>
 
@@ -157,7 +165,7 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Rating (0–5)</label>
+          <label class="form-label">Rating (0-5)</label>
           <input type="number" class="form-control" id="prat" placeholder="4.8" min="0" max="5" step="0.1">
         </div>
         <div class="form-group">
@@ -225,7 +233,7 @@ requireAdmin(async (user, profile) => {
   await load();
 });
 
-// ── Key ───────────────────────────────────────────────────
+// -- Key ---------------------------------------------------
 window.saveKey = v => { localStorage.setItem('imgbb_key',v.trim()); applyKeyUI(v.trim()); };
 function applyKeyUI(v) {
   const bar=document.getElementById('key-bar'), st=document.getElementById('key-st');
@@ -233,7 +241,7 @@ function applyKeyUI(v) {
   else { bar.classList.remove('has-key'); st.textContent=''; }
 }
 
-// ── Load ──────────────────────────────────────────────────
+// -- Load --------------------------------------------------
 async function load() {
   try {
     all = await getProducts();
@@ -266,7 +274,7 @@ function render(list) {
         <strong>${p.name}</strong>
         ${(p.tags||[]).length?`<div style="font-size:.66rem;color:var(--t3);margin-top:.1rem">${p.tags.slice(0,3).join(' · ')}</div>`:''}
       </td>
-      <td><span class="badge badge-blue">${p.category||'—'}</span></td>
+      <td><span class="badge badge-blue">${p.category||'-'}</span></td>
       <td>
         <strong>${formatCurrency(p.price)}</strong>
         ${p.originalPrice?`<div style="font-size:.68rem;color:var(--t3);text-decoration:line-through">${formatCurrency(p.originalPrice)}</div>`:''}
@@ -275,7 +283,7 @@ function render(list) {
         ${p.stock??0}
       </td>
       <td class="hide-mobile">
-        ${p.badge?`<span class="badge ${p.badge==='New'?'badge-blue':p.badge==='Sale'?'badge-red':'badge-amber'}">${p.badge}</span>`:'<span style="color:var(--t3)">—</span>'}
+        ${p.badge?`<span class="badge ${p.badge==='New'?'badge-blue':p.badge==='Sale'?'badge-red':'badge-amber'}">${p.badge}</span>`:'<span style="color:var(--t3)">-</span>'}
       </td>
       <td>
         <div style="display:flex;gap:.35rem;justify-content:flex-end">
@@ -290,7 +298,7 @@ function render(list) {
   }).join('');
 }
 
-// ── Search + filter ───────────────────────────────────────
+// -- Search + filter ---------------------------------------
 const si = document.getElementById('search');
 const cf = document.getElementById('cat-filter');
 function filter() {
@@ -302,7 +310,7 @@ function filter() {
 si?.addEventListener('input', debounce(filter,250));
 cf?.addEventListener('change', filter);
 
-// ── Image upload (ImgBB) ──────────────────────────────────
+// -- Image upload (ImgBB) ----------------------------------
 async function uploadImgBB(file) {
   const key = document.getElementById('imgbb-key').value.trim()||localStorage.getItem('imgbb_key')||'';
   if (!key) { showToast('Key Missing','Enter ImageBB API key!','error'); throw new Error('no key'); }
@@ -357,7 +365,7 @@ function renderImgs() {
 }
 window.rmImg = i => { imgs.splice(i,1); renderImgs(); };
 
-// ── Modals ────────────────────────────────────────────────
+// -- Modals ------------------------------------------------
 window.OM = id => document.getElementById(id)?.classList.add('open');
 window.CM = id => document.getElementById(id)?.classList.remove('open');
 
@@ -454,6 +462,68 @@ document.getElementById('del-btn').addEventListener('click',async()=>{
 
 ['prod-modal','del-modal'].forEach(id=>{ document.getElementById(id)?.addEventListener('click',e=>{ if(e.target===e.currentTarget) CM(id); }); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){CM('prod-modal');CM('del-modal');} });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+// == EXPORT (CSV + PDF) ==============================
+const _ds = () => new Date().toISOString().slice(0,10);
+const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+function _dlCSV(csv,fname){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=fname; a.click();
+}
+function _makeCSV(headers,rows){
+  return '\uFEFF'+[headers.map(_esc),...rows.map(r=>r.map(_esc))].map(r=>r.join(',')).join('\r\n');
+}
+
+window.doExport = function(type) {
+  if (!all.length) { alert('No data to export!'); return; }
+  const rows = all.map((p,i) => [
+    i+1, p.name||'', p.category||'', p.price||0,
+    p.originalPrice||'', p.stock||0,
+    (p.rating||0).toFixed(1), p.reviews||p.reviewCount||0,
+    p.badge||'', p.featured?'Yes':'No'
+  ]);
+  const headers = ['#','Name','Category','Price (INR)','Orig. Price','Stock','Rating','Reviews','Badge','Featured'];
+
+  if (type === 'csv') {
+    _dlCSV(_makeCSV(headers, rows), 'LUXE_Products_'+_ds()+'.csv');
+    return;
+  }
+
+  // PDF
+  if (!window.jspdf) { alert('PDF library loading... try again in 2 seconds.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const pw  = doc.internal.pageSize.getWidth();
+  const ph  = doc.internal.pageSize.getHeight();
+  doc.setFillColor(10,14,20); doc.rect(0,0,pw,22,'F');
+  doc.setFillColor(201,169,110); doc.rect(0,22,pw,1.5,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(245,240,232);
+  doc.text('LUXE', 14, 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(154,154,154);
+  doc.text('Products Report', 28, 14);
+  doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
+  doc.setFontSize(8); doc.text('Total products: '+all.length, 14, 29);
+  doc.autoTable({
+    head: [headers], body: rows, startY: 33,
+    styles:{ font:'helvetica',fontSize:8,cellPadding:{top:3,bottom:3,left:3.5,right:3.5},lineColor:[30,35,50],lineWidth:0.3,textColor:[210,205,195],fillColor:[13,17,23] },
+    headStyles:{ fillColor:[28,38,52],textColor:[201,169,110],fontStyle:'bold' },
+    alternateRowStyles:{ fillColor:[18,24,32] },
+    columnStyles:{ 0:{halign:'center',cellWidth:8} },
+    margin:{ left:14, right:14 },
+    didDrawPage: d => {
+      const pg=d.pageNumber, tot=doc.internal.getNumberOfPages();
+      doc.setFillColor(201,169,110); doc.rect(0,ph-3,pw,1.2,'F');
+      doc.setFontSize(7); doc.setTextColor(80,85,100);
+      doc.text('LUXE Admin - Confidential',14,ph-6);
+      doc.text('Page '+pg+' of '+tot,pw-14,ph-6,{align:'right'});
+    }
+  });
+  doc.save('LUXE_Products_'+_ds()+'.pdf');
+};
+
 </script>
 </body>
 </html>
