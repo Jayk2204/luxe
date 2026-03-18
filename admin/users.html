@@ -93,6 +93,7 @@ import { injectLayout } from './js/admin-layout.js';
 injectLayout('Users');
 
 let all=[], selected=null;
+window._allUsers = all;
 
 requireAdmin(async (user, profile) => {
   document.getElementById('page-body').style.display='block';
@@ -102,6 +103,7 @@ requireAdmin(async (user, profile) => {
 async function load() {
   try {
     all=await getUsers();
+    window._allUsers = all;
     renderStats(all);
     document.getElementById('count-lbl').textContent=`${all.length} users total`;
     render(all);
@@ -241,7 +243,8 @@ document.getElementById('user-modal')?.addEventListener('click',e=>{ if(e.target
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') CM('user-modal'); });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+<script>
 // == EXPORT (CSV + PDF) ==============================
 const _ds = () => new Date().toISOString().slice(0,10);
 const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
@@ -255,12 +258,14 @@ function _makeCSV(headers,rows){
 }
 
 window.doExport = function(type) {
-  if (!all.length) { alert('No users to export!'); return; }
+  const data = window._allUsers || [];
+  if (!data.length) { alert('No users to export!'); return; }
   const headers = ['#','Name','Email','Role','Status','Phone','Joined Date'];
-  const rows = all.map((u,i) => [
+  const rows = data.map((u,i) => [
     i+1, u.displayName||u.name||'', u.email||'',
     u.role||'customer', u.banned?'Banned':'Active',
-    u.phone||'', formatDate(u.createdAt)
+    u.phone||'',
+    u.createdAt ? (u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('en-IN') : new Date(u.createdAt).toLocaleDateString('en-IN')) : '-'
   ]);
 
   if (type === 'csv') {
@@ -282,7 +287,7 @@ window.doExport = function(type) {
   doc.text('Users Report', 28, 14);
   doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
   doc.setFontSize(8);
-  doc.text('Total users: '+all.length+' | Admins: '+all.filter(u=>u.role==="admin").length, 14, 29);
+  doc.text('Total users: '+data.length+' | Admins: '+data.filter(u=>u.role==="admin").length, 14, 29);
   doc.autoTable({
     head: [headers], body: rows, startY: 33,
     styles:{ font:'helvetica',fontSize:8,cellPadding:{top:3,bottom:3,left:3.5,right:3.5},lineColor:[30,35,50],lineWidth:0.3,textColor:[210,205,195],fillColor:[13,17,23] },
@@ -300,7 +305,6 @@ window.doExport = function(type) {
   });
   doc.save('LUXE_Users_'+_ds()+'.pdf');
 };
-
 </script>
 </body>
 </html>
