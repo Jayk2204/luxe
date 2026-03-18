@@ -111,6 +111,7 @@ import { injectLayout } from './js/admin-layout.js';
 injectLayout('Orders');
 
 let all = [], current = null;
+window._allOrders = all;
 
 requireAdmin(async () => {
   document.getElementById('page-body').style.display = 'block';
@@ -121,6 +122,7 @@ requireAdmin(async () => {
 async function load() {
   try {
     all = await getOrders();
+    window._allOrders = all;
     renderStats(all);
     document.getElementById('count-lbl').textContent = `${all.length} orders total`;
     render(all);
@@ -366,7 +368,8 @@ document.addEventListener('keydown', e => {
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+<script>
 // == EXPORT (CSV + PDF) ==============================
 const _ds = () => new Date().toISOString().slice(0,10);
 const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
@@ -381,7 +384,7 @@ function _makeCSV(headers,rows){
 function _fmt(n){ return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:0}).format(Math.round(n||0)); }
 
 window.doExport = function(type) {
-  const data = all;
+  const data = window._allOrders || [];
   if (!data.length) { alert('No orders to export!'); return; }
   const headers = ['#','Order ID','Customer','Email','Phone','Items','Subtotal','Shipping','COD Fee','Coupon','Discount','Total','Payment','Status','City','State','Pincode','Date'];
   const rows = data.map((o,i) => [
@@ -392,7 +395,7 @@ window.doExport = function(type) {
     o.couponCode||'', o.couponDiscount||0, o.total||0,
     o.paymentMethod||'cod', o.status||'pending',
     o.shippingAddress?.city||'', o.shippingAddress?.state||'',
-    o.shippingAddress?.pincode||'', formatDate(o.createdAt)
+    o.shippingAddress?.pincode||'', o.createdAt ? new Date(o.createdAt?.seconds ? o.createdAt.seconds*1000 : o.createdAt).toLocaleDateString('en-IN') : '-'
   ]);
 
   if (type === 'csv') {
@@ -415,14 +418,14 @@ window.doExport = function(type) {
   doc.text('Orders Report', 28, 14);
   doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
   doc.setFontSize(8); doc.text('Total orders: '+data.length+' | Revenue: '+_fmt(rev), 14, 29);
-  // Compact PDF columns (fewer cols fit better)
   const pdfHeaders = [['#','Order ID','Customer','Email','Items','Total','Payment','Status','City','Date']];
   const pdfRows = data.map((o,i) => [
     i+1, '#'+o.id.slice(-8).toUpperCase(),
     (o.shippingAddress?.name||'').slice(0,16), (o.userEmail||'').slice(0,20),
     (o.items||[]).length, _fmt(o.total||0),
     (o.paymentMethod||'cod').toUpperCase(), (o.status||'pending').toUpperCase(),
-    (o.shippingAddress?.city||'-').slice(0,10), formatDate(o.createdAt)
+    (o.shippingAddress?.city||'-').slice(0,10),
+    o.createdAt ? new Date(o.createdAt?.seconds ? o.createdAt.seconds*1000 : o.createdAt).toLocaleDateString('en-IN') : '-'
   ]);
   doc.autoTable({
     head: pdfHeaders, body: pdfRows, startY: 33,
@@ -441,7 +444,6 @@ window.doExport = function(type) {
   });
   doc.save('LUXE_Orders_'+_ds()+'.pdf');
 };
-
 </script>
 </body>
 </html>

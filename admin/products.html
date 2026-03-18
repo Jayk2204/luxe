@@ -222,6 +222,7 @@ import { injectLayout } from './js/admin-layout.js';
 injectLayout('Products');
 
 let all=[], editId=null, delId=null, imgs=[];
+window._allProducts = all;
 
 requireAdmin(async (user, profile) => {
 
@@ -245,6 +246,7 @@ function applyKeyUI(v) {
 async function load() {
   try {
     all = await getProducts();
+    window._allProducts = all;
     document.getElementById('count-lbl').textContent = `${all.length} products`;
     render(all);
   } catch(e) {
@@ -464,7 +466,8 @@ document.getElementById('del-btn').addEventListener('click',async()=>{
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){CM('prod-modal');CM('del-modal');} });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+<script>
 // == EXPORT (CSV + PDF) ==============================
 const _ds = () => new Date().toISOString().slice(0,10);
 const _esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
@@ -478,8 +481,9 @@ function _makeCSV(headers,rows){
 }
 
 window.doExport = function(type) {
-  if (!all.length) { alert('No data to export!'); return; }
-  const rows = all.map((p,i) => [
+  const data = window._allProducts || [];
+  if (!data.length) { alert('No data to export!'); return; }
+  const rows = data.map((p,i) => [
     i+1, p.name||'', p.category||'', p.price||0,
     p.originalPrice||'', p.stock||0,
     (p.rating||0).toFixed(1), p.reviews||p.reviewCount||0,
@@ -505,7 +509,7 @@ window.doExport = function(type) {
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(154,154,154);
   doc.text('Products Report', 28, 14);
   doc.text('Generated: '+new Date().toLocaleString('en-IN'), pw-14, 14, {align:'right'});
-  doc.setFontSize(8); doc.text('Total products: '+all.length, 14, 29);
+  doc.setFontSize(8); doc.text('Total products: '+data.length, 14, 29);
   doc.autoTable({
     head: [headers], body: rows, startY: 33,
     styles:{ font:'helvetica',fontSize:8,cellPadding:{top:3,bottom:3,left:3.5,right:3.5},lineColor:[30,35,50],lineWidth:0.3,textColor:[210,205,195],fillColor:[13,17,23] },
@@ -523,7 +527,6 @@ window.doExport = function(type) {
   });
   doc.save('LUXE_Products_'+_ds()+'.pdf');
 };
-
 </script>
 </body>
 </html>
